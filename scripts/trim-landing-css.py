@@ -33,12 +33,11 @@ trimmed = foundation + '\n' + reset + '\n' + landing
 
 checks = {
     'landing shell': '.sm-sales-shell{' in trimmed,
+    'persistent checkout dock': '.sm-sales-dock{' in trimmed,
     'desktop hero': '.sm-desktop-hero{' in trimmed,
     'mobile hero': '.sm-mobile-hero{' in trimmed,
-    'format section': '.sm-format-v2{' in trimmed,
-    'section navigation': '.sm-section-nav' in trimmed,
-    'creator section': '.sm-creators{' in trimmed,
-    'faq section': '.sm-faq-modern{' in trimmed,
+    'desktop CTA': '.sm-dh-primary{' in trimmed,
+    'mobile CTA': '.sm-mh-cta' in trimmed,
     'Manrope font': '@font-face{font-family:Manrope' in trimmed,
     'Manrope variable': font_marker in trimmed,
     'generic auth removed': '.auth-shell{' not in trimmed,
