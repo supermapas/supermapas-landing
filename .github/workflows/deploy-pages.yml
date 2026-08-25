@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -24,14 +25,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch hydrated React bundle
+      - name: Restore approved hydrated React bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p public /tmp/sm-react
+          mkdir -p public /tmp/sm-approved
           curl --fail --location --retry 4 --retry-delay 2 \
-            'https://sdmntprbrazilsouth.oaiusercontent.com/files/00000000-ed54-820e-921e-8e8ea42b91c5/raw?se=2026-08-25T04%3A22%3A38Z&sp=r&sv=2026-02-06&sr=b&scid=0ba2e5e2-77ed-53d6-8841-1714a7d630e6&skoid=68f37fa7-4e08-478b-93f3-c72d563a0ab3&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-08-24T22%3A54%3A33Z&ske=2026-08-25T22%3A54%3A33Z&sks=b&skv=2026-02-06&sig=DjlfS8cUbonVwxaOKYgdMfp%2Fop6faiM1CihF7qCk2AU%3D' \
-            -o /tmp/sm-react/artifact.zip
-          unzip -o /tmp/sm-react/artifact.zip -d /tmp/sm-react/artifact
-          tar -xzf /tmp/sm-react/artifact/supermapas-react-pages.tar.gz -C public
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/9548938058/zip" \
+            -o /tmp/sm-approved/github-pages.zip
+          unzip -o /tmp/sm-approved/github-pages.zip -d /tmp/sm-approved/artifact
+          test -f /tmp/sm-approved/artifact/artifact.tar
+          tar -xf /tmp/sm-approved/artifact/artifact.tar -C public
 
       - name: Rebase compiled bundle to custom-domain root
         run: |
