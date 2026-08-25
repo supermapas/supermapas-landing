@@ -66,6 +66,9 @@ jobs:
       - name: Replace Next hydration with static interactions
         run: python scripts/strip-next-runtime.py
 
+      - name: Harden legacy routes and SEO files
+        run: python scripts/harden-legacy-routes.py
+
       - name: Validate approved visual bundle invariants
         run: |
           test -f public/index.html
@@ -127,6 +130,21 @@ jobs:
           PY
           node --check /tmp/sm-static-runtime.js
 
+      - name: Validate legacy routes and SEO files
+        run: |
+          test -f public/robots.txt
+          test -f public/sitemap.xml
+          test -f public/404.html
+          grep -Fq 'User-agent: *' public/robots.txt
+          grep -Fq 'Sitemap: https://www.supermapas.com.br/sitemap.xml' public/robots.txt
+          grep -Fq '<loc>https://www.supermapas.com.br/</loc>' public/sitemap.xml
+          grep -Fq 'noindex,follow' public/404.html
+          grep -Fq 'Página não encontrada' public/404.html
+          ! grep -Fq '/_next/static/' public/404.html
+          ! grep -Fq 'googletagmanager' public/404.html
+          ! grep -Fq 'connect.facebook.net' public/404.html
+          test $(wc -c < public/404.html) -lt 5000
+
       - name: Validate direct-production hardening
         run: |
           grep -Fq 'https://pay.hotmart.com/A92093667Q?checkoutMode=2&off=ia91gsts' public/index.html
@@ -156,7 +174,9 @@ jobs:
           retention-days: 7
 
       - name: Materialize exact validated bundle for isolated hosting
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'perf/static-runtime-v1'
+        if: github.event_name == 'pull_request'
+        env:
+          PREVIEW_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
           rm -rf vercel-static
           cp -a public vercel-static
@@ -167,5 +187,5 @@ jobs:
             echo "Validated bundle already materialized"
             exit 0
           fi
-          git commit -m "Materialize static-runtime landing bundle"
-          git push origin HEAD:perf/static-runtime-v1
+          git commit -m "Materialize validated landing bundle"
+          git push origin "HEAD:${PREVIEW_BRANCH}"
