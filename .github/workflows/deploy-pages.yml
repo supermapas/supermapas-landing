@@ -90,7 +90,7 @@ jobs:
 
           path = Path('public/index.html')
           html = path.read_text(encoding='utf-8')
-          bridge = r'''<script id="sm-wix-embed-nav">(function(){try{var q=new URLSearchParams(location.search);if(q.get('embed')!=='wix')return;function externalTop(a){if(!a||!a.href)return;try{var u=new URL(a.href,location.href);if(u.hostname==='pay.hotmart.com'||u.hostname==='wa.me'||u.hostname.endsWith('.hotmart.com'))a.setAttribute('target','_top')}catch(_){}}document.querySelectorAll('a[href]').forEach(externalTop);document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;externalTop(a)},true)}catch(_){}})();</script>'''
+          bridge = r'''<script id="sm-wix-embed-nav">(function(){try{var q=new URLSearchParams(location.search);if(q.get('embed')!=='wix')return;var PARENT='https://www.supermapas.com.br';function classify(a){if(!a||!a.href)return null;try{var u=new URL(a.href,location.href);if(u.hostname==='pay.hotmart.com'||u.hostname.endsWith('.hotmart.com'))return{kind:'checkout',url:u.href};if(u.hostname==='wa.me')return{kind:'external',url:u.href};return null}catch(_){return null}}document.querySelectorAll('a[href]').forEach(function(a){var x=classify(a);if(x&&x.kind==='external')a.setAttribute('target','_top')});document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;var x=classify(a);if(!x)return;if(x.kind==='external'){a.setAttribute('target','_top');return}if(x.kind==='checkout'){e.preventDefault();e.stopPropagation();try{parent.postMessage({type:'sm-hotmart-checkout',href:x.url,source:'supermapas-landing'},PARENT)}catch(_){}var href=x.url;setTimeout(function(){try{window.top.location.href=href}catch(_){location.href=href}},1200)}},true)}catch(_){}})();</script>'''
           if 'id="sm-wix-embed-nav"' not in html:
               if '</body>' not in html:
                   raise SystemExit('closing body tag missing')
@@ -109,6 +109,7 @@ jobs:
           grep -q 'história dos SuperMapas' public/index.html
           grep -q 'dos SuperMapas.' public/index.html
           grep -q 'sm-wix-embed-nav' public/index.html
+          grep -q 'sm-hotmart-checkout' public/index.html
           grep -q 'O que está incluso no acesso?' public/index.html
           ! grep -R -q 'O que está incluído no acesso?' public
           grep -q 'URLSearchParams(location.search).get("embed")&&j()' public/_next/static/chunks/0cnqcucz7h_pk.js
