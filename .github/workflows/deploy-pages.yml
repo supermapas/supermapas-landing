@@ -44,6 +44,21 @@ jobs:
         run: |
           grep -RIlZ '/supermapas-landing' public | xargs -0 -r sed -i 's#/supermapas-landing##g'
 
+      - name: Match initial section label timing in Wix embed
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('public/_next/static/chunks/0cnqcucz7h_pk.js')
+          js = path.read_text(encoding='utf-8')
+          old = '},[e,S,j,w]);(0,r.useEffect)(()=>{let e=x();'
+          new = '},[e,S,j,w]);(0,r.useEffect)(()=>{try{"wix"===new URLSearchParams(location.search).get("embed")&&j()}catch(e){}},[j]);(0,r.useEffect)(()=>{let e=x();'
+          if js.count(old) != 1:
+              raise SystemExit(f'expected one section-nav lifecycle anchor, found {js.count(old)}')
+          js = js.replace(old, new, 1)
+          path.write_text(js, encoding='utf-8')
+          PY
+
       - name: Add Wix embed external navigation bridge
         run: |
           python - <<'PY'
@@ -70,6 +85,7 @@ jobs:
           grep -q 'história dos SuperMapas' public/index.html
           grep -q 'dos SuperMapas.' public/index.html
           grep -q 'sm-wix-embed-nav' public/index.html
+          grep -q 'URLSearchParams(location.search).get("embed")&&j()' public/_next/static/chunks/0cnqcucz7h_pk.js
           grep -R -q 'sm-sales-dock' public/_next/static
           grep -R -q 'setPointerCapture' public/_next/static
           grep -R -q 'IntersectionObserver' public/_next/static
