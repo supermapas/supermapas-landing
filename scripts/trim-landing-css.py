@@ -19,17 +19,21 @@ if font_end < 0:
     raise SystemExit('Manrope variable rule is malformed')
 font_end += 1
 
+# Preserve the original global variables/reset byte-for-byte so typography,
+# colors and browser defaults remain identical to the approved bundle.
+global_start = css.find(':root{', font_end)
+global_end_marker = 'button,a{-webkit-tap-highlight-color:transparent}'
+if global_start < 0:
+    raise SystemExit('global reset start not found')
+global_end = css.find(global_end_marker, global_start)
+if global_end < 0:
+    raise SystemExit('global reset end not found')
+global_end += len(global_end_marker)
+
 foundation = css[:font_end]
-reset = (
-    '*{box-sizing:border-box}'
-    'html{background:#fff}'
-    'body{-webkit-font-smoothing:antialiased;margin:0;font-family:var(--font-manrope),Manrope,Arial,sans-serif}'
-    'a{color:inherit;text-decoration:none}'
-    'button,input,select,textarea{font:inherit}'
-    'button,a{-webkit-tap-highlight-color:transparent}'
-)
+global_reset = css[global_start:global_end]
 landing = css[landing_start:]
-trimmed = foundation + '\n' + reset + '\n' + landing
+trimmed = foundation + '\n' + global_reset + '\n' + landing
 
 checks = {
     'landing shell': '.sm-sales-shell{' in trimmed,
@@ -40,6 +44,8 @@ checks = {
     'mobile CTA': '.sm-mh-cta' in trimmed,
     'Manrope font': '@font-face{font-family:Manrope' in trimmed,
     'Manrope variable': font_marker in trimmed,
+    'original root variables': ':root{--bg:#f7f8fc;' in trimmed,
+    'original Inter body fallback': 'font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif' in trimmed,
     'generic auth removed': '.auth-shell{' not in trimmed,
     'generic dashboard removed': '.dashboard-page' not in trimmed,
     'generic editor removed': '.editor-page' not in trimmed,
