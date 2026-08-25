@@ -10,6 +10,7 @@ DESCRIPTION = '98 Supermapas, 50 Super-resumos e 190 Supercards para estudar, re
 OG_IMAGE = 'https://static.wixstatic.com/media/1a67b8_3ac74c621b754162abd32de5d6843052~mv2.png'
 FAVICON = 'https://static.wixstatic.com/media/1a67b8_4f097583af86427db8e4168a1012c7a3~mv2.png'
 META_PIXEL_ID = '261169597067924'
+GOOGLE_TAG_ID = 'AW-18370953717'
 CHECKOUT_OLD = 'https://pay.hotmart.com/A92093667Q?checkoutMode=10'
 CHECKOUT = 'https://pay.hotmart.com/A92093667Q?checkoutMode=2&off=ia91gsts'
 
@@ -34,6 +35,13 @@ if 'id="sm-meta-pixel"' not in html:
     if '</head>' not in html:
         raise SystemExit('closing head missing')
     html = html.replace('</head>', head + '</head>', 1)
+
+# Preserve the Google Ads / Google tag that is active on the current Wix site.
+google_tag = f'''\n<script async id="sm-google-tag-loader" src="https://www.googletagmanager.com/gtag/js?id={GOOGLE_TAG_ID}"></script>\n<script id="sm-google-tag">window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','{GOOGLE_TAG_ID}');</script>\n'''
+if 'id="sm-google-tag"' not in html:
+    if '</head>' not in html:
+        raise SystemExit('closing head missing')
+    html = html.replace('</head>', google_tag + '</head>', 1)
 
 # Forward campaign/click identifiers from the landing URL to every Hotmart checkout link.
 forward = r'''<script id="sm-checkout-attribution">(function(){var KEYS=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid','gclid','ttclid'];function patch(){var src=new URLSearchParams(location.search);document.querySelectorAll('a[href*="pay.hotmart.com/A92093667Q"]').forEach(function(a){try{var u=new URL(a.href,location.href);KEYS.forEach(function(k){var v=src.get(k);if(v)u.searchParams.set(k,v)});a.href=u.toString()}catch(_){}})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',patch,{once:true});else patch()})();</script>'''
@@ -60,6 +68,7 @@ checks = [
     ('open graph', 'property="og:title"' in html and 'property="og:image"' in html),
     ('favicon', 'rel="icon"' in html),
     ('meta pixel', META_PIXEL_ID in html and 'sm-meta-pixel' in html),
+    ('google tag', GOOGLE_TAG_ID in html and 'sm-google-tag' in html and 'googletagmanager.com/gtag/js' in html),
     ('checkout offer', 'off=ia91gsts' in bundle_text),
     ('checkout mode', 'checkoutMode=2' in bundle_text),
     ('stale checkout removed globally', 'checkoutMode=10' not in bundle_text),
