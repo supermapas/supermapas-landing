@@ -44,7 +44,9 @@ if 'id="sm-google-tag"' not in html:
     html = html.replace('</head>', google_tag + '</head>', 1)
 
 # Forward campaign/click identifiers from the landing URL to every Hotmart checkout link.
-forward = r'''<script id="sm-checkout-attribution">(function(){var KEYS=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid','gclid','ttclid'];function patch(){var src=new URLSearchParams(location.search);document.querySelectorAll('a[href*="pay.hotmart.com/A92093667Q"]').forEach(function(a){try{var u=new URL(a.href,location.href);KEYS.forEach(function(k){var v=src.get(k);if(v)u.searchParams.set(k,v)});a.href=u.toString()}catch(_){}})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',patch,{once:true});else patch()})();</script>'''
+# The persistent sales dock is rendered by React only after scrolling, so patch links at
+# initial load and again synchronously when any Hotmart CTA is clicked.
+forward = r'''<script id="sm-checkout-attribution">(function(){var KEYS=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid','gclid','ttclid'];var src=new URLSearchParams(location.search);function patchLink(a){try{var u=new URL(a.href,location.href);KEYS.forEach(function(k){var v=src.get(k);if(v)u.searchParams.set(k,v)});a.href=u.toString()}catch(_){}}function patchAll(){document.querySelectorAll('a[href*="pay.hotmart.com/A92093667Q"]').forEach(patchLink)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',patchAll,{once:true});else patchAll();document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href*="pay.hotmart.com/A92093667Q"]'):null;if(a)patchLink(a)},true)})();</script>'''
 if 'id="sm-checkout-attribution"' not in html:
     if '</body>' not in html:
         raise SystemExit('closing body missing')
@@ -73,6 +75,7 @@ checks = [
     ('checkout mode', 'checkoutMode=2' in bundle_text),
     ('stale checkout removed globally', 'checkoutMode=10' not in bundle_text),
     ('attribution forwarding', 'sm-checkout-attribution' in html and 'fbclid' in html and 'gclid' in html),
+    ('dynamic checkout attribution', 'patchLink' in html and "document.addEventListener('click'" in html),
 ]
 failed = [name for name, ok in checks if not ok]
 if failed:
