@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1] / 'public'
@@ -14,8 +15,30 @@ GOOGLE_TAG_ID = 'AW-18370953717'
 CHECKOUT_OLD = 'https://pay.hotmart.com/A92093667Q?checkoutMode=10'
 CHECKOUT = 'https://pay.hotmart.com/A92093667Q?checkoutMode=2&off=ia91gsts'
 
-# Replace stale checkout references everywhere React may hydrate from, not only index.html.
+# Keep the approved visuals, but request appropriately sized WebP variants from the same Wix CDN.
+# Replacements are applied across the hydrated bundle so React cannot restore the heavier PNG URLs.
+HERO_IMAGE_ORIGINAL = 'https://static.wixstatic.com/media/1a67b8_3ac74c621b754162abd32de5d6843052~mv2.png'
+HERO_IMAGE_WEBP = 'https://static.wixstatic.com/media/1a67b8_3ac74c621b754162abd32de5d6843052~mv2.png/v1/fit/w_1600,h_1200/file.webp'
+IMAGE_REWRITES = {
+    HERO_IMAGE_ORIGINAL: HERO_IMAGE_WEBP,
+    'https://static.wixstatic.com/media/1a67b8_65fd23abbd49440aa523bd8d2b7142df~mv2.png':
+        'https://static.wixstatic.com/media/1a67b8_65fd23abbd49440aa523bd8d2b7142df~mv2.png/v1/fit/w_1200,h_844/file.webp',
+    'https://static.wixstatic.com/media/1a67b8_97c960898bc04b7b8c8e9b1c0c1e49ab~mv2.png':
+        'https://static.wixstatic.com/media/1a67b8_97c960898bc04b7b8c8e9b1c0c1e49ab~mv2.png/v1/fit/w_760,h_1054/file.webp',
+    'https://static.wixstatic.com/media/1a67b8_01c579c2d24b495bbd011e319bebeb41~mv2.png':
+        'https://static.wixstatic.com/media/1a67b8_01c579c2d24b495bbd011e319bebeb41~mv2.png/v1/fit/w_760,h_1054/file.webp',
+    'https://static.wixstatic.com/media/1a67b8_b696731e83344bc893cf613867cee66c~mv2.png':
+        'https://static.wixstatic.com/media/1a67b8_b696731e83344bc893cf613867cee66c~mv2.png/v1/fit/w_640,h_904/file.webp',
+    'https://static.wixstatic.com/media/1a67b8_fbd380961a1b47d3aa4569aef6278ebb~mv2.png':
+        'https://static.wixstatic.com/media/1a67b8_fbd380961a1b47d3aa4569aef6278ebb~mv2.png/v1/fit/w_640,h_904/file.webp',
+    'https://static.wixstatic.com/media/1a67b8_4906fb8fd7ef4ec1b33346f2b3ce670d~mv2.png':
+        'https://static.wixstatic.com/media/1a67b8_4906fb8fd7ef4ec1b33346f2b3ce670d~mv2.png/v1/fit/w_640,h_904/file.webp',
+}
+
+# Replace stale checkout references and the selected image URLs everywhere React may hydrate from,
+# not only index.html.
 replaced = 0
+image_replacements = 0
 for path in ROOT.rglob('*'):
     if not path.is_file() or path.suffix.lower() not in {'.html', '.js', '.json', '.txt'}:
         continue
@@ -23,10 +46,24 @@ for path in ROOT.rglob('*'):
         text = path.read_text(encoding='utf-8')
     except (UnicodeDecodeError, OSError):
         continue
+
+    changed = False
+
     count = text.count(CHECKOUT_OLD)
     if count:
-        path.write_text(text.replace(CHECKOUT_OLD, CHECKOUT), encoding='utf-8')
+        text = text.replace(CHECKOUT_OLD, CHECKOUT)
         replaced += count
+        changed = True
+
+    for old, new in IMAGE_REWRITES.items():
+        count = text.count(old)
+        if count:
+            text = text.replace(old, new)
+            image_replacements += count
+            changed = True
+
+    if changed:
+        path.write_text(text, encoding='utf-8')
 
 html = INDEX.read_text(encoding='utf-8')
 
@@ -36,12 +73,33 @@ if 'id="sm-meta-pixel"' not in html:
         raise SystemExit('closing head missing')
     html = html.replace('</head>', head + '</head>', 1)
 
+# Start the hero request as soon as the browser parses the head. The page already uses this
+# exact visual; only the transport format/size and request priority change.
+hero_perf = f'''\n<link id="sm-wix-preconnect" rel="preconnect" href="https://static.wixstatic.com" crossorigin=""/>\n<link id="sm-hero-preload" rel="preload" as="image" href="{HERO_IMAGE_WEBP}" fetchpriority="high"/>\n'''
+if 'id="sm-hero-preload"' not in html:
+    if '</head>' not in html:
+        raise SystemExit('closing head missing')
+    html = html.replace('</head>', hero_perf + '</head>', 1)
+
 # Preserve the Google Ads / Google tag that is active on the current Wix site.
 google_tag = f'''\n<script async id="sm-google-tag-loader" src="https://www.googletagmanager.com/gtag/js?id={GOOGLE_TAG_ID}"></script>\n<script id="sm-google-tag">window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','{GOOGLE_TAG_ID}');</script>\n'''
 if 'id="sm-google-tag"' not in html:
     if '</head>' not in html:
         raise SystemExit('closing head missing')
     html = html.replace('</head>', google_tag + '</head>', 1)
+
+# The two hero images are above the fold. Keep all images below the fold lazy, but make the
+# desktop/mobile hero <img> eager in the server HTML. The preload above guarantees the request
+# has already started even before React hydrates.
+def make_hero_eager(match):
+    tag = match.group(0)
+    if 'loading="lazy"' in tag:
+        tag = tag.replace('loading="lazy"', 'loading="eager"', 1)
+    elif 'loading=' not in tag:
+        tag = tag.replace('<img', '<img loading="eager"', 1)
+    return tag
+
+html = re.sub(r'<img\b[^>]*class="sm-(?:dh|mh)-composite"[^>]*>', make_hero_eager, html)
 
 # Forward campaign/click identifiers from the landing URL to every Hotmart checkout link.
 # The persistent sales dock is rendered by React only after scrolling, so patch links at
@@ -68,6 +126,7 @@ for path in ROOT.rglob('*'):
         pass
 bundle_text = '\n'.join(all_text)
 html = INDEX.read_text(encoding='utf-8')
+hero_tags = re.findall(r'<img\b[^>]*class="sm-(?:dh|mh)-composite"[^>]*>', html)
 checks = [
     ('canonical', f'rel="canonical" href="{CANONICAL}"' in html),
     ('open graph', 'property="og:title"' in html and 'property="og:image"' in html),
@@ -82,8 +141,16 @@ checks = [
     ('return image recovery marker', 'markPendingImages' in html and 'data-sm-return-retry' in html),
     ('targeted BFCache image recovery', "window.addEventListener('pageshow'" in html and 'recoverMarkedImages' in html and "u.searchParams.set('_sm_retry','1')" in html),
     ('no forced page reload', 'location.reload' not in html),
+    ('hero WebP rewrite', HERO_IMAGE_WEBP in bundle_text),
+    ('format WebP rewrites', all(new in bundle_text for new in IMAGE_REWRITES.values())),
+    ('hero preload', 'id="sm-hero-preload"' in html and f'href="{HERO_IMAGE_WEBP}"' in html),
+    ('Wix CDN preconnect', 'id="sm-wix-preconnect"' in html),
+    ('hero eager server HTML', len(hero_tags) == 2 and all('loading="eager"' in tag for tag in hero_tags)),
 ]
 failed = [name for name, ok in checks if not ok]
 if failed:
     raise SystemExit('hardening validation failed: ' + ', '.join(failed))
-print(f'production hardening checks passed; checkout replacements: {replaced}')
+print(
+    'production hardening checks passed; '
+    f'checkout replacements: {replaced}; image URL replacements: {image_replacements}'
+)

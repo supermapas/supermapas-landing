@@ -57,6 +57,9 @@ jobs:
       - name: Apply direct-production hardening
         run: python scripts/harden-production.py
 
+      - name: Start near-fold format images earlier
+        run: python scripts/optimize-near-fold-images.py
+
       - name: Validate approved visual bundle invariants
         run: |
           test -f public/index.html
@@ -85,6 +88,10 @@ jobs:
           grep -Fq 'id="sm-checkout-attribution"' public/index.html
           grep -Fq "'utm_campaign'" public/index.html
           grep -Fq "'fbclid'" public/index.html
+          grep -Fq 'id="sm-hero-preload"' public/index.html
+          grep -Fq 'id="sm-format-near-eager"' public/index.html
+          grep -Fq '1a67b8_3ac74c621b754162abd32de5d6843052~mv2.png/v1/fit/w_1600,h_1200/file.webp' public/index.html
+          grep -Fq '1a67b8_65fd23abbd49440aa523bd8d2b7142df~mv2.png/v1/fit/w_1200,h_844/file.webp' public/index.html
           ! grep -q 'static.hotmart.com/checkout/widget.min.js' public/index.html
           ! grep -q 'hotmart__button-checkout' public/index.html
           ! grep -q 'sm-restore-scroll' public/index.html
@@ -99,7 +106,7 @@ jobs:
           retention-days: 7
 
       - name: Materialize exact validated bundle for isolated hosting
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'chore/production-hardening'
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'perf/image-loading-v1'
         run: |
           rm -rf vercel-static
           cp -a public vercel-static
@@ -110,5 +117,5 @@ jobs:
             echo "Validated bundle already materialized"
             exit 0
           fi
-          git commit -m "Materialize validated landing bundle for isolated preview"
-          git push origin HEAD:chore/production-hardening
+          git commit -m "Materialize performance-tested landing bundle"
+          git push origin HEAD:perf/image-loading-v1
