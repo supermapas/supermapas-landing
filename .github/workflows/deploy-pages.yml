@@ -113,6 +113,28 @@ jobs:
               path.write_text(html, encoding='utf-8')
           PY
 
+      - name: Refine mobile section rail and sticky dock
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          js_path = Path('public/_next/static/chunks/0cnqcucz7h_pk.js')
+          js = js_path.read_text(encoding='utf-8')
+          old_js = 'let r=t.matches&&(o||c||d);'
+          new_js = 'let r=t.matches&&o;'
+          if js.count(old_js) != 1:
+              raise SystemExit(f'expected one sticky dock suppression anchor, found {js.count(old_js)}')
+          js_path.write_text(js.replace(old_js, new_js, 1), encoding='utf-8')
+
+          css_path = Path('public/_next/static/chunks/3qg_tgjt67qum.css')
+          css = css_path.read_text(encoding='utf-8')
+          old_css = '@media (max-width:700px){.sm-section-nav{z-index:185;right:0;touch-action:none!important}'
+          new_css = '@media (max-width:700px){.sm-section-nav{z-index:185;right:-12px;touch-action:none!important}'
+          if css.count(old_css) != 1:
+              raise SystemExit(f'expected one mobile section-nav position anchor, found {css.count(old_css)}')
+          css_path.write_text(css.replace(old_css, new_css, 1), encoding='utf-8')
+          PY
+
       - name: Add temporary Wix performance probe
         run: |
           python - <<'PY'
@@ -145,6 +167,8 @@ jobs:
           grep -q 'O que está incluso no acesso?' public/index.html
           ! grep -R -q 'O que está incluído no acesso?' public
           grep -q 'URLSearchParams(location.search).get("embed")&&j()' public/_next/static/chunks/0cnqcucz7h_pk.js
+          grep -Fq 'let r=t.matches&&o;' public/_next/static/chunks/0cnqcucz7h_pk.js
+          grep -Fq 'right:-12px;touch-action:none!important' public/_next/static/chunks/3qg_tgjt67qum.css
           grep -R -q 'sm-sales-dock' public/_next/static
           grep -R -q 'setPointerCapture' public/_next/static
           grep -R -q 'IntersectionObserver' public/_next/static
