@@ -109,8 +109,9 @@ jobs:
           index = Path('public/index.html')
           html = index.read_text(encoding='utf-8')
 
-          # Restrict eager loading to the three audience illustrations only.
-          audience = r'''<script id="sm-wix-audience-eager">(function(){try{if(new URLSearchParams(location.search).get('embed')!=='wix')return;function force(){document.querySelectorAll('.sm-audience-use-visual img').forEach(function(img){try{img.removeAttribute('loading');img.loading='eager';img.fetchPriority='high';var src=img.getAttribute('src');if(src&&!img.complete)img.src=src;if(img.decode)img.decode().catch(function(){})}catch(_){}})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',force,{once:true});else force();setTimeout(force,250);setTimeout(force,1200);setTimeout(force,3000)}catch(_){}})();</script>'''
+          # Safari/Wix fix for the three audience illustrations, deferred until after
+          # the initial page load so below-the-fold assets do not compete with the hero.
+          audience = r'''<script id="sm-wix-audience-eager">(function(){try{if(new URLSearchParams(location.search).get('embed')!=='wix')return;var done=false;function force(){if(done)return;done=true;document.querySelectorAll('.sm-audience-use-visual img').forEach(function(img){try{img.removeAttribute('loading');img.loading='eager';img.fetchPriority='low';var src=img.getAttribute('src');if(src&&!img.complete)img.src=src;if(img.decode)img.decode().catch(function(){})}catch(_){}})}function schedule(){setTimeout(force,350)}if(document.readyState==='complete')schedule();else window.addEventListener('load',schedule,{once:true});setTimeout(force,2200)}catch(_){}})();</script>'''
 
           # In Wix, only the parent document performs checkout navigation. There is no
           # delayed iframe fallback, preventing Safari BFCache from replaying a timer on Back.
@@ -129,6 +130,8 @@ jobs:
           grep -q '/_next/static/' public/index.html
           ! grep -R -q '/supermapas-landing' public
           grep -q 'sm-wix-audience-eager' public/index.html
+          grep -q "fetchPriority='low'" public/index.html
+          grep -q 'setTimeout(force,2200)' public/index.html
           ! grep -q 'sm-wix-image-stabilizer' public/index.html
           grep -q 'sm-wix-embed-nav' public/index.html
           grep -q 'sm-hotmart-checkout' public/index.html
