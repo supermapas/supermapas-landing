@@ -24,20 +24,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch approved landing snapshot
+      - name: Fetch hydrated React bundle
         run: |
-          mkdir -p public
+          mkdir -p public /tmp/sm-react
           curl --fail --location --retry 4 --retry-delay 2 \
-            'https://qzrkgekzfbmsghudxkmd.supabase.co/functions/v1/supermapas-wix-package' \
-            -o public/index.html
+            'https://sdmntprbrazilsouth.oaiusercontent.com/files/00000000-1470-820e-b7ec-304f6c012c54/raw?se=2026-08-25T04%3A08%3A51Z&sp=r&sv=2026-02-06&sr=b&scid=5e1eb02c-22da-5178-b4b1-28b03c206efd&skoid=68f37fa7-4e08-478b-93f3-c72d563a0ab3&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-08-24T22%3A50%3A53Z&ske=2026-08-25T22%3A50%3A53Z&sks=b&skv=2026-02-06&sig=EKwXefw4fFno1XitDchzXCzJ3wvQ2xGAtGUHDwCiH%2Fs%3D' \
+            -o /tmp/sm-react/artifact.zip
+          unzip -o /tmp/sm-react/artifact.zip -d /tmp/sm-react/artifact
+          tar -xzf /tmp/sm-react/artifact/supermapas-react-pages.tar.gz -C public
 
-      - name: Validate landing bundle
+      - name: Validate hydrated landing bundle
         run: |
-          test $(wc -c < public/index.html) -gt 300000
+          test -f public/index.html
+          test $(wc -c < public/index.html) -gt 20000
           grep -q 'sm-section-nav' public/index.html
-          grep -q 'sm-sales-dock' public/index.html
-          grep -q '98 Supermapas + 50 Super-Resumos + 190 Supercards' public/index.html
-          grep -q 'Quem está por trás' public/index.html
+          grep -q '/supermapas-landing/_next/static/' public/index.html
+          grep -R -q 'sm-sales-dock' public/_next/static
+          grep -R -q 'setPointerCapture' public/_next/static
+          grep -R -q 'IntersectionObserver' public/_next/static
           touch public/.nojekyll
 
       - name: Configure Pages
