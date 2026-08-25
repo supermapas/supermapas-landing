@@ -45,8 +45,10 @@ if 'id="sm-google-tag"' not in html:
 
 # Forward campaign/click identifiers from the landing URL to every Hotmart checkout link.
 # The persistent sales dock is rendered by React only after scrolling, so patch links at
-# initial load and again synchronously when any Hotmart CTA is clicked.
-forward = r'''<script id="sm-checkout-attribution">(function(){var KEYS=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid','gclid','ttclid'];var src=new URLSearchParams(location.search);function patchLink(a){try{var u=new URL(a.href,location.href);KEYS.forEach(function(k){var v=src.get(k);if(v)u.searchParams.set(k,v)});a.href=u.toString()}catch(_){}}function patchAll(){document.querySelectorAll('a[href*="pay.hotmart.com/A92093667Q"]').forEach(patchLink)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',patchAll,{once:true});else patchAll();document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href*="pay.hotmart.com/A92093667Q"]'):null;if(a)patchLink(a)},true)})();</script>'''
+# initial load and again synchronously when any Hotmart CTA is activated.
+# Before leaving for checkout, promote still-pending images out of native lazy mode so a
+# BFCache restore does not leave interrupted lazy requests permanently stalled.
+forward = r'''<script id="sm-checkout-attribution">(function(){var KEYS=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid','gclid','ttclid'];var src=new URLSearchParams(location.search);function patchLink(a){try{var u=new URL(a.href,location.href);KEYS.forEach(function(k){var v=src.get(k);if(v)u.searchParams.set(k,v)});a.href=u.toString()}catch(_){}}function patchAll(){document.querySelectorAll('a[href*="pay.hotmart.com/A92093667Q"]').forEach(patchLink)}function promotePendingImages(){document.querySelectorAll('img').forEach(function(img){try{if(img.complete)return;if(img.getAttribute('loading')==='lazy'){img.removeAttribute('loading');img.loading='eager'}var s=img.getAttribute('src');if(s)img.src=s;if(img.decode)img.decode().catch(function(){})}catch(_){}})}function prepareCheckout(e){var n=e.target;var a=n&&n.closest?n.closest('a[href*="pay.hotmart.com/A92093667Q"]'):null;if(!a)return;promotePendingImages();patchLink(a)}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',patchAll,{once:true});else patchAll();document.addEventListener('pointerdown',prepareCheckout,true);document.addEventListener('click',prepareCheckout,true)})();</script>'''
 if 'id="sm-checkout-attribution"' not in html:
     if '</body>' not in html:
         raise SystemExit('closing body missing')
@@ -76,6 +78,7 @@ checks = [
     ('stale checkout removed globally', 'checkoutMode=10' not in bundle_text),
     ('attribution forwarding', 'sm-checkout-attribution' in html and 'fbclid' in html and 'gclid' in html),
     ('dynamic checkout attribution', 'patchLink' in html and "document.addEventListener('click'" in html),
+    ('checkout image handoff', 'promotePendingImages' in html and "document.addEventListener('pointerdown'" in html and "img.loading='eager'" in html),
 ]
 failed = [name for name, ok in checks if not ok]
 if failed:
