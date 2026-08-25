@@ -2,6 +2,13 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "rm -rf dist && cp -R vercel-static dist",
   "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/lingua-portuguesa",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/",
