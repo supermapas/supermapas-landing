@@ -128,11 +128,19 @@ jobs:
 
           css_path = Path('public/_next/static/chunks/3qg_tgjt67qum.css')
           css = css_path.read_text(encoding='utf-8')
-          old_css = '@media (max-width:700px){.sm-section-nav{z-index:185;right:0;touch-action:none!important}'
-          new_css = '@media (max-width:700px){.sm-section-nav{z-index:185;right:-12px;touch-action:none!important}'
-          if css.count(old_css) != 1:
-              raise SystemExit(f'expected one mobile section-nav position anchor, found {css.count(old_css)}')
-          css_path.write_text(css.replace(old_css, new_css, 1), encoding='utf-8')
+          replacements = [
+              ('@media (max-width:700px){.sm-section-nav{z-index:185;right:0;touch-action:none!important}',
+               '@media (max-width:700px){.sm-section-nav{z-index:185;right:-12px;touch-action:none!important}'),
+              ('.sm-section-nav-rail{width:48px;height:min(50vh,380px);min-height:290px;touch-action:none!important}',
+               '.sm-section-nav-rail{width:34px;height:min(50vh,380px);min-height:290px;touch-action:none!important}'),
+              ('.sm-section-nav.is-dragging .sm-section-nav-rail{width:58px}',
+               '.sm-section-nav.is-dragging .sm-section-nav-rail{width:40px}'),
+          ]
+          for old_css, new_css in replacements:
+              if css.count(old_css) != 1:
+                  raise SystemExit(f'expected one mobile section-nav CSS anchor, found {css.count(old_css)} for {old_css}')
+              css = css.replace(old_css, new_css, 1)
+          css_path.write_text(css, encoding='utf-8')
           PY
 
       - name: Add temporary Wix performance probe
@@ -169,6 +177,8 @@ jobs:
           grep -q 'URLSearchParams(location.search).get("embed")&&j()' public/_next/static/chunks/0cnqcucz7h_pk.js
           grep -Fq 'let r=t.matches&&o;' public/_next/static/chunks/0cnqcucz7h_pk.js
           grep -Fq 'right:-12px;touch-action:none!important' public/_next/static/chunks/3qg_tgjt67qum.css
+          grep -Fq '.sm-section-nav-rail{width:34px;height:min(50vh,380px)' public/_next/static/chunks/3qg_tgjt67qum.css
+          grep -Fq '.sm-section-nav.is-dragging .sm-section-nav-rail{width:40px}' public/_next/static/chunks/3qg_tgjt67qum.css
           grep -R -q 'sm-sales-dock' public/_next/static
           grep -R -q 'setPointerCapture' public/_next/static
           grep -R -q 'IntersectionObserver' public/_next/static
