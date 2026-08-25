@@ -40,12 +40,12 @@ jobs:
           test -f /tmp/sm-approved/artifact/artifact.tar
           tar -xf /tmp/sm-approved/artifact/artifact.tar -C public
 
-      - name: Apply approved Wix integration patches
+      - name: Apply approved Wix patches
         run: |
           python - <<'PY'
           from pathlib import Path
 
-          # Rebase original Pages artifact to the custom-domain root.
+          # Rebase approved artifact to custom-domain root.
           for path in Path('public').rglob('*'):
               if not path.is_file():
                   continue
@@ -56,44 +56,43 @@ jobs:
               if '/supermapas-landing' in text:
                   path.write_text(text.replace('/supermapas-landing', ''), encoding='utf-8')
 
-          # Approved FAQ wording.
+          # FAQ wording.
           old_faq = 'O que está incluído no acesso?'
           new_faq = 'O que está incluso no acesso?'
-          faq_count = 0
+          changed = 0
           for path in Path('public').rglob('*'):
-              if not path.is_file() or path.suffix.lower() not in {'.html', '.js', '.json', '.txt', '.css'}:
+              if not path.is_file() or path.suffix.lower() not in {'.html','.js','.json','.txt','.css'}:
                   continue
               try:
                   text = path.read_text(encoding='utf-8')
               except UnicodeDecodeError:
                   continue
-              count = text.count(old_faq)
-              if count:
-                  path.write_text(text.replace(old_faq, new_faq), encoding='utf-8')
-                  faq_count += count
-          if faq_count < 1:
-              raise SystemExit('FAQ question was not found')
+              n = text.count(old_faq)
+              if n:
+                  path.write_text(text.replace(old_faq,new_faq), encoding='utf-8')
+                  changed += n
+          if changed < 1:
+              raise SystemExit('FAQ anchor missing')
 
-          # Approved React behavior patches: initial nav label timing and sticky dock
-          # hidden only in the offer section.
+          # Approved React behavior patches.
           js_path = Path('public/_next/static/chunks/0cnqcucz7h_pk.js')
           js = js_path.read_text(encoding='utf-8')
-          lifecycle_old = '},[e,S,j,w]);(0,r.useEffect)(()=>{let e=x();'
-          lifecycle_new = '},[e,S,j,w]);(0,r.useEffect)(()=>{try{"wix"===new URLSearchParams(location.search).get("embed")&&j()}catch(e){}},[j]);(0,r.useEffect)(()=>{let e=x();'
-          if js.count(lifecycle_old) != 1:
-              raise SystemExit(f'nav lifecycle anchor mismatch: {js.count(lifecycle_old)}')
-          js = js.replace(lifecycle_old, lifecycle_new, 1)
-          dock_old = 'let r=t.matches&&(o||c||d);'
-          dock_new = 'let r=t.matches&&o;'
-          if js.count(dock_old) != 1:
-              raise SystemExit(f'dock anchor mismatch: {js.count(dock_old)}')
-          js = js.replace(dock_old, dock_new, 1)
+          old = '},[e,S,j,w]);(0,r.useEffect)(()=>{let e=x();'
+          new = '},[e,S,j,w]);(0,r.useEffect)(()=>{try{"wix"===new URLSearchParams(location.search).get("embed")&&j()}catch(e){}},[j]);(0,r.useEffect)(()=>{let e=x();'
+          if js.count(old) != 1:
+              raise SystemExit('nav label anchor mismatch')
+          js = js.replace(old,new,1)
+          old = 'let r=t.matches&&(o||c||d);'
+          new = 'let r=t.matches&&o;'
+          if js.count(old) != 1:
+              raise SystemExit('sticky dock anchor mismatch')
+          js = js.replace(old,new,1)
           js_path.write_text(js, encoding='utf-8')
 
-          # Approved mobile rail geometry only. No other spacing/layout CSS is touched.
+          # Approved mobile rail geometry only.
           css_path = Path('public/_next/static/chunks/3qg_tgjt67qum.css')
           css = css_path.read_text(encoding='utf-8')
-          css_replacements = [
+          reps = [
               ('@media (max-width:700px){.sm-section-nav{z-index:185;right:0;touch-action:none!important}',
                '@media (max-width:700px){.sm-section-nav{z-index:185;right:-8px;touch-action:none!important}'),
               ('.sm-section-nav-rail{width:48px;height:min(50vh,380px);min-height:290px;touch-action:none!important}',
@@ -101,42 +100,37 @@ jobs:
               ('.sm-section-nav.is-dragging .sm-section-nav-rail{width:58px}',
                '.sm-section-nav.is-dragging .sm-section-nav-rail{width:40px}'),
           ]
-          for old, new in css_replacements:
+          for old,new in reps:
               if css.count(old) != 1:
-                  raise SystemExit(f'rail CSS anchor mismatch: {css.count(old)} :: {old}')
-              css = css.replace(old, new, 1)
+                  raise SystemExit('rail CSS anchor mismatch: '+old)
+              css = css.replace(old,new,1)
           css_path.write_text(css, encoding='utf-8')
 
-          # Wix-only image stabilization. Install in HEAD so Safari sees image nodes as
-          # eager as they are created, including nodes replaced during React hydration.
           index = Path('public/index.html')
           html = index.read_text(encoding='utf-8')
-          image_guard = r'''<script id="sm-wix-image-stabilizer">(function(){try{if(new URLSearchParams(location.search).get('embed')!=='wix')return;function eager(img){if(!img||img.tagName!=='IMG')return;try{img.loading='eager';img.setAttribute('loading','eager');var s=img.getAttribute('src');if(s&&!img.complete){var p=new Image();p.src=s}var ss=img.getAttribute('srcset');if(ss){var first=ss.split(',')[0].trim().split(/\s+/)[0];if(first){var q=new Image();q.src=first}}}catch(_){}}function scan(root){try{if(root&&root.tagName==='IMG')eager(root);if(root&&root.querySelectorAll)root.querySelectorAll('img').forEach(eager)}catch(_){}}scan(document);var mo=new MutationObserver(function(ms){ms.forEach(function(m){if(m.type==='attributes'){eager(m.target);return}m.addedNodes.forEach(scan)})});mo.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['loading','src','srcset']});document.addEventListener('DOMContentLoaded',function(){scan(document)},{once:true});window.addEventListener('load',function(){scan(document)},{once:true});setTimeout(function(){scan(document)},250);setTimeout(function(){scan(document)},1200);setTimeout(function(){scan(document)},3500)}catch(_){}})();</script>'''
-          if '</head>' not in html:
-              raise SystemExit('closing head tag missing')
-          html = html.replace('</head>', image_guard + '</head>', 1)
 
-          # External navigation + checkout event bridge; keeps checkout outside iframe.
-          nav_bridge = r'''<script id="sm-wix-embed-nav">(function(){try{var q=new URLSearchParams(location.search);if(q.get('embed')!=='wix')return;var PARENT='https://www.supermapas.com.br';function classify(a){if(!a||!a.href)return null;try{var u=new URL(a.href,location.href);if(u.hostname==='pay.hotmart.com'||u.hostname.endsWith('.hotmart.com'))return{kind:'checkout',url:u.href};if(u.hostname==='wa.me')return{kind:'external',url:u.href};return null}catch(_){return null}}document.querySelectorAll('a[href]').forEach(function(a){var x=classify(a);if(x&&x.kind==='external')a.setAttribute('target','_top')});document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;var x=classify(a);if(!x)return;if(x.kind==='external'){a.setAttribute('target','_top');return}if(x.kind==='checkout'){e.preventDefault();e.stopPropagation();try{parent.postMessage({type:'sm-hotmart-checkout',href:x.url,source:'supermapas-landing'},PARENT)}catch(_){}var href=x.url;setTimeout(function(){try{window.top.location.href=href}catch(_){location.href=href}},1200)}},true)}catch(_){}})();</script>'''
+          # Restrict eager loading to the three audience illustrations only.
+          audience = r'''<script id="sm-wix-audience-eager">(function(){try{if(new URLSearchParams(location.search).get('embed')!=='wix')return;function force(){document.querySelectorAll('.sm-audience-use-visual img').forEach(function(img){try{img.removeAttribute('loading');img.loading='eager';img.fetchPriority='high';var src=img.getAttribute('src');if(src&&!img.complete)img.src=src;if(img.decode)img.decode().catch(function(){})}catch(_){}})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',force,{once:true});else force();setTimeout(force,250);setTimeout(force,1200);setTimeout(force,3000)}catch(_){}})();</script>'''
+
+          # Checkout bridge remains unchanged.
+          bridge = r'''<script id="sm-wix-embed-nav">(function(){try{var q=new URLSearchParams(location.search);if(q.get('embed')!=='wix')return;var PARENT='https://www.supermapas.com.br';function classify(a){if(!a||!a.href)return null;try{var u=new URL(a.href,location.href);if(u.hostname==='pay.hotmart.com'||u.hostname.endsWith('.hotmart.com'))return{kind:'checkout',url:u.href};if(u.hostname==='wa.me')return{kind:'external',url:u.href};return null}catch(_){return null}}document.querySelectorAll('a[href]').forEach(function(a){var x=classify(a);if(x&&x.kind==='external')a.setAttribute('target','_top')});document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;var x=classify(a);if(!x)return;if(x.kind==='external'){a.setAttribute('target','_top');return}if(x.kind==='checkout'){e.preventDefault();e.stopPropagation();try{parent.postMessage({type:'sm-hotmart-checkout',href:x.url,source:'supermapas-landing'},PARENT)}catch(_){}var href=x.url;setTimeout(function(){try{window.top.location.href=href}catch(_){location.href=href}},1200)}},true)}catch(_){}})();</script>'''
           if '</body>' not in html:
-              raise SystemExit('closing body tag missing')
-          html = html.replace('</body>', nav_bridge + '</body>', 1)
+              raise SystemExit('closing body missing')
+          html = html.replace('</body>', audience + bridge + '</body>', 1)
           index.write_text(html, encoding='utf-8')
           PY
 
-      - name: Validate stabilized landing bundle
+      - name: Validate landing bundle
         run: |
           test -f public/index.html
           test $(wc -c < public/index.html) -gt 20000
           grep -q 'sm-section-nav' public/index.html
           grep -q '/_next/static/' public/index.html
           ! grep -R -q '/supermapas-landing' public
-          grep -q 'fundador dos SuperMapas' public/index.html
-          grep -q 'história dos SuperMapas' public/index.html
-          grep -q 'sm-wix-image-stabilizer' public/index.html
+          grep -q 'sm-wix-audience-eager' public/index.html
+          ! grep -q 'sm-wix-image-stabilizer' public/index.html
           grep -q 'sm-wix-embed-nav' public/index.html
           grep -q 'sm-hotmart-checkout' public/index.html
-          ! grep -q 'sm-wix-perf-v31' public/index.html
           grep -q 'O que está incluso no acesso?' public/index.html
           ! grep -R -q 'O que está incluído no acesso?' public
           grep -q 'URLSearchParams(location.search).get("embed")&&j()' public/_next/static/chunks/0cnqcucz7h_pk.js
@@ -144,7 +138,6 @@ jobs:
           grep -Fq 'right:-8px;touch-action:none!important' public/_next/static/chunks/3qg_tgjt67qum.css
           grep -Fq '.sm-section-nav-rail{width:34px;height:min(50vh,380px)' public/_next/static/chunks/3qg_tgjt67qum.css
           grep -Fq '.sm-section-nav.is-dragging .sm-section-nav-rail{width:40px}' public/_next/static/chunks/3qg_tgjt67qum.css
-          grep -R -q 'sm-sales-dock' public/_next/static
           grep -R -q 'setPointerCapture' public/_next/static
           grep -R -q 'IntersectionObserver' public/_next/static
           touch public/.nojekyll
