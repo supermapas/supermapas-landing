@@ -107,10 +107,14 @@ jobs:
 
           audience = r'''<script id="sm-wix-audience-eager">(function(){try{if(new URLSearchParams(location.search).get('embed')!=='wix')return;var done=false;function force(){if(done)return;done=true;document.querySelectorAll('.sm-audience-use-visual img').forEach(function(img){try{img.removeAttribute('loading');img.loading='eager';img.fetchPriority='low';var src=img.getAttribute('src');if(src&&!img.complete)img.src=src;if(img.decode)img.decode().catch(function(){})}catch(_){}})}function schedule(){setTimeout(force,350)}if(document.readyState==='complete')schedule();else window.addEventListener('load',schedule,{once:true});setTimeout(force,2200)}catch(_){}})();</script>'''
 
-          bridge = r'''<script id="sm-wix-embed-nav">(function(){try{var q=new URLSearchParams(location.search);if(q.get('embed')!=='wix')return;var PARENT='https://www.supermapas.com.br';function classify(a){if(!a||!a.href)return null;try{var u=new URL(a.href,location.href);if(u.hostname==='pay.hotmart.com'||u.hostname.endsWith('.hotmart.com'))return{kind:'checkout',url:u.href};if(u.hostname==='wa.me')return{kind:'external',url:u.href};return null}catch(_){return null}}window.addEventListener('message',function(ev){try{if(ev.origin!==PARENT)return;var d=ev.data;if(!d||d.type!=='sm-restore-scroll'||typeof d.y!=='number')return;var y=Math.max(0,d.y);requestAnimationFrame(function(){scrollTo(0,y);setTimeout(function(){scrollTo(0,y)},80)})}catch(_){}});document.querySelectorAll('a[href]').forEach(function(a){var x=classify(a);if(x&&x.kind==='external')a.setAttribute('target','_top')});document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;var x=classify(a);if(!x)return;if(x.kind==='external'){a.setAttribute('target','_top');return}if(x.kind==='checkout'){e.preventDefault();e.stopPropagation();try{if(window.top!==window){parent.postMessage({type:'sm-hotmart-checkout',href:x.url,source:'supermapas-landing',scrollY:Math.max(0,window.scrollY||document.documentElement.scrollTop||0)},PARENT);return}}catch(_){}location.href=x.url}},true)}catch(_){}})();</script>'''
+          # Hotmart's official checkout Widget runs inside the full-screen landing iframe.
+          # Existing CTA markup/classes are untouched: a hidden official Hotmart anchor is
+          # triggered from the real CTA so Hotmart CSS cannot restyle the approved buttons.
+          overlay = r'''<script id="sm-hotmart-overlay-v1">(function(){try{if(new URLSearchParams(location.search).get('embed')!=='wix')return;var OFFER='https://pay.hotmart.com/A92093667Q?checkoutMode=2&off=ia91gsts';var FALLBACK='https://pay.hotmart.com/A92093667Q?checkoutMode=10';var ready=false,failed=false,pending=false;function isCheckout(a){if(!a||!a.href)return false;try{var u=new URL(a.href,location.href);return u.hostname==='pay.hotmart.com'||u.hostname.endsWith('.hotmart.com')}catch(_){return false}}function isWhatsApp(a){if(!a||!a.href)return false;try{return new URL(a.href,location.href).hostname==='wa.me'}catch(_){return false}}var proxy=document.createElement('a');proxy.href=OFFER;proxy.className='hotmart-fb hotmart__button-checkout';proxy.setAttribute('onclick','return false;');proxy.setAttribute('aria-hidden','true');proxy.setAttribute('tabindex','-1');proxy.style.cssText='position:fixed!important;left:-9999px!important;top:-9999px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important';proxy.textContent='Comprar Agora';document.body.appendChild(proxy);function fire(){pending=false;if(ready){proxy.click();return}if(failed){location.href=FALLBACK;return}pending=true}var link=document.createElement('link');link.rel='stylesheet';link.type='text/css';link.href='https://static.hotmart.com/css/hotmart-fb.min.css';document.head.appendChild(link);var script=document.createElement('script');script.src='https://static.hotmart.com/checkout/widget.min.js';script.onload=function(){ready=true;if(pending)fire()};script.onerror=function(){failed=true;if(pending)fire()};document.head.appendChild(script);document.querySelectorAll('a[href]').forEach(function(a){if(isWhatsApp(a))a.setAttribute('target','_top')});document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;if(!a)return;if(isWhatsApp(a)){a.setAttribute('target','_top');return}if(!isCheckout(a)||a===proxy)return;e.preventDefault();e.stopPropagation();fire()},true)}catch(_){}})();</script>'''
+
           if '</body>' not in html:
               raise SystemExit('closing body missing')
-          html = html.replace('</body>', audience + bridge + '</body>', 1)
+          html = html.replace('</body>', audience + overlay + '</body>', 1)
           index.write_text(html, encoding='utf-8')
           PY
 
@@ -125,12 +129,12 @@ jobs:
           grep -q "fetchPriority='low'" public/index.html
           grep -q 'setTimeout(force,2200)' public/index.html
           ! grep -q 'sm-wix-image-stabilizer' public/index.html
-          grep -q 'sm-wix-embed-nav' public/index.html
-          grep -q 'sm-hotmart-checkout' public/index.html
-          grep -q 'sm-restore-scroll' public/index.html
-          grep -q 'scrollY:' public/index.html
-          grep -q 'window.top!==window' public/index.html
-          ! grep -q 'window.top.location.href=href' public/index.html
+          grep -q 'sm-hotmart-overlay-v1' public/index.html
+          grep -q 'checkoutMode=2&off=ia91gsts' public/index.html
+          grep -q 'static.hotmart.com/checkout/widget.min.js' public/index.html
+          grep -q 'hotmart__button-checkout' public/index.html
+          ! grep -q 'sm-hotmart-checkout' public/index.html
+          ! grep -q 'sm-restore-scroll' public/index.html
           grep -q 'O que está incluso no acesso?' public/index.html
           ! grep -R -q 'O que está incluído no acesso?' public
           grep -q 'URLSearchParams(location.search).get("embed")&&j()' public/_next/static/chunks/0cnqcucz7h_pk.js
