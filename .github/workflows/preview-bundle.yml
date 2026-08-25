@@ -60,6 +60,9 @@ jobs:
       - name: Start near-fold format images earlier
         run: python scripts/optimize-near-fold-images.py
 
+      - name: Trim unrelated application CSS
+        run: python scripts/trim-landing-css.py
+
       - name: Validate approved visual bundle invariants
         run: |
           test -f public/index.html
@@ -76,6 +79,24 @@ jobs:
           grep -Fq 'right:-8px;touch-action:none!important' public/_next/static/chunks/3qg_tgjt67qum.css
           grep -R -q 'setPointerCapture' public/_next/static
           grep -R -q 'IntersectionObserver' public/_next/static
+
+      - name: Validate landing CSS trim
+        run: |
+          css=public/_next/static/chunks/06-3g1k36rw0y.css
+          test -f "$css"
+          grep -Fq '.sm-sales-shell{' "$css"
+          grep -Fq '.sm-desktop-hero{' "$css"
+          grep -Fq '.sm-mobile-hero{' "$css"
+          grep -Fq '.sm-creators{' "$css"
+          grep -Fq '.sm-faq-modern{' "$css"
+          grep -Fq '@font-face{font-family:Manrope' "$css"
+          ! grep -Fq '.auth-shell{' "$css"
+          ! grep -Fq '.dashboard-page' "$css"
+          ! grep -Fq '.editor-page' "$css"
+          ! grep -Fq '.billing-page' "$css"
+          ! grep -Fq '.library-page' "$css"
+          test $(wc -c < "$css") -lt 93500
+          test $(wc -c < "$css") -gt 20000
 
       - name: Validate direct-production hardening
         run: |
@@ -106,7 +127,7 @@ jobs:
           retention-days: 7
 
       - name: Materialize exact validated bundle for isolated hosting
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'perf/image-loading-v1'
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'perf/css-js-trim-v1'
         run: |
           rm -rf vercel-static
           cp -a public vercel-static
@@ -117,5 +138,5 @@ jobs:
             echo "Validated bundle already materialized"
             exit 0
           fi
-          git commit -m "Materialize performance-tested landing bundle"
-          git push origin HEAD:perf/image-loading-v1
+          git commit -m "Materialize CSS-trimmed landing bundle"
+          git push origin HEAD:perf/css-js-trim-v1
