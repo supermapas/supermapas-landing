@@ -45,7 +45,6 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
-          # Rebase approved artifact to custom-domain root.
           for path in Path('public').rglob('*'):
               if not path.is_file():
                   continue
@@ -56,7 +55,6 @@ jobs:
               if '/supermapas-landing' in text:
                   path.write_text(text.replace('/supermapas-landing', ''), encoding='utf-8')
 
-          # FAQ wording.
           old_faq = 'O que está incluído no acesso?'
           new_faq = 'O que está incluso no acesso?'
           changed = 0
@@ -74,7 +72,6 @@ jobs:
           if changed < 1:
               raise SystemExit('FAQ anchor missing')
 
-          # Approved React behavior patches.
           js_path = Path('public/_next/static/chunks/0cnqcucz7h_pk.js')
           js = js_path.read_text(encoding='utf-8')
           old = '},[e,S,j,w]);(0,r.useEffect)(()=>{let e=x();'
@@ -89,7 +86,6 @@ jobs:
           js = js.replace(old,new,1)
           js_path.write_text(js, encoding='utf-8')
 
-          # Approved mobile rail geometry only.
           css_path = Path('public/_next/static/chunks/3qg_tgjt67qum.css')
           css = css_path.read_text(encoding='utf-8')
           reps = [
@@ -109,13 +105,9 @@ jobs:
           index = Path('public/index.html')
           html = index.read_text(encoding='utf-8')
 
-          # Safari/Wix fix for the three audience illustrations, deferred until after
-          # the initial page load so below-the-fold assets do not compete with the hero.
           audience = r'''<script id="sm-wix-audience-eager">(function(){try{if(new URLSearchParams(location.search).get('embed')!=='wix')return;var done=false;function force(){if(done)return;done=true;document.querySelectorAll('.sm-audience-use-visual img').forEach(function(img){try{img.removeAttribute('loading');img.loading='eager';img.fetchPriority='low';var src=img.getAttribute('src');if(src&&!img.complete)img.src=src;if(img.decode)img.decode().catch(function(){})}catch(_){}})}function schedule(){setTimeout(force,350)}if(document.readyState==='complete')schedule();else window.addEventListener('load',schedule,{once:true});setTimeout(force,2200)}catch(_){}})();</script>'''
 
-          # In Wix, only the parent document performs checkout navigation. There is no
-          # delayed iframe fallback, preventing Safari BFCache from replaying a timer on Back.
-          bridge = r'''<script id="sm-wix-embed-nav">(function(){try{var q=new URLSearchParams(location.search);if(q.get('embed')!=='wix')return;var PARENT='https://www.supermapas.com.br';function classify(a){if(!a||!a.href)return null;try{var u=new URL(a.href,location.href);if(u.hostname==='pay.hotmart.com'||u.hostname.endsWith('.hotmart.com'))return{kind:'checkout',url:u.href};if(u.hostname==='wa.me')return{kind:'external',url:u.href};return null}catch(_){return null}}document.querySelectorAll('a[href]').forEach(function(a){var x=classify(a);if(x&&x.kind==='external')a.setAttribute('target','_top')});document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;var x=classify(a);if(!x)return;if(x.kind==='external'){a.setAttribute('target','_top');return}if(x.kind==='checkout'){e.preventDefault();e.stopPropagation();try{if(window.top!==window){parent.postMessage({type:'sm-hotmart-checkout',href:x.url,source:'supermapas-landing'},PARENT);return}}catch(_){}location.href=x.url}},true)}catch(_){}})();</script>'''
+          bridge = r'''<script id="sm-wix-embed-nav">(function(){try{var q=new URLSearchParams(location.search);if(q.get('embed')!=='wix')return;var PARENT='https://www.supermapas.com.br';function classify(a){if(!a||!a.href)return null;try{var u=new URL(a.href,location.href);if(u.hostname==='pay.hotmart.com'||u.hostname.endsWith('.hotmart.com'))return{kind:'checkout',url:u.href};if(u.hostname==='wa.me')return{kind:'external',url:u.href};return null}catch(_){return null}}window.addEventListener('message',function(ev){try{if(ev.origin!==PARENT)return;var d=ev.data;if(!d||d.type!=='sm-restore-scroll'||typeof d.y!=='number')return;var y=Math.max(0,d.y);requestAnimationFrame(function(){scrollTo(0,y);setTimeout(function(){scrollTo(0,y)},80)})}catch(_){}});document.querySelectorAll('a[href]').forEach(function(a){var x=classify(a);if(x&&x.kind==='external')a.setAttribute('target','_top')});document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;var x=classify(a);if(!x)return;if(x.kind==='external'){a.setAttribute('target','_top');return}if(x.kind==='checkout'){e.preventDefault();e.stopPropagation();try{if(window.top!==window){parent.postMessage({type:'sm-hotmart-checkout',href:x.url,source:'supermapas-landing',scrollY:Math.max(0,window.scrollY||document.documentElement.scrollTop||0)},PARENT);return}}catch(_){}location.href=x.url}},true)}catch(_){}})();</script>'''
           if '</body>' not in html:
               raise SystemExit('closing body missing')
           html = html.replace('</body>', audience + bridge + '</body>', 1)
@@ -135,6 +127,8 @@ jobs:
           ! grep -q 'sm-wix-image-stabilizer' public/index.html
           grep -q 'sm-wix-embed-nav' public/index.html
           grep -q 'sm-hotmart-checkout' public/index.html
+          grep -q 'sm-restore-scroll' public/index.html
+          grep -q 'scrollY:' public/index.html
           grep -q 'window.top!==window' public/index.html
           ! grep -q 'window.top.location.href=href' public/index.html
           grep -q 'O que está incluso no acesso?' public/index.html
