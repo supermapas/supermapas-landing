@@ -130,7 +130,7 @@ jobs:
           css = css_path.read_text(encoding='utf-8')
           replacements = [
               ('@media (max-width:700px){.sm-section-nav{z-index:185;right:0;touch-action:none!important}',
-               '@media (max-width:700px){.sm-section-nav{z-index:185;right:-12px;touch-action:none!important}'),
+               '@media (max-width:700px){.sm-section-nav{z-index:185;right:-8px;touch-action:none!important}'),
               ('.sm-section-nav-rail{width:48px;height:min(50vh,380px);min-height:290px;touch-action:none!important}',
                '.sm-section-nav-rail{width:34px;height:min(50vh,380px);min-height:290px;touch-action:none!important}'),
               ('.sm-section-nav.is-dragging .sm-section-nav-rail{width:58px}',
@@ -176,7 +176,7 @@ jobs:
           ! grep -R -q 'O que está incluído no acesso?' public
           grep -q 'URLSearchParams(location.search).get("embed")&&j()' public/_next/static/chunks/0cnqcucz7h_pk.js
           grep -Fq 'let r=t.matches&&o;' public/_next/static/chunks/0cnqcucz7h_pk.js
-          grep -Fq 'right:-12px;touch-action:none!important' public/_next/static/chunks/3qg_tgjt67qum.css
+          grep -Fq 'right:-8px;touch-action:none!important' public/_next/static/chunks/3qg_tgjt67qum.css
           grep -Fq '.sm-section-nav-rail{width:34px;height:min(50vh,380px)' public/_next/static/chunks/3qg_tgjt67qum.css
           grep -Fq '.sm-section-nav.is-dragging .sm-section-nav-rail{width:40px}' public/_next/static/chunks/3qg_tgjt67qum.css
           grep -R -q 'sm-sales-dock' public/_next/static
