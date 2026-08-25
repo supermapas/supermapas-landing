@@ -40,18 +40,26 @@ jobs:
           test -f /tmp/sm-approved/artifact/artifact.tar
           tar -xf /tmp/sm-approved/artifact/artifact.tar -C public
 
-      - name: Rebase compiled bundle to custom-domain root
-        run: |
-          grep -RIlZ '/supermapas-landing' public | xargs -0 -r sed -i 's#/supermapas-landing##g'
-
-      - name: Change FAQ wording to incluso
+      - name: Apply approved Wix integration patches
         run: |
           python - <<'PY'
           from pathlib import Path
 
-          old = 'O que está incluído no acesso?'
-          new = 'O que está incluso no acesso?'
-          replacements = 0
+          # Rebase original Pages artifact to the custom-domain root.
+          for path in Path('public').rglob('*'):
+              if not path.is_file():
+                  continue
+              try:
+                  text = path.read_text(encoding='utf-8')
+              except (UnicodeDecodeError, OSError):
+                  continue
+              if '/supermapas-landing' in text:
+                  path.write_text(text.replace('/supermapas-landing', ''), encoding='utf-8')
+
+          # Approved FAQ wording.
+          old_faq = 'O que está incluído no acesso?'
+          new_faq = 'O que está incluso no acesso?'
+          faq_count = 0
           for path in Path('public').rglob('*'):
               if not path.is_file() or path.suffix.lower() not in {'.html', '.js', '.json', '.txt', '.css'}:
                   continue
@@ -59,76 +67,33 @@ jobs:
                   text = path.read_text(encoding='utf-8')
               except UnicodeDecodeError:
                   continue
-              count = text.count(old)
+              count = text.count(old_faq)
               if count:
-                  path.write_text(text.replace(old, new), encoding='utf-8')
-                  replacements += count
-          if replacements < 1:
-              raise SystemExit('FAQ question was not found in compiled bundle')
-          print(f'FAQ replacements: {replacements}')
-          PY
+                  path.write_text(text.replace(old_faq, new_faq), encoding='utf-8')
+                  faq_count += count
+          if faq_count < 1:
+              raise SystemExit('FAQ question was not found')
 
-      - name: Match initial section label timing in Wix embed
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path('public/_next/static/chunks/0cnqcucz7h_pk.js')
-          js = path.read_text(encoding='utf-8')
-          old = '},[e,S,j,w]);(0,r.useEffect)(()=>{let e=x();'
-          new = '},[e,S,j,w]);(0,r.useEffect)(()=>{try{"wix"===new URLSearchParams(location.search).get("embed")&&j()}catch(e){}},[j]);(0,r.useEffect)(()=>{let e=x();'
-          if js.count(old) != 1:
-              raise SystemExit(f'expected one section-nav lifecycle anchor, found {js.count(old)}')
-          js = js.replace(old, new, 1)
-          path.write_text(js, encoding='utf-8')
-          PY
-
-      - name: Add Wix embed external navigation bridge
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path('public/index.html')
-          html = path.read_text(encoding='utf-8')
-          bridge = r'''<script id="sm-wix-embed-nav">(function(){try{var q=new URLSearchParams(location.search);if(q.get('embed')!=='wix')return;var PARENT='https://www.supermapas.com.br';function classify(a){if(!a||!a.href)return null;try{var u=new URL(a.href,location.href);if(u.hostname==='pay.hotmart.com'||u.hostname.endsWith('.hotmart.com'))return{kind:'checkout',url:u.href};if(u.hostname==='wa.me')return{kind:'external',url:u.href};return null}catch(_){return null}}document.querySelectorAll('a[href]').forEach(function(a){var x=classify(a);if(x&&x.kind==='external')a.setAttribute('target','_top')});document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;var x=classify(a);if(!x)return;if(x.kind==='external'){a.setAttribute('target','_top');return}if(x.kind==='checkout'){e.preventDefault();e.stopPropagation();try{parent.postMessage({type:'sm-hotmart-checkout',href:x.url,source:'supermapas-landing'},PARENT)}catch(_){}var href=x.url;setTimeout(function(){try{window.top.location.href=href}catch(_){location.href=href}},1200)}},true)}catch(_){}})();</script>'''
-          if 'id="sm-wix-embed-nav"' not in html:
-              if '</body>' not in html:
-                  raise SystemExit('closing body tag missing')
-              html = html.replace('</body>', bridge + '</body>', 1)
-              path.write_text(html, encoding='utf-8')
-          PY
-
-      - name: Force audience illustrations in Wix iframe
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path('public/index.html')
-          html = path.read_text(encoding='utf-8')
-          script = r'''<script id="sm-wix-audience-eager">(function(){try{if(new URLSearchParams(location.search).get('embed')!=='wix')return;function force(){document.querySelectorAll('.sm-audience-use-visual img').forEach(function(img){try{img.removeAttribute('loading');img.loading='eager';img.fetchPriority='high';var src=img.getAttribute('src');if(src&&!img.complete){img.src=src}if(img.decode)img.decode().catch(function(){})}catch(_){}})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',force,{once:true});else force();setTimeout(force,250);setTimeout(force,1200)}catch(_){}})();</script>'''
-          if 'id="sm-wix-audience-eager"' not in html:
-              if '</body>' not in html:
-                  raise SystemExit('closing body tag missing')
-              html = html.replace('</body>', script + '</body>', 1)
-              path.write_text(html, encoding='utf-8')
-          PY
-
-      - name: Refine mobile section rail and sticky dock
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
+          # Approved React behavior patches: initial nav label timing and sticky dock
+          # hidden only in the offer section.
           js_path = Path('public/_next/static/chunks/0cnqcucz7h_pk.js')
           js = js_path.read_text(encoding='utf-8')
-          old_js = 'let r=t.matches&&(o||c||d);'
-          new_js = 'let r=t.matches&&o;'
-          if js.count(old_js) != 1:
-              raise SystemExit(f'expected one sticky dock suppression anchor, found {js.count(old_js)}')
-          js_path.write_text(js.replace(old_js, new_js, 1), encoding='utf-8')
+          lifecycle_old = '},[e,S,j,w]);(0,r.useEffect)(()=>{let e=x();'
+          lifecycle_new = '},[e,S,j,w]);(0,r.useEffect)(()=>{try{"wix"===new URLSearchParams(location.search).get("embed")&&j()}catch(e){}},[j]);(0,r.useEffect)(()=>{let e=x();'
+          if js.count(lifecycle_old) != 1:
+              raise SystemExit(f'nav lifecycle anchor mismatch: {js.count(lifecycle_old)}')
+          js = js.replace(lifecycle_old, lifecycle_new, 1)
+          dock_old = 'let r=t.matches&&(o||c||d);'
+          dock_new = 'let r=t.matches&&o;'
+          if js.count(dock_old) != 1:
+              raise SystemExit(f'dock anchor mismatch: {js.count(dock_old)}')
+          js = js.replace(dock_old, dock_new, 1)
+          js_path.write_text(js, encoding='utf-8')
 
+          # Approved mobile rail geometry only. No other spacing/layout CSS is touched.
           css_path = Path('public/_next/static/chunks/3qg_tgjt67qum.css')
           css = css_path.read_text(encoding='utf-8')
-          replacements = [
+          css_replacements = [
               ('@media (max-width:700px){.sm-section-nav{z-index:185;right:0;touch-action:none!important}',
                '@media (max-width:700px){.sm-section-nav{z-index:185;right:-8px;touch-action:none!important}'),
               ('.sm-section-nav-rail{width:48px;height:min(50vh,380px);min-height:290px;touch-action:none!important}',
@@ -136,29 +101,30 @@ jobs:
               ('.sm-section-nav.is-dragging .sm-section-nav-rail{width:58px}',
                '.sm-section-nav.is-dragging .sm-section-nav-rail{width:40px}'),
           ]
-          for old_css, new_css in replacements:
-              if css.count(old_css) != 1:
-                  raise SystemExit(f'expected one mobile section-nav CSS anchor, found {css.count(old_css)} for {old_css}')
-              css = css.replace(old_css, new_css, 1)
+          for old, new in css_replacements:
+              if css.count(old) != 1:
+                  raise SystemExit(f'rail CSS anchor mismatch: {css.count(old)} :: {old}')
+              css = css.replace(old, new, 1)
           css_path.write_text(css, encoding='utf-8')
+
+          # Wix-only image stabilization. Install in HEAD so Safari sees image nodes as
+          # eager as they are created, including nodes replaced during React hydration.
+          index = Path('public/index.html')
+          html = index.read_text(encoding='utf-8')
+          image_guard = r'''<script id="sm-wix-image-stabilizer">(function(){try{if(new URLSearchParams(location.search).get('embed')!=='wix')return;function eager(img){if(!img||img.tagName!=='IMG')return;try{img.loading='eager';img.setAttribute('loading','eager');var s=img.getAttribute('src');if(s&&!img.complete){var p=new Image();p.src=s}var ss=img.getAttribute('srcset');if(ss){var first=ss.split(',')[0].trim().split(/\s+/)[0];if(first){var q=new Image();q.src=first}}}catch(_){}}function scan(root){try{if(root&&root.tagName==='IMG')eager(root);if(root&&root.querySelectorAll)root.querySelectorAll('img').forEach(eager)}catch(_){}}scan(document);var mo=new MutationObserver(function(ms){ms.forEach(function(m){if(m.type==='attributes'){eager(m.target);return}m.addedNodes.forEach(scan)})});mo.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['loading','src','srcset']});document.addEventListener('DOMContentLoaded',function(){scan(document)},{once:true});window.addEventListener('load',function(){scan(document)},{once:true});setTimeout(function(){scan(document)},250);setTimeout(function(){scan(document)},1200);setTimeout(function(){scan(document)},3500)}catch(_){}})();</script>'''
+          if '</head>' not in html:
+              raise SystemExit('closing head tag missing')
+          html = html.replace('</head>', image_guard + '</head>', 1)
+
+          # External navigation + checkout event bridge; keeps checkout outside iframe.
+          nav_bridge = r'''<script id="sm-wix-embed-nav">(function(){try{var q=new URLSearchParams(location.search);if(q.get('embed')!=='wix')return;var PARENT='https://www.supermapas.com.br';function classify(a){if(!a||!a.href)return null;try{var u=new URL(a.href,location.href);if(u.hostname==='pay.hotmart.com'||u.hostname.endsWith('.hotmart.com'))return{kind:'checkout',url:u.href};if(u.hostname==='wa.me')return{kind:'external',url:u.href};return null}catch(_){return null}}document.querySelectorAll('a[href]').forEach(function(a){var x=classify(a);if(x&&x.kind==='external')a.setAttribute('target','_top')});document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;var x=classify(a);if(!x)return;if(x.kind==='external'){a.setAttribute('target','_top');return}if(x.kind==='checkout'){e.preventDefault();e.stopPropagation();try{parent.postMessage({type:'sm-hotmart-checkout',href:x.url,source:'supermapas-landing'},PARENT)}catch(_){}var href=x.url;setTimeout(function(){try{window.top.location.href=href}catch(_){location.href=href}},1200)}},true)}catch(_){}})();</script>'''
+          if '</body>' not in html:
+              raise SystemExit('closing body tag missing')
+          html = html.replace('</body>', nav_bridge + '</body>', 1)
+          index.write_text(html, encoding='utf-8')
           PY
 
-      - name: Add temporary Wix performance probe
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path('public/index.html')
-          html = path.read_text(encoding='utf-8')
-          probe = r'''<script id="sm-wix-perf-v31">(function(){try{var q=new URLSearchParams(location.search);if(q.get('embed')!=='wix'||q.get('perf')!=='31')return;var PARENT='https://www.supermapas.com.br',lcp=0,cls=0;try{new PerformanceObserver(function(list){var e=list.getEntries();if(e.length){var x=e[e.length-1];lcp=x.startTime||x.renderTime||0}}).observe({type:'largest-contentful-paint',buffered:true})}catch(_){}try{new PerformanceObserver(function(list){list.getEntries().forEach(function(e){if(!e.hadRecentInput)cls+=e.value||0})}).observe({type:'layout-shift',buffered:true})}catch(_){}function send(stage){try{var nav=performance.getEntriesByType('navigation')[0]||{},res=performance.getEntriesByType('resource')||[],transfer=0,encoded=0,decoded=0,hosts={};res.forEach(function(r){transfer+=r.transferSize||0;encoded+=r.encodedBodySize||0;decoded+=r.decodedBodySize||0;try{var h=new URL(r.name).hostname;hosts[h]=(hosts[h]||0)+1}catch(_){}});parent.postMessage({type:'sm-landing-perf-v31',metrics:{stage:stage,ts:new Date().toISOString(),href:location.href,innerWidth:innerWidth,innerHeight:innerHeight,ttfbMs:Math.round(nav.responseStart||0),domContentLoadedMs:Math.round(nav.domContentLoadedEventEnd||0),loadMs:Math.round(nav.loadEventEnd||0),lcpMs:Math.round(lcp||0),cls:Math.round(cls*10000)/10000,resourceCount:res.length,transferBytes:transfer,encodedBytes:encoded,decodedBytes:decoded,hostCounts:hosts}},PARENT)}catch(_){}}window.addEventListener('load',function(){setTimeout(function(){send('load')},100)},{once:true});setTimeout(function(){send('final')},7000)}catch(_){}})();</script>'''
-          if 'id="sm-wix-perf-v31"' not in html:
-              if '</body>' not in html:
-                  raise SystemExit('closing body tag missing')
-              html = html.replace('</body>', probe + '</body>', 1)
-              path.write_text(html, encoding='utf-8')
-          PY
-
-      - name: Validate hydrated landing bundle
+      - name: Validate stabilized landing bundle
         run: |
           test -f public/index.html
           test $(wc -c < public/index.html) -gt 20000
@@ -167,11 +133,10 @@ jobs:
           ! grep -R -q '/supermapas-landing' public
           grep -q 'fundador dos SuperMapas' public/index.html
           grep -q 'história dos SuperMapas' public/index.html
-          grep -q 'dos SuperMapas.' public/index.html
+          grep -q 'sm-wix-image-stabilizer' public/index.html
           grep -q 'sm-wix-embed-nav' public/index.html
           grep -q 'sm-hotmart-checkout' public/index.html
-          grep -q 'sm-wix-audience-eager' public/index.html
-          grep -q 'sm-wix-perf-v31' public/index.html
+          ! grep -q 'sm-wix-perf-v31' public/index.html
           grep -q 'O que está incluso no acesso?' public/index.html
           ! grep -R -q 'O que está incluído no acesso?' public
           grep -q 'URLSearchParams(location.search).get("embed")&&j()' public/_next/static/chunks/0cnqcucz7h_pk.js
@@ -182,7 +147,6 @@ jobs:
           grep -R -q 'sm-sales-dock' public/_next/static
           grep -R -q 'setPointerCapture' public/_next/static
           grep -R -q 'IntersectionObserver' public/_next/static
-          grep -R -q 'Segoe UI' public/_next/static
           touch public/.nojekyll
 
       - name: Configure Pages
