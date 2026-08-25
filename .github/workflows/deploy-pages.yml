@@ -98,6 +98,21 @@ jobs:
               path.write_text(html, encoding='utf-8')
           PY
 
+      - name: Force audience illustrations in Wix iframe
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('public/index.html')
+          html = path.read_text(encoding='utf-8')
+          script = r'''<script id="sm-wix-audience-eager">(function(){try{if(new URLSearchParams(location.search).get('embed')!=='wix')return;function force(){document.querySelectorAll('.sm-audience-use-visual img').forEach(function(img){try{img.removeAttribute('loading');img.loading='eager';img.fetchPriority='high';var src=img.getAttribute('src');if(src&&!img.complete){img.src=src}if(img.decode)img.decode().catch(function(){})}catch(_){}})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',force,{once:true});else force();setTimeout(force,250);setTimeout(force,1200)}catch(_){}})();</script>'''
+          if 'id="sm-wix-audience-eager"' not in html:
+              if '</body>' not in html:
+                  raise SystemExit('closing body tag missing')
+              html = html.replace('</body>', script + '</body>', 1)
+              path.write_text(html, encoding='utf-8')
+          PY
+
       - name: Add temporary Wix performance probe
         run: |
           python - <<'PY'
@@ -125,6 +140,7 @@ jobs:
           grep -q 'dos SuperMapas.' public/index.html
           grep -q 'sm-wix-embed-nav' public/index.html
           grep -q 'sm-hotmart-checkout' public/index.html
+          grep -q 'sm-wix-audience-eager' public/index.html
           grep -q 'sm-wix-perf-v31' public/index.html
           grep -q 'O que está incluso no acesso?' public/index.html
           ! grep -R -q 'O que está incluído no acesso?' public
