@@ -44,6 +44,30 @@ jobs:
         run: |
           grep -RIlZ '/supermapas-landing' public | xargs -0 -r sed -i 's#/supermapas-landing##g'
 
+      - name: Change FAQ wording to incluso
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          old = 'O que está incluído no acesso?'
+          new = 'O que está incluso no acesso?'
+          replacements = 0
+          for path in Path('public').rglob('*'):
+              if not path.is_file() or path.suffix.lower() not in {'.html', '.js', '.json', '.txt', '.css'}:
+                  continue
+              try:
+                  text = path.read_text(encoding='utf-8')
+              except UnicodeDecodeError:
+                  continue
+              count = text.count(old)
+              if count:
+                  path.write_text(text.replace(old, new), encoding='utf-8')
+                  replacements += count
+          if replacements < 1:
+              raise SystemExit('FAQ question was not found in compiled bundle')
+          print(f'FAQ replacements: {replacements}')
+          PY
+
       - name: Match initial section label timing in Wix embed
         run: |
           python - <<'PY'
@@ -85,6 +109,8 @@ jobs:
           grep -q 'história dos SuperMapas' public/index.html
           grep -q 'dos SuperMapas.' public/index.html
           grep -q 'sm-wix-embed-nav' public/index.html
+          grep -q 'O que está incluso no acesso?' public/index.html
+          ! grep -R -q 'O que está incluído no acesso?' public
           grep -q 'URLSearchParams(location.search).get("embed")&&j()' public/_next/static/chunks/0cnqcucz7h_pk.js
           grep -R -q 'sm-sales-dock' public/_next/static
           grep -R -q 'setPointerCapture' public/_next/static
