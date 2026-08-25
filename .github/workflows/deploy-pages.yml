@@ -113,11 +113,9 @@ jobs:
           # the initial page load so below-the-fold assets do not compete with the hero.
           audience = r'''<script id="sm-wix-audience-eager">(function(){try{if(new URLSearchParams(location.search).get('embed')!=='wix')return;var done=false;function force(){if(done)return;done=true;document.querySelectorAll('.sm-audience-use-visual img').forEach(function(img){try{img.removeAttribute('loading');img.loading='eager';img.fetchPriority='low';var src=img.getAttribute('src');if(src&&!img.complete)img.src=src;if(img.decode)img.decode().catch(function(){})}catch(_){}})}function schedule(){setTimeout(force,350)}if(document.readyState==='complete')schedule();else window.addEventListener('load',schedule,{once:true});setTimeout(force,2200)}catch(_){}})();</script>'''
 
-          # In Wix, preserve the original landing context on iOS and Meta in-app browsers.
-          # Their BFCache/WebView restore can freeze the transformed iframe after returning
-          # from Hotmart. A direct user-gesture window.open keeps the landing alive behind
-          # checkout. If opening a new context is blocked, fall back to parent navigation.
-          bridge = r'''<script id="sm-wix-embed-nav">(function(){try{var q=new URLSearchParams(location.search);if(q.get('embed')!=='wix')return;var PARENT='https://www.supermapas.com.br';var PRESERVE_CHECKOUT_CONTEXT=/iPad|iPhone|iPod|Instagram|FBAN|FBAV|FB_IAB|FB4A|FBMD/i.test(navigator.userAgent||'');function classify(a){if(!a||!a.href)return null;try{var u=new URL(a.href,location.href);if(u.hostname==='pay.hotmart.com'||u.hostname.endsWith('.hotmart.com'))return{kind:'checkout',url:u.href};if(u.hostname==='wa.me')return{kind:'external',url:u.href};return null}catch(_){return null}}document.querySelectorAll('a[href]').forEach(function(a){var x=classify(a);if(x&&x.kind==='external')a.setAttribute('target','_top')});document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;var x=classify(a);if(!x)return;if(x.kind==='external'){a.setAttribute('target','_top');return}if(x.kind==='checkout'){e.preventDefault();e.stopPropagation();if(PRESERVE_CHECKOUT_CONTEXT){try{var w=window.open(x.url,'_blank');if(w){try{w.opener=null}catch(_){}return}}catch(_){}}try{if(window.top!==window){parent.postMessage({type:'sm-hotmart-checkout',href:x.url,source:'supermapas-landing'},PARENT);return}}catch(_){}location.href=x.url}},true)}catch(_){}})();</script>'''
+          # In Wix, only the parent document performs checkout navigation. There is no
+          # delayed iframe fallback, preventing Safari BFCache from replaying a timer on Back.
+          bridge = r'''<script id="sm-wix-embed-nav">(function(){try{var q=new URLSearchParams(location.search);if(q.get('embed')!=='wix')return;var PARENT='https://www.supermapas.com.br';function classify(a){if(!a||!a.href)return null;try{var u=new URL(a.href,location.href);if(u.hostname==='pay.hotmart.com'||u.hostname.endsWith('.hotmart.com'))return{kind:'checkout',url:u.href};if(u.hostname==='wa.me')return{kind:'external',url:u.href};return null}catch(_){return null}}document.querySelectorAll('a[href]').forEach(function(a){var x=classify(a);if(x&&x.kind==='external')a.setAttribute('target','_top')});document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;var x=classify(a);if(!x)return;if(x.kind==='external'){a.setAttribute('target','_top');return}if(x.kind==='checkout'){e.preventDefault();e.stopPropagation();try{if(window.top!==window){parent.postMessage({type:'sm-hotmart-checkout',href:x.url,source:'supermapas-landing'},PARENT);return}}catch(_){}location.href=x.url}},true)}catch(_){}})();</script>'''
           if '</body>' not in html:
               raise SystemExit('closing body missing')
           html = html.replace('</body>', audience + bridge + '</body>', 1)
@@ -136,8 +134,6 @@ jobs:
           grep -q 'setTimeout(force,2200)' public/index.html
           ! grep -q 'sm-wix-image-stabilizer' public/index.html
           grep -q 'sm-wix-embed-nav' public/index.html
-          grep -q 'PRESERVE_CHECKOUT_CONTEXT' public/index.html
-          grep -Fq "window.open(x.url,'_blank')" public/index.html
           grep -q 'sm-hotmart-checkout' public/index.html
           grep -q 'window.top!==window' public/index.html
           ! grep -q 'window.top.location.href=href' public/index.html
