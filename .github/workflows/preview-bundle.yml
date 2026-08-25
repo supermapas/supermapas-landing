@@ -85,10 +85,11 @@ jobs:
           css=public/_next/static/chunks/06-3g1k36rw0y.css
           test -f "$css"
           grep -Fq '.sm-sales-shell{' "$css"
+          grep -Fq '.sm-sales-dock{' "$css"
           grep -Fq '.sm-desktop-hero{' "$css"
           grep -Fq '.sm-mobile-hero{' "$css"
-          grep -Fq '.sm-creators{' "$css"
-          grep -Fq '.sm-faq-modern{' "$css"
+          grep -Fq '.sm-dh-primary{' "$css"
+          grep -Fq '.sm-mh-cta' "$css"
           grep -Fq '@font-face{font-family:Manrope' "$css"
           ! grep -Fq '.auth-shell{' "$css"
           ! grep -Fq '.dashboard-page' "$css"
