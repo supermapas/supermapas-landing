@@ -1,0 +1,5 @@
+1:"$Sreact.fragment"
+2:I[97367,["/_next/static/chunks/1d4h-sglyo8ft.js","/_next/static/chunks/14mumt5_n0xhi.js","/_next/static/chunks/0cnqcucz7h_pk.js"],"OutletBoundary"]
+3:"$Sreact.suspense"
+0:{"rsc":["$","$1","c",{"children":[["$","footer",null,{"className":"sm-final-footer","children":["$","div",null,{"className":"sm-final-footer-inner","children":[["$","img",null,{"src":"https://static.wixstatic.com/media/1a67b8_4f097583af86427db8e4168a1012c7a3~mv2.png","alt":"Supermapas","loading":"lazy"}],["$","p",null,{"children":"© 2026 Supermapas · Material digital de Língua Portuguesa."}]]}]}],null,["$","$L2",null,{"children":["$","$3",null,{"name":"Next.MetadataOutlet","children":"$@4"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"PqySbJh4TTL3MobLhM6_p"}
+4:null

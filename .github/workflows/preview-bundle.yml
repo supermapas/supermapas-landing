@@ -1,0 +1,114 @@
+name: Validate production-ready landing bundle
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  build-preview-bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+
+      - name: Restore approved hydrated React bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p public /tmp/sm-approved
+          curl --fail --location --retry 4 --retry-delay 2 \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/9548938058/zip" \
+            -o /tmp/sm-approved/github-pages.zip
+          unzip -o /tmp/sm-approved/github-pages.zip -d /tmp/sm-approved/artifact
+          test -f /tmp/sm-approved/artifact/artifact.tar
+          tar -xf /tmp/sm-approved/artifact/artifact.tar -C public
+
+      - name: Apply exact approved landing patches
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          workflow = Path('.github/workflows/deploy-pages.yml').read_text(encoding='utf-8')
+          start_marker = "          python - <<'PY'\n"
+          start = workflow.find(start_marker)
+          if start < 0:
+              raise SystemExit('approved patch heredoc start not found')
+          start += len(start_marker)
+          end = workflow.find("\n          PY\n", start)
+          if end < 0:
+              raise SystemExit('approved patch heredoc end not found')
+
+          lines = workflow[start:end].splitlines()
+          script = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines) + '\n'
+          compile(script, '<approved-wix-patches>', 'exec')
+          exec(script, {'__name__': '__main__'})
+          PY
+
+      - name: Apply direct-production hardening
+        run: python scripts/harden-production.py
+
+      - name: Validate approved visual bundle invariants
+        run: |
+          test -f public/index.html
+          test $(wc -c < public/index.html) -gt 20000
+          grep -q 'sm-section-nav' public/index.html
+          grep -q '/_next/static/' public/index.html
+          ! grep -R -q '/supermapas-landing' public
+          grep -q 'sm-wix-audience-eager' public/index.html
+          grep -q 'sm-wix-parent-overlay-bridge' public/index.html
+          grep -q 'O que está incluso no acesso?' public/index.html
+          ! grep -R -q 'O que está incluído no acesso?' public
+          grep -q 'URLSearchParams(location.search).get("embed")&&j()' public/_next/static/chunks/0cnqcucz7h_pk.js
+          grep -Fq 'let r=t.matches&&o;' public/_next/static/chunks/0cnqcucz7h_pk.js
+          grep -Fq 'right:-8px;touch-action:none!important' public/_next/static/chunks/3qg_tgjt67qum.css
+          grep -R -q 'setPointerCapture' public/_next/static
+          grep -R -q 'IntersectionObserver' public/_next/static
+
+      - name: Validate direct-production hardening
+        run: |
+          grep -Fq 'https://pay.hotmart.com/A92093667Q?checkoutMode=2&off=ia91gsts' public/index.html
+          ! grep -R -q 'checkoutMode=10' public
+          grep -Fq '261169597067924' public/index.html
+          grep -Fq 'rel="canonical" href="https://www.supermapas.com.br/"' public/index.html
+          grep -Fq 'property="og:title"' public/index.html
+          grep -Fq 'property="og:image"' public/index.html
+          grep -Fq 'id="sm-checkout-attribution"' public/index.html
+          grep -Fq "'utm_campaign'" public/index.html
+          grep -Fq "'fbclid'" public/index.html
+          ! grep -q 'static.hotmart.com/checkout/widget.min.js' public/index.html
+          ! grep -q 'hotmart__button-checkout' public/index.html
+          ! grep -q 'sm-restore-scroll' public/index.html
+          touch public/.nojekyll
+
+      - name: Upload validated bundle only
+        uses: actions/upload-artifact@v4
+        with:
+          name: supermapas-production-ready-${{ github.sha }}
+          path: public
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Materialize exact validated bundle for isolated hosting
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'chore/production-hardening'
+        run: |
+          rm -rf vercel-static
+          cp -a public vercel-static
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add vercel-static
+          if git diff --cached --quiet; then
+            echo "Validated bundle already materialized"
+            exit 0
+          fi
+          git commit -m "Materialize validated landing bundle for isolated preview"
+          git push origin HEAD:chore/production-hardening
