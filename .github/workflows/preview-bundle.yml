@@ -63,6 +63,9 @@ jobs:
       - name: Trim unrelated application CSS
         run: python scripts/trim-landing-css.py
 
+      - name: Replace Next hydration with static interactions
+        run: python scripts/strip-next-runtime.py
+
       - name: Validate approved visual bundle invariants
         run: |
           test -f public/index.html
@@ -99,6 +102,31 @@ jobs:
           test $(wc -c < "$css") -lt 93500
           test $(wc -c < "$css") -gt 20000
 
+      - name: Validate static runtime optimization
+        run: |
+          grep -Fq 'id="sm-static-interactions"' public/index.html
+          ! grep -Fq 'self.__next_f' public/index.html
+          ! grep -Eq '<script[^>]+src="/_next/static/chunks/[^\"]+\.js' public/index.html
+          ! grep -Eq '<link[^>]+as="script"[^>]+/_next/static/chunks/' public/index.html
+          grep -Fq 'sm-image-lightbox' public/index.html
+          grep -Fq 'sm-dock-checkout' public/index.html
+          grep -Fq 'setPointerCapture' public/index.html
+          grep -Fq 'IntersectionObserver' public/index.html
+          grep -Fq 'scrollIntoView' public/index.html
+          test $(wc -c < public/index.html) -lt 90000
+          test -f public/_next/static/chunks/0cnqcucz7h_pk.js
+          test -f public/_next/static/chunks/14mumt5_n0xhi.js
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          html = Path('public/index.html').read_text(encoding='utf-8')
+          match = re.search(r'<script id="sm-static-interactions">(.*?)</script>', html, re.S)
+          if not match:
+              raise SystemExit('static interaction script not found for syntax check')
+          Path('/tmp/sm-static-runtime.js').write_text(match.group(1), encoding='utf-8')
+          PY
+          node --check /tmp/sm-static-runtime.js
+
       - name: Validate direct-production hardening
         run: |
           grep -Fq 'https://pay.hotmart.com/A92093667Q?checkoutMode=2&off=ia91gsts' public/index.html
@@ -128,7 +156,7 @@ jobs:
           retention-days: 7
 
       - name: Materialize exact validated bundle for isolated hosting
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'perf/css-js-trim-v1'
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'perf/static-runtime-v1'
         run: |
           rm -rf vercel-static
           cp -a public vercel-static
@@ -139,5 +167,5 @@ jobs:
             echo "Validated bundle already materialized"
             exit 0
           fi
-          git commit -m "Materialize CSS-trimmed landing bundle"
-          git push origin HEAD:perf/css-js-trim-v1
+          git commit -m "Materialize static-runtime landing bundle"
+          git push origin HEAD:perf/static-runtime-v1
