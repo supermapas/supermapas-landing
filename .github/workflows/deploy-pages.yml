@@ -33,12 +33,17 @@ jobs:
           unzip -o /tmp/sm-react/artifact.zip -d /tmp/sm-react/artifact
           tar -xzf /tmp/sm-react/artifact/supermapas-react-pages.tar.gz -C public
 
+      - name: Rebase compiled bundle to custom-domain root
+        run: |
+          grep -RIlZ '/supermapas-landing' public | xargs -0 -r sed -i 's#/supermapas-landing##g'
+
       - name: Validate hydrated landing bundle
         run: |
           test -f public/index.html
           test $(wc -c < public/index.html) -gt 20000
           grep -q 'sm-section-nav' public/index.html
-          grep -q '/supermapas-landing/_next/static/' public/index.html
+          grep -q '/_next/static/' public/index.html
+          ! grep -R -q '/supermapas-landing' public
           grep -q 'fundador dos SuperMapas' public/index.html
           grep -q 'história dos SuperMapas' public/index.html
           grep -q 'dos SuperMapas.' public/index.html
