@@ -116,6 +116,16 @@ jobs:
           test $(wc -c < public/index.html) -lt 90000
           test -f public/_next/static/chunks/0cnqcucz7h_pk.js
           test -f public/_next/static/chunks/14mumt5_n0xhi.js
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          html = Path('public/index.html').read_text(encoding='utf-8')
+          match = re.search(r'<script id="sm-static-interactions">(.*?)</script>', html, re.S)
+          if not match:
+              raise SystemExit('static interaction script not found for syntax check')
+          Path('/tmp/sm-static-runtime.js').write_text(match.group(1), encoding='utf-8')
+          PY
+          node --check /tmp/sm-static-runtime.js
 
       - name: Validate direct-production hardening
         run: |
