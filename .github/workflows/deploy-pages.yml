@@ -28,7 +28,7 @@ jobs:
         run: |
           mkdir -p public /tmp/sm-react
           curl --fail --location --retry 4 --retry-delay 2 \
-            'https://sdmntprbrazilsouth.oaiusercontent.com/files/00000000-1470-820e-b7ec-304f6c012c54/raw?se=2026-08-25T04%3A08%3A51Z&sp=r&sv=2026-02-06&sr=b&scid=5e1eb02c-22da-5178-b4b1-28b03c206efd&skoid=68f37fa7-4e08-478b-93f3-c72d563a0ab3&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-08-24T22%3A50%3A53Z&ske=2026-08-25T22%3A50%3A53Z&sks=b&skv=2026-02-06&sig=EKwXefw4fFno1XitDchzXCzJ3wvQ2xGAtGUHDwCiH%2Fs%3D' \
+            'https://sdmntprbrazilsouth.oaiusercontent.com/files/00000000-d974-820e-84d8-379ec21ae4fe/raw?se=2026-08-25T04%3A17%3A56Z&sp=r&sv=2026-02-06&sr=b&scid=d164dce1-08c3-5a83-a4ab-24c49207a68c&skoid=68f37fa7-4e08-478b-93f3-c72d563a0ab3&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-08-24T22%3A52%3A35Z&ske=2026-08-25T22%3A52%3A35Z&sks=b&skv=2026-02-06&sig=wH96UbFq9P9rhTak8PPZCEm08muIvMdn72Q8pjDSios%3D' \
             -o /tmp/sm-react/artifact.zip
           unzip -o /tmp/sm-react/artifact.zip -d /tmp/sm-react/artifact
           tar -xzf /tmp/sm-react/artifact/supermapas-react-pages.tar.gz -C public
@@ -42,6 +42,7 @@ jobs:
           grep -R -q 'sm-sales-dock' public/_next/static
           grep -R -q 'setPointerCapture' public/_next/static
           grep -R -q 'IntersectionObserver' public/_next/static
+          grep -R -q 'Segoe UI' public/_next/static
           touch public/.nojekyll
 
       - name: Configure Pages
