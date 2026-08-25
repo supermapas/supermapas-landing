@@ -44,6 +44,7 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
 
           for path in Path('public').rglob('*'):
               if not path.is_file():
@@ -71,6 +72,43 @@ jobs:
                   changed += n
           if changed < 1:
               raise SystemExit('FAQ anchor missing')
+
+          # Remove only legacy forced-reload calls that are coupled to mobile/history
+          # resume handlers. Normal application code is left untouched.
+          removed_reload = 0
+          resume_markers = ('pageshow', 'visibilitychange', 'focus', 'pagehide')
+          reload_patterns = (
+              ('window.location.reload()', 'void 0'),
+              ('location.reload()', 'void 0'),
+              ('window.location.reload(true)', 'void 0'),
+              ('location.reload(true)', 'void 0'),
+          )
+          for path in Path('public').rglob('*'):
+              if not path.is_file() or path.suffix.lower() not in {'.html', '.js'}:
+                  continue
+              try:
+                  text = path.read_text(encoding='utf-8')
+              except (UnicodeDecodeError, OSError):
+                  continue
+              original = text
+              for old, new in reload_patterns:
+                  start = 0
+                  while True:
+                      idx = text.find(old, start)
+                      if idx < 0:
+                          break
+                      lo = max(0, idx - 1800)
+                      hi = min(len(text), idx + 1800)
+                      context = text[lo:hi]
+                      if any(marker in context for marker in resume_markers):
+                          text = text[:idx] + new + text[idx + len(old):]
+                          removed_reload += 1
+                          start = idx + len(new)
+                      else:
+                          start = idx + len(old)
+              if text != original:
+                  path.write_text(text, encoding='utf-8')
+          print(f'removed legacy resume reload calls: {removed_reload}')
 
           js_path = Path('public/_next/static/chunks/0cnqcucz7h_pk.js')
           js = js_path.read_text(encoding='utf-8')
@@ -107,9 +145,6 @@ jobs:
 
           audience = r'''<script id="sm-wix-audience-eager">(function(){try{if(new URLSearchParams(location.search).get('embed')!=='wix')return;var done=false;function force(){if(done)return;done=true;document.querySelectorAll('.sm-audience-use-visual img').forEach(function(img){try{img.removeAttribute('loading');img.loading='eager';img.fetchPriority='low';var src=img.getAttribute('src');if(src&&!img.complete)img.src=src;if(img.decode)img.decode().catch(function(){})}catch(_){}})}function schedule(){setTimeout(force,350)}if(document.readyState==='complete')schedule();else window.addEventListener('load',schedule,{once:true});setTimeout(force,2200)}catch(_){}})();</script>'''
 
-          # The landing remains visually isolated in the iframe, but checkout is opened by
-          # the Wix parent document. This keeps Hotmart's overlay outside the transformed
-          # iframe so its own scrolling and close controls use the real top-level viewport.
           bridge = r'''<script id="sm-wix-parent-overlay-bridge">(function(){try{if(new URLSearchParams(location.search).get('embed')!=='wix')return;var PARENT='https://www.supermapas.com.br';function classify(a){if(!a||!a.href)return null;try{var u=new URL(a.href,location.href);if(u.hostname==='pay.hotmart.com'||u.hostname.endsWith('.hotmart.com'))return{kind:'checkout',url:u.href};if(u.hostname==='wa.me')return{kind:'external',url:u.href};return null}catch(_){return null}}document.querySelectorAll('a[href]').forEach(function(a){var x=classify(a);if(x&&x.kind==='external')a.setAttribute('target','_top')});document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;var x=classify(a);if(!x)return;if(x.kind==='external'){a.setAttribute('target','_top');return}if(x.kind==='checkout'){e.preventDefault();e.stopPropagation();try{if(window.top!==window){parent.postMessage({type:'sm-hotmart-overlay',source:'supermapas-landing'},PARENT);return}}catch(_){}location.href=x.url}},true)}catch(_){}})();</script>'''
 
           if '</body>' not in html:
