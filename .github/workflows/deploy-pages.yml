@@ -44,6 +44,21 @@ jobs:
         run: |
           grep -RIlZ '/supermapas-landing' public | xargs -0 -r sed -i 's#/supermapas-landing##g'
 
+      - name: Add Wix embed external navigation bridge
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('public/index.html')
+          html = path.read_text(encoding='utf-8')
+          bridge = r'''<script id="sm-wix-embed-nav">(function(){try{var q=new URLSearchParams(location.search);if(q.get('embed')!=='wix')return;function externalTop(a){if(!a||!a.href)return;try{var u=new URL(a.href,location.href);if(u.hostname==='pay.hotmart.com'||u.hostname==='wa.me'||u.hostname.endsWith('.hotmart.com'))a.setAttribute('target','_top')}catch(_){}}document.querySelectorAll('a[href]').forEach(externalTop);document.addEventListener('click',function(e){var n=e.target;var a=n&&n.closest?n.closest('a[href]'):null;externalTop(a)},true)}catch(_){}})();</script>'''
+          if 'id="sm-wix-embed-nav"' not in html:
+              if '</body>' not in html:
+                  raise SystemExit('closing body tag missing')
+              html = html.replace('</body>', bridge + '</body>', 1)
+              path.write_text(html, encoding='utf-8')
+          PY
+
       - name: Validate hydrated landing bundle
         run: |
           test -f public/index.html
@@ -54,6 +69,7 @@ jobs:
           grep -q 'fundador dos SuperMapas' public/index.html
           grep -q 'história dos SuperMapas' public/index.html
           grep -q 'dos SuperMapas.' public/index.html
+          grep -q 'sm-wix-embed-nav' public/index.html
           grep -R -q 'sm-sales-dock' public/_next/static
           grep -R -q 'setPointerCapture' public/_next/static
           grep -R -q 'IntersectionObserver' public/_next/static
