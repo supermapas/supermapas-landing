@@ -15,11 +15,8 @@ html = html.replace(
 
 html = html.replace(
   '<h3>Odair Diniz</h3><p>Incentivador, colaborador e parte da história dos SuperMapas.</p>',
-  '<h3>Aldair Diniz</h3><p>Criador do Superdicas de Português e colaborador dos Supermapas, participa da pesquisa, troca de ideias e construção do projeto desde a sua trajetória inicial.</p>'
+  '<h3>Odair Diniz</h3><p>Criador do Superdicas de Português e colaborador dos Supermapas, participa da pesquisa, troca de ideias e construção do projeto desde a sua trajetória inicial.</p>'
 );
-
-html = html.replaceAll('Retrato de Odair Diniz', 'Retrato de Aldair Diniz');
-html = html.replaceAll('Abrir Instagram de Odair Diniz:', 'Abrir Instagram de Aldair Diniz:');
 
 // Slightly refine the section intro to support authority instead of sentimentality alone.
 html = html.replace(
