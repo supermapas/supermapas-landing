@@ -9,27 +9,17 @@ if (!html.includes('data-sm-carousel="maps"') || !html.includes('data-sm-carouse
 }
 
 const css = `<style id="sm-carousel-fit-polish-v1">
-/* Keep the previously approved visual size, but make the frame itself exactly match the file ratio. */
+/* Restore the original Production geometry. The carousel must not resize the visual column. */
 .sm-format-carousel{
-  --sm-frame-w:94%;
-  --sm-frame-ratio:2048/1447;
   position:relative!important;
   overflow:visible!important;
 }
-.sm-format-v2-map-visual.sm-format-carousel{
-  --sm-frame-w:94%;
-  --sm-frame-ratio:2048/1447;
-}
-.sm-format-v2-summary-visual.sm-format-carousel{
-  --sm-frame-w:64%;
-  --sm-frame-ratio:1447/2048;
-}
-.sm-format-v2-card-visual.sm-format-carousel{
-  --sm-frame-w:94%;
-  --sm-frame-ratio:2048/1447;
-}
 
-/* No site-created canvas: the frame has the same ratio as the source file. */
+/* Only the INTERNAL frame gets a ratio. The outer .sm-format-v2-visual keeps Production sizing/padding. */
+.sm-format-v2-map-visual.sm-format-carousel{--sm-frame-w:93%;--sm-frame-ratio:2048/1447}
+.sm-format-v2-summary-visual.sm-format-carousel{--sm-frame-w:47%;--sm-frame-ratio:1447/2048}
+.sm-format-v2-card-visual.sm-format-carousel{--sm-frame-w:93%;--sm-frame-ratio:2048/1447}
+
 .sm-format-carousel-frame{
   position:absolute!important;
   left:50%!important;
@@ -44,10 +34,10 @@ const css = `<style id="sm-carousel-fit-polish-v1">
   margin:0!important;
   padding:0!important;
   border:0!important;
-  border-radius:5px!important;
+  border-radius:0!important;
   background:transparent!important;
   overflow:visible!important;
-  filter:drop-shadow(0 18px 18px rgba(41,31,78,.17)) drop-shadow(0 -8px 12px rgba(41,31,78,.09)) drop-shadow(9px 0 12px rgba(41,31,78,.07)) drop-shadow(-9px 0 12px rgba(41,31,78,.07))!important;
+  filter:none!important;
 }
 .sm-format-carousel-track{
   position:absolute!important;
@@ -56,9 +46,9 @@ const css = `<style id="sm-carousel-fit-polish-v1">
   height:100%!important;
   margin:0!important;
   padding:0!important;
-  overflow:hidden!important;
+  overflow:visible!important;
   border:0!important;
-  border-radius:4px!important;
+  border-radius:0!important;
   background:transparent!important;
 }
 .sm-format-carousel-slide{
@@ -75,32 +65,35 @@ const css = `<style id="sm-carousel-fit-polish-v1">
   object-position:50% 50%!important;
   background:transparent!important;
   transform:none!important;
+  filter:drop-shadow(0 22px 28px #33255824)!important;
 }
 
-/* Arrows follow the real edge of the reduced frame, not the larger layout box. */
+/* Controls sit just outside the exact image rectangle. */
 .sm-format-carousel .sm-carousel-arrow{
   top:50%!important;
   bottom:auto!important;
   transform:translateY(-50%)!important;
   margin:0!important;
 }
-.sm-format-carousel .sm-carousel-prev{
-  left:calc((100% - var(--sm-frame-w))/2 - 24px)!important;
-}
-.sm-format-carousel .sm-carousel-next{
-  right:calc((100% - var(--sm-frame-w))/2 - 24px)!important;
-}
+.sm-format-carousel .sm-carousel-prev{left:calc((100% - var(--sm-frame-w))/2 - 24px)!important}
+.sm-format-carousel .sm-carousel-next{right:calc((100% - var(--sm-frame-w))/2 - 24px)!important}
 
-@media(max-width:720px){
-  .sm-format-v2-map-visual.sm-format-carousel,
+@media(max-width:1100px) and (min-width:901px){
+  .sm-format-v2-map-visual.sm-format-carousel{--sm-frame-w:92%}
+  .sm-format-v2-summary-visual.sm-format-carousel{--sm-frame-w:46.5%}
   .sm-format-v2-card-visual.sm-format-carousel{--sm-frame-w:92%}
-  .sm-format-v2-summary-visual.sm-format-carousel{--sm-frame-w:62%}
-  .sm-format-carousel .sm-carousel-prev{
-    left:calc((100% - var(--sm-frame-w))/2 - 17px)!important;
-  }
-  .sm-format-carousel .sm-carousel-next{
-    right:calc((100% - var(--sm-frame-w))/2 - 17px)!important;
-  }
+}
+@media(max-width:900px) and (min-width:641px){
+  .sm-format-v2-map-visual.sm-format-carousel{--sm-frame-w:91%}
+  .sm-format-v2-summary-visual.sm-format-carousel{--sm-frame-w:48%}
+  .sm-format-v2-card-visual.sm-format-carousel{--sm-frame-w:91%}
+}
+@media(max-width:640px){
+  .sm-format-v2-map-visual.sm-format-carousel{--sm-frame-w:92%}
+  .sm-format-v2-summary-visual.sm-format-carousel{--sm-frame-w:54%}
+  .sm-format-v2-card-visual.sm-format-carousel{--sm-frame-w:92%}
+  .sm-format-carousel .sm-carousel-prev{left:calc((100% - var(--sm-frame-w))/2 - 17px)!important}
+  .sm-format-carousel .sm-carousel-next{right:calc((100% - var(--sm-frame-w))/2 - 17px)!important}
 }
 </style>`;
 
@@ -111,4 +104,4 @@ if (!html.includes('id="sm-catalog-search-input"') || (html.match(/data-catalog-
 }
 
 fs.writeFileSync(target, html);
-console.log('Carousel fit polish v1 applied.');
+console.log('Carousel fit polish v1 applied with Production geometry.');
