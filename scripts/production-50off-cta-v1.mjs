@@ -58,16 +58,21 @@ replaceAtLeast('Acessar agora', 'Garantir 50% OFF', 1);
 replaceRequired('<small>✓ 7 dias de garantia</small>', '<small>✓ 50% OFF já aplicado · 7 dias de garantia</small>');
 replaceRequired('<div class="sm-mh-guarantee">✓ 7 dias de garantia</div>', '<div class="sm-mh-guarantee">✓ 50% OFF já aplicado · 7 dias de garantia</div>');
 
+// The section-nav label should start hidden and only appear through the same
+// interactions/state changes used by the other sections.
+replaceRequired('<nav class="sm-section-nav is-label-visible"', '<nav class="sm-section-nav"');
+replaceRequired("  try{if(new URLSearchParams(location.search).get('embed')==='wix')showLabel(true);}catch(_){ }\n  scan();", "  scan();");
+
 const css = `
 <style id="sm-production-offer-v1">
 .sm-offer-pill{display:inline-flex;align-items:center;gap:8px;width:max-content;margin:0 0 16px;padding:5px 5px 5px 12px;border:1px solid rgba(101,78,210,.18);border-radius:999px;background:#fff;box-shadow:0 8px 24px rgba(54,38,120,.10);font-size:11px;font-weight:800;letter-spacing:.08em;color:#51428f}
 .sm-offer-pill strong{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;background:#f36a2d;color:#fff;font-size:12px;letter-spacing:.04em;box-shadow:0 5px 14px rgba(243,106,45,.24)}
 .sm-price-was{display:block!important;margin-bottom:2px!important;font-size:11px!important;font-weight:700!important;line-height:1.2!important;color:#6e6880!important}
 .sm-price-was s{opacity:.72;text-decoration-thickness:1.5px}.sm-price-was b{color:#e55721!important;font-weight:900!important}
-.sm-offer-close-discount{display:flex;align-items:center;gap:9px;margin-bottom:6px;font-size:13px;font-weight:800;color:#7a7489}
+.sm-offer-close-discount{display:flex;align-items:center;justify-content:flex-start;gap:9px;width:100%;margin-bottom:6px;font-size:13px;font-weight:800;color:#7a7489;text-align:left}
 .sm-offer-close-discount s{text-decoration-thickness:1.5px}.sm-offer-close-discount b{display:inline-flex;padding:5px 8px;border-radius:999px;background:#f36a2d;color:#fff;font-size:11px;letter-spacing:.04em}
 .sm-dh-primary,.sm-mh-cta,.sm-mh-offer-cta,.sm-offer-close-cta,.sm-faq-closing a,.sm-dh-offer>a,.sm-dh-header-cta{font-weight:900!important}
-@media(max-width:640px){.sm-offer-pill{margin:0 auto 14px;font-size:10px;padding-left:10px}.sm-offer-pill strong{font-size:11px;padding:5px 8px}.sm-price-was{font-size:10px!important}.sm-offer-close-discount{justify-content:center}}
+@media(max-width:640px){.sm-offer-pill{margin:0 auto 14px;font-size:10px;padding-left:10px}.sm-offer-pill strong{font-size:11px;padding:5px 8px}.sm-price-was{font-size:10px!important}.sm-offer-close-discount{justify-content:flex-start!important;text-align:left!important}}
 </style>`;
 replaceRequired('</head>', `${css}\n</head>`);
 
