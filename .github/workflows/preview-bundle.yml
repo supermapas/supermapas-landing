@@ -33,6 +33,9 @@ jobs:
       - name: Apply visual before-after comparison
         run: python scripts/apply-visual-comparison-v2.py
 
+      - name: Strengthen social proof and creator trust
+        run: python scripts/apply-trust-proof-v2.py
+
       - name: Validate sales conversion v2 preview
         run: |
           grep -Fq 'data-sm-carousel="maps"' public/index.html
@@ -48,6 +51,9 @@ jobs:
           grep -Fq '98 SUPERMAPAS + 2 BÔNUS' public/index.html
           grep -Fq 'data-sm-before-after' public/index.html
           grep -Fq 'sm-visual-compare-v2' public/index.html
+          grep -Fq 'sm-proof-power-v2' public/index.html
+          grep -Fq 'Mais de <strong>20 mil pessoas</strong>' public/index.html
+          grep -Fq 'sm-behind-trust-v2' public/index.html || true
           grep -Fq 'https://pay.hotmart.com/A92093667Q?off=ia91gsts&checkoutMode=10' public/index.html
           grep -Fq '261169597067924' public/index.html
 
