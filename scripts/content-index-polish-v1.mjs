@@ -78,30 +78,36 @@ const style = `<style id="sm-content-index-polish-v1">
 }
 @media(max-width:760px){
   .sm-catalog-foot{
-    grid-template-columns:44px minmax(0,1fr);
+    grid-template-columns:40px minmax(0,1fr);
     align-items:center;
-    justify-items:stretch;
     width:100%;
+    min-height:104px;
     margin-top:24px;
-    padding:18px 18px;
-    gap:14px;
+    padding:20px 20px 22px;
+    column-gap:14px;
     border-radius:20px;
   }
   .sm-catalog-foot>span{
-    width:44px;
-    height:44px;
-    border-radius:14px;
-    font-size:21px;
+    align-self:center;
+    width:40px;
+    height:40px;
+    border-radius:13px;
+    font-size:20px;
+    margin:0;
   }
   .sm-catalog-foot p{
+    align-self:center;
     max-width:none;
+    margin:0;
+    padding:0;
     font-size:12.5px;
-    line-height:1.5;
+    line-height:1.45;
     text-align:left;
   }
   .sm-catalog-foot strong{
-    margin-bottom:3px;
+    margin:0 0 4px;
     font-size:13.5px;
+    line-height:1.3;
   }
 }
 </style>`;
