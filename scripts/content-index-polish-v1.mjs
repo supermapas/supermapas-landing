@@ -17,40 +17,53 @@ const style = `<style id="sm-content-index-polish-v1">
   .sm-proof-v2-reasons{
     display:block!important;
   }
+
+  /* Give the heading a clear visual gap before the four reasons. */
   .sm-proof-v2-reasons>p,
   .sm-proof-v2-reasons>h3,
-  .sm-proof-v2-reasons>strong{
-    margin-bottom:18px!important;
+  .sm-proof-v2-reasons>strong,
+  .sm-proof-v2-reasons>span:first-child{
+    display:block!important;
+    margin-bottom:0!important;
   }
+
   .sm-proof-v2-reasons>div{
     display:grid!important;
     grid-template-columns:repeat(4,minmax(0,1fr))!important;
     gap:6px!important;
-    align-items:stretch!important;
-    margin:0!important;
-    padding:0 0 22px!important;
+    align-items:center!important;
+    margin:22px 0 0!important;
+    padding:0 0 24px!important;
     border-bottom:1px solid rgba(255,255,255,.18)!important;
   }
+
+  /* Force true horizontal + vertical centering inside every pill. */
   .sm-proof-v2-reasons>div>span{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
     box-sizing:border-box!important;
     min-width:0!important;
     width:100%!important;
     height:42px!important;
-    padding:0 3px!important;
+    min-height:42px!important;
+    margin:0!important;
+    padding:0 2px!important;
     border-radius:999px!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:center!important;
     font-size:10px!important;
+    font-weight:800!important;
     line-height:1!important;
     text-align:center!important;
+    text-indent:0!important;
     white-space:nowrap!important;
   }
+
+  /* One separator only, with the same breathing room on both sides. */
   .sm-proof-v2-reasons>small{
     display:flex!important;
     align-items:center!important;
     gap:10px!important;
-    margin:22px 0 0!important;
+    margin:24px 0 0!important;
     padding:0!important;
     border:0!important;
   }
