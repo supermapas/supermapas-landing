@@ -51,6 +51,7 @@ runpy.run_path("scripts/build-free-maps-page.py", run_name="__main__")
 runpy.run_path("scripts/polish-free-maps-page.py", run_name="__main__")
 runpy.run_path("scripts/add-free-maps-complete-cta.py", run_name="__main__")
 runpy.run_path("scripts/marketing-offer-v2.py", run_name="__main__")
+runpy.run_path("scripts/marketing-proof-exact.py", run_name="__main__")
 
 assert "Sitemap: https://www.supermapas.com.br/sitemap.xml" in robots
 assert "https://www.supermapas.com.br/" in sitemap
@@ -77,5 +78,8 @@ assert "2026-08-30T23:59:59-03:00" in landing
 assert "95 páginas · 2 por página" in landing
 assert "sm-early-proof" in landing
 assert "GARANTIR 50% OFF AGORA" in landing
+assert "Muito prático, bonito, fácil de aplicar e muito funcional." in landing
+assert "Amei a organização do material e a facilidade de entendimento." in landing
+assert "Muito bom, fácil interpretação, auxilia muito nos concursos e o professor." in landing
 
 print("legacy route hardening and marketing offer assets generated")
