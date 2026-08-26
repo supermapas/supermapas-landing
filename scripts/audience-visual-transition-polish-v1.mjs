@@ -8,6 +8,11 @@ if (!html.includes('id="publicos"') || !html.includes('id="estudo-visual"')) {
   throw new Error('Audience or visual study section not found.');
 }
 
+html = html.replace(
+  '<h2 id="sm-visual-study-title">A mesma matéria. <span>Uma forma muito mais visual de entender.</span></h2>',
+  '<h2 id="sm-visual-study-title"><span class="sm-vc-title-line sm-vc-title-line-1">A mesma matéria.</span> <span class="sm-vc-title-line sm-vc-title-line-2">Uma forma muito mais</span> <span class="sm-vc-title-line sm-vc-title-line-3">visual de entender.</span></h2>'
+);
+
 const css = `<style id="sm-audience-visual-transition-polish-v1">
 /* Tighten the transition between audience pain and visual proof without offsets. */
 #publicos.sm-pain-audience{padding-bottom:28px!important}
@@ -56,6 +61,10 @@ const css = `<style id="sm-audience-visual-transition-polish-v1">
   letter-spacing:-.048em!important;
   font-weight:900!important;
 }
+.sm-visual-compare-v3 .sm-vc-title-line{display:inline!important}
+.sm-visual-compare-v3 .sm-vc-title-line-1{color:#211c2b!important}
+.sm-visual-compare-v3 .sm-vc-title-line-2,
+.sm-visual-compare-v3 .sm-vc-title-line-3{color:#7056d9!important}
 .sm-visual-compare-v3 .sm-vc-intro p{
   margin:0 auto!important;
   font-size:17px!important;
@@ -87,9 +96,17 @@ const css = `<style id="sm-audience-visual-transition-polish-v1">
     letter-spacing:.15em!important;
   }
   .sm-visual-compare-v3 .sm-vc-intro h2{
+    width:100%!important;
+    max-width:none!important;
     margin-bottom:12px!important;
-    font-size:clamp(38px,10.8vw,50px)!important;
-    line-height:.97!important;
+    font-size:clamp(34px,9.3vw,44px)!important;
+    line-height:.96!important;
+    letter-spacing:-.05em!important;
+  }
+  .sm-visual-compare-v3 .sm-vc-title-line{
+    display:block!important;
+    width:100%!important;
+    white-space:nowrap!important;
   }
   .sm-visual-compare-v3 .sm-vc-intro p{font-size:15px!important}
 }
@@ -100,6 +117,7 @@ const css = `<style id="sm-audience-visual-transition-polish-v1">
     min-height:44px!important;
     font-size:11px!important;
   }
+  .sm-visual-compare-v3 .sm-vc-intro h2{font-size:clamp(32px,9vw,40px)!important}
 }
 </style>`;
 
