@@ -32,8 +32,7 @@ const css = `<style id="sm-carousel-fit-polish-v1">
   border:0!important;
   background:transparent!important;
   overflow:visible!important;
-  transform:none!important;
-  filter:none!important;
+  filter:drop-shadow(0 14px 18px rgba(51,37,88,.12)) drop-shadow(0 -4px 8px rgba(51,37,88,.045))!important;
 }
 .sm-format-carousel-track{
   position:relative!important;
@@ -58,25 +57,28 @@ const css = `<style id="sm-carousel-fit-polish-v1">
   object-position:50% 50%!important;
   background:transparent!important;
   transform:none!important;
-  filter:drop-shadow(0 22px 28px #33255824)!important;
+  filter:none!important;
 }
 
 /* Map: same 93% visual width used by the fixed Production image. */
 .sm-format-v2-map-visual.sm-format-carousel .sm-format-carousel-frame{
   width:93%!important;
   aspect-ratio:2048/1447!important;
+  transform:translateX(16px)!important;
 }
 
 /* Summary: same width occupied by each fixed summary in Production. */
 .sm-format-v2-summary-visual.sm-format-carousel .sm-format-carousel-frame{
   width:47%!important;
   aspect-ratio:1447/2048!important;
+  transform:none!important;
 }
 
 /* Cards: preserve the visual footprint of the original 3-card composition. */
 .sm-format-v2-card-visual.sm-format-carousel .sm-format-carousel-frame{
   width:82%!important;
   aspect-ratio:2048/1447!important;
+  transform:translateX(19px)!important;
 }
 
 /* Arrows are anchored to the actual frame edges without changing its size. */
@@ -95,23 +97,24 @@ const css = `<style id="sm-carousel-fit-polish-v1">
 .sm-format-v2-card-visual.sm-format-carousel .sm-carousel-next{right:6%!important}
 
 @media (max-width:1100px) and (min-width:901px){
-  .sm-format-v2-map-visual.sm-format-carousel .sm-format-carousel-frame{width:92%!important}
-  .sm-format-v2-summary-visual.sm-format-carousel .sm-format-carousel-frame{width:46.5%!important}
-  .sm-format-v2-card-visual.sm-format-carousel .sm-format-carousel-frame{width:84%!important}
+  .sm-format-v2-map-visual.sm-format-carousel .sm-format-carousel-frame{width:92%!important;transform:translateX(12px)!important}
+  .sm-format-v2-summary-visual.sm-format-carousel .sm-format-carousel-frame{width:46.5%!important;transform:none!important}
+  .sm-format-v2-card-visual.sm-format-carousel .sm-format-carousel-frame{width:84%!important;transform:translateX(11px)!important}
 }
 
 @media (max-width:900px) and (min-width:641px){
-  .sm-format-v2-map-visual.sm-format-carousel .sm-format-carousel-frame{width:91%!important}
-  .sm-format-v2-summary-visual.sm-format-carousel .sm-format-carousel-frame{width:48%!important}
-  .sm-format-v2-card-visual.sm-format-carousel .sm-format-carousel-frame{width:90%!important}
+  .sm-format-v2-map-visual.sm-format-carousel .sm-format-carousel-frame{width:91%!important;transform:translateX(9px)!important}
+  .sm-format-v2-summary-visual.sm-format-carousel .sm-format-carousel-frame{width:48%!important;transform:none!important}
+  .sm-format-v2-card-visual.sm-format-carousel .sm-format-carousel-frame{width:90%!important;transform:translateX(10px)!important}
   .sm-format-v2-summary-visual.sm-format-carousel .sm-carousel-prev{left:21%!important}
   .sm-format-v2-summary-visual.sm-format-carousel .sm-carousel-next{right:21%!important}
 }
 
 @media (max-width:640px){
-  .sm-format-v2-map-visual.sm-format-carousel .sm-format-carousel-frame{width:92%!important}
-  .sm-format-v2-summary-visual.sm-format-carousel .sm-format-carousel-frame{width:54%!important}
-  .sm-format-v2-card-visual.sm-format-carousel .sm-format-carousel-frame{width:92%!important}
+  .sm-format-carousel-frame{filter:drop-shadow(0 10px 14px rgba(51,37,88,.11)) drop-shadow(0 -3px 6px rgba(51,37,88,.04))!important}
+  .sm-format-v2-map-visual.sm-format-carousel .sm-format-carousel-frame{width:92%!important;transform:none!important}
+  .sm-format-v2-summary-visual.sm-format-carousel .sm-format-carousel-frame{width:54%!important;transform:none!important}
+  .sm-format-v2-card-visual.sm-format-carousel .sm-format-carousel-frame{width:92%!important;transform:none!important}
   .sm-format-v2-map-visual.sm-format-carousel .sm-carousel-prev,
   .sm-format-v2-card-visual.sm-format-carousel .sm-carousel-prev{left:0!important}
   .sm-format-v2-map-visual.sm-format-carousel .sm-carousel-next,
