@@ -15,6 +15,7 @@ python3 scripts/apply-aggressive-sales-v2.py
 python3 scripts/apply-aggressive-marketing-v2.py
 python3 scripts/apply-visual-comparison-v2.py
 python3 scripts/apply-trust-proof-v2.py
+python3 scripts/apply-preview-refinements-v3.py
 
 cp public/index.html dist/index.html
 
