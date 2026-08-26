@@ -12,11 +12,6 @@
       "source": "/c%C3%B3pia-mapas-mentais-de-l%C3%ADngua-portug",
       "destination": "/",
       "permanent": true
-    },
-    {
-      "source": "/mapas-gratuitos",
-      "destination": "https://supermapas.wixsite.com/website/mapas-gratuitos",
-      "permanent": false
     }
   ],
   "headers": [
@@ -31,6 +26,24 @@
     },
     {
       "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, stale-while-revalidate=60"
+        }
+      ]
+    },
+    {
+      "source": "/mapas-gratuitos",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, stale-while-revalidate=60"
+        }
+      ]
+    },
+    {
+      "source": "/mapas-gratuitos/index.html",
       "headers": [
         {
           "key": "Cache-Control",
