@@ -82,7 +82,21 @@ const css = `<style id="sm-visual-compare-polish-v1">
   box-shadow:none!important;
 }
 .sm-visual-compare-v3 .sm-vc-divider{
-  box-shadow:0 4px 18px rgba(84,62,145,.24)!important;
+  width:5px!important;
+  background:linear-gradient(180deg,#7b4df1 0%,#5f59ee 48%,#2e9ee7 100%)!important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.85),0 6px 22px rgba(83,69,203,.34)!important;
+}
+.sm-visual-compare-v3 .sm-vc-divider span{
+  width:44px!important;
+  height:44px!important;
+  display:grid!important;
+  place-items:center!important;
+  border-radius:50%!important;
+  background:linear-gradient(135deg,#7548ee,#388fe6)!important;
+  color:#fff!important;
+  border:3px solid #fff!important;
+  box-shadow:0 7px 22px rgba(68,54,180,.38)!important;
+  font-weight:900!important;
 }
 .sm-visual-compare-v3 .sm-vc-benefits{
   margin-top:clamp(22px,2.4vw,34px)!important;
@@ -127,6 +141,7 @@ const css = `<style id="sm-visual-compare-polish-v1">
   .sm-visual-compare-v3 .sm-vc-text-content{padding:20px!important;gap:7px!important}
   .sm-visual-compare-v3 .sm-vc-text-content h3{font-size:28px!important}
   .sm-visual-compare-v3 .sm-vc-text-content p{font-size:9.5px!important;line-height:1.34!important}
+  .sm-visual-compare-v3 .sm-vc-divider span{width:38px!important;height:38px!important}
   .sm-visual-compare-v3 .sm-vc-benefits{grid-template-columns:1fr!important}
   .sm-visual-compare-v3 .sm-vc-benefits>div{min-height:92px!important}
 }
