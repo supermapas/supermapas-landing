@@ -18,5 +18,6 @@ node scripts/mobile-hero-summary-polish-v1.mjs dist/index.html
 node scripts/audience-pain-layout-fix-v1.mjs dist/index.html
 node scripts/audience-pain-compact-v2.mjs dist/index.html
 node scripts/audience-pain-hard-reset-v1.mjs dist/index.html
+node scripts/audience-pain-balance-v4.mjs dist/index.html
 
 echo "Sales conversion v3 preview built from production base."
