@@ -72,7 +72,7 @@ const css = `
 .sm-offer-close-discount{display:flex;align-items:center;justify-content:flex-start;gap:9px;width:100%;margin-bottom:6px;font-size:13px;font-weight:800;color:#7a7489;text-align:left}
 .sm-offer-close-discount s{text-decoration-thickness:1.5px}.sm-offer-close-discount b{display:inline-flex;padding:5px 8px;border-radius:999px;background:#f36a2d;color:#fff;font-size:11px;letter-spacing:.04em}
 .sm-dh-primary,.sm-mh-cta,.sm-mh-offer-cta,.sm-offer-close-cta,.sm-faq-closing a,.sm-dh-offer>a,.sm-dh-header-cta{font-weight:900!important}
-@media(max-width:640px){.sm-offer-pill{margin:0 auto 14px;font-size:10px;padding-left:10px}.sm-offer-pill strong{font-size:11px;padding:5px 8px}.sm-price-was{font-size:10px!important}.sm-offer-close-discount{justify-content:flex-start!important;text-align:left!important}}
+@media(max-width:640px){.sm-mh-copy>.sm-offer-pill{display:flex;width:100%;max-width:none;box-sizing:border-box;justify-content:space-between;margin:0 0 18px;padding:8px 8px 8px 16px;font-size:12px;letter-spacing:.09em}.sm-mh-copy>.sm-offer-pill strong{font-size:14px;padding:9px 14px}.sm-price-was{font-size:10px!important}.sm-offer-close-discount{justify-content:flex-start!important;text-align:left!important}}
 </style>`;
 replaceRequired('</head>', `${css}\n</head>`);
 
