@@ -13,5 +13,6 @@ node scripts/syntax-map-swap-v1.mjs dist/index.html
 node scripts/carousel-map-order-v2.mjs dist/index.html
 node scripts/carousel-fit-polish-v1.mjs dist/index.html
 node scripts/visual-compare-polish-v1.mjs dist/index.html
+node scripts/mobile-hero-summary-polish-v1.mjs dist/index.html
 
 echo "Sales conversion v3 preview built from production base."
