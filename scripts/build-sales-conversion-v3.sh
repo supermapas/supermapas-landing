@@ -10,6 +10,7 @@ node scripts/content-index-polish-v1.mjs dist/index.html
 node scripts/sales-conversion-v3.mjs dist/index.html
 node scripts/sales-conversion-v3-cleanup.mjs dist/index.html
 node scripts/syntax-map-swap-v1.mjs dist/index.html
+node scripts/carousel-map-order-v2.mjs dist/index.html
 node scripts/carousel-fit-polish-v1.mjs dist/index.html
 
 echo "Sales conversion v3 preview built from production base."
