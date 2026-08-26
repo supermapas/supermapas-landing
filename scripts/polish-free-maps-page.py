@@ -21,10 +21,26 @@ if old_download not in html:
     raise SystemExit("free maps download link marker not found")
 html = html.replace(old_download, new_download, 1)
 
+staging_endpoint = "https://qzrkgekzfbmsghudxkmd.supabase.co/functions/v1/capture-free-maps-lead"
+production_endpoint = "https://lkgcipyxkkhmqqxcqxxp.supabase.co/functions/v1/capture-free-maps-lead"
+if staging_endpoint not in html:
+    raise SystemExit("staging free maps endpoint marker not found")
+html = html.replace(staging_endpoint, production_endpoint, 1)
+
+staging_anon = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6cmtnZWt6ZmJtc2dodWR4a21kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2NDU4NTcsImV4cCI6MjEwMjIyMTg1N30.ndlkz5HfmKTZjv3O2W-1D3Mw1gMIx97XBBxR0yEi9eE"
+production_anon = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxrZ2NpcHl4a2tobXFxeGNxeHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MjEyNTEsImV4cCI6MjEwMjM5NzI1MX0.VI4vcNpkKbkncieQYaLN0_Z3YiDeS-Y6Ioq7AFHeuIo"
+if staging_anon not in html:
+    raise SystemExit("staging anon key marker not found")
+html = html.replace(staging_anon, production_anon, 1)
+
 PAGE.write_text(html, encoding="utf-8")
 
 assert 'Conheça gratuitamente os <span>SuperMapas</span> de Língua Portuguesa.' in html
 assert 'text-wrap:balance' in html
 assert 'download="Supermapas-versao-gratuita.pdf"' in html
+assert production_endpoint in html
+assert production_anon in html
+assert staging_endpoint not in html
+assert staging_anon not in html
 
-print("free maps page title and download filename polished")
+print("free maps page polished and pointed to production lead capture")
