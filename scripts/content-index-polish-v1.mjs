@@ -5,6 +5,12 @@ if (!target) throw new Error('Usage: node scripts/content-index-polish-v1.mjs <h
 
 let html = fs.readFileSync(target, 'utf8');
 
+/* Final copy and browser icon for this preview. */
+html = html.replace('Veja tudo o que está <span>incluído no material.</span>', 'Veja tudo o que está <span>incluso no material.</span>');
+if (!html.includes('href="/favicon.png"')) {
+  html = html.replace('</head>', '<link rel="icon" type="image/png" sizes="64x64" href="/favicon.png"/><link rel="apple-touch-icon" href="/favicon.png"/></head>');
+}
+
 const style = `<style id="sm-content-index-polish-v1">
 /* Keep iOS Safari from zooming when the catalog search receives focus. */
 @media (max-width:760px){
@@ -72,17 +78,31 @@ const style = `<style id="sm-content-index-polish-v1">
 }
 @media(max-width:760px){
   .sm-catalog-foot{
-    grid-template-columns:1fr;
-    justify-items:center;
+    grid-template-columns:44px minmax(0,1fr);
+    align-items:center;
+    justify-items:stretch;
     width:100%;
     margin-top:24px;
-    padding:22px 20px 23px;
-    gap:12px;
+    padding:18px 18px;
+    gap:14px;
     border-radius:20px;
   }
-  .sm-catalog-foot>span{width:48px;height:48px;border-radius:15px}
-  .sm-catalog-foot p{max-width:440px;font-size:13px;line-height:1.55;text-align:center}
-  .sm-catalog-foot strong{margin-bottom:4px;font-size:14px}
+  .sm-catalog-foot>span{
+    width:44px;
+    height:44px;
+    border-radius:14px;
+    font-size:21px;
+  }
+  .sm-catalog-foot p{
+    max-width:none;
+    font-size:12.5px;
+    line-height:1.5;
+    text-align:left;
+  }
+  .sm-catalog-foot strong{
+    margin-bottom:3px;
+    font-size:13.5px;
+  }
 }
 </style>`;
 
@@ -95,8 +115,6 @@ const script = `<script id="sm-content-index-polish-interactions">(function(){
     groups.forEach(function(group){group.open=false;});
   }
 
-  /* The original filter decides which groups/items match. This refinement only
-     keeps matching accordions closed so the visitor chooses what to expand. */
   input.addEventListener('input',keepClosed);
   input.addEventListener('search',keepClosed);
 
