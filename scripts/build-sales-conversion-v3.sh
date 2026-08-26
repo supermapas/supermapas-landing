@@ -20,6 +20,8 @@ node scripts/audience-pain-compact-v2.mjs dist/index.html
 node scripts/audience-pain-hard-reset-v1.mjs dist/index.html
 node scripts/audience-pain-balance-v4.mjs dist/index.html
 node scripts/audience-message-polish-v1.mjs dist/index.html
+node scripts/visual-message-simplify-v1.mjs dist/index.html
+node scripts/visual-message-title-width-v1.mjs dist/index.html
 node scripts/audience-nav-mobile-polish-v1.mjs dist/index.html
 node scripts/visual-section-order-v1.mjs dist/index.html
 node scripts/audience-visual-transition-polish-v1.mjs dist/index.html
