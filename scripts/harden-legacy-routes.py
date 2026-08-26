@@ -50,6 +50,7 @@ not_found = """<!doctype html>
 runpy.run_path("scripts/build-free-maps-page.py", run_name="__main__")
 runpy.run_path("scripts/polish-free-maps-page.py", run_name="__main__")
 runpy.run_path("scripts/add-free-maps-complete-cta.py", run_name="__main__")
+runpy.run_path("scripts/marketing-offer-v2.py", run_name="__main__")
 
 assert "Sitemap: https://www.supermapas.com.br/sitemap.xml" in robots
 assert "https://www.supermapas.com.br/" in sitemap
@@ -66,4 +67,15 @@ assert 'download="Supermapas-versao-gratuita.pdf"' in free_page
 assert 'class="lower-cta js-preserve"' in free_page
 assert "QUERO CONHECER A VERSÃO COMPLETA" in free_page
 
-print("legacy route hardening assets generated")
+landing = (PUBLIC / "index.html").read_text(encoding="utf-8")
+assert 'id="sm-marketing-offer-v2"' in landing
+assert 'id="sm-marketing-offer-v2-css"' in landing
+assert "50% OFF" in landing
+assert "R$134" in landing
+assert "R$67" in landing
+assert "2026-08-30T23:59:59-03:00" in landing
+assert "95 páginas · 2 por página" in landing
+assert "sm-early-proof" in landing
+assert "GARANTIR 50% OFF AGORA" in landing
+
+print("legacy route hardening and marketing offer assets generated")
