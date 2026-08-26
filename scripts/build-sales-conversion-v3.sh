@@ -27,5 +27,6 @@ node scripts/nav-order-hard-fix-v1.mjs dist/index.html
 node scripts/offer-redundancy-cleanup-v1.mjs dist/index.html
 node scripts/fixed-dock-polish-v2.mjs dist/index.html
 node scripts/proof-real-screenshots-v1.mjs dist/index.html
+node scripts/offer-value-stack-v1.mjs dist/index.html
 
 echo "Sales conversion v3 preview built from production base."
