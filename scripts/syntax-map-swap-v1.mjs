@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+const target=process.argv[2];
+if(!target) throw new Error('Usage: node scripts/syntax-map-swap-v1.mjs <html-file>');
+let html=fs.readFileSync(target,'utf8');
+const oldId='1a67b8_671c4f73838544f99f02cf381f2c30d0~mv2.png';
+const newUrl='https://static.wixstatic.com/media/1a67b8_3349f85caed646c39461d5c2c9bd0ba1~mv2.png/v1/fit/w_1200,h_848/file.webp';
+const re=new RegExp(`https://static\\.wixstatic\\.com/media/${oldId.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\$&')}/v1/fit/w_1200,h_848/file\\.webp`,'g');
+if(!re.test(html)) throw new Error('Vozes verbais carousel image not found.');
+html=html.replace(re,newUrl).replace('Supermapa: Vozes verbais','Supermapa: Sintaxe — definição e termos essenciais');
+fs.writeFileSync(target,html);
+console.log('Syntax Supermap swap applied using Wix WebP delivery.');
