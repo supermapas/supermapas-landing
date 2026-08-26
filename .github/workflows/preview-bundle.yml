@@ -147,8 +147,8 @@ jobs:
 
       - name: Validate direct-production hardening
         run: |
-          grep -Fq 'https://pay.hotmart.com/A92093667Q?checkoutMode=2&off=ia91gsts' public/index.html
-          ! grep -R -q 'checkoutMode=10' public
+          grep -Fq 'https://pay.hotmart.com/A92093667Q?off=ia91gsts&checkoutMode=10' public/index.html
+          ! grep -R -q 'checkoutMode=2' public
           grep -Fq '261169597067924' public/index.html
           grep -Fq 'rel="canonical" href="https://www.supermapas.com.br/"' public/index.html
           grep -Fq 'property="og:title"' public/index.html
