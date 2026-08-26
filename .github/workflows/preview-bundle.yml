@@ -1,12 +1,15 @@
 name: Validate sales conversion v2 preview
 
 on:
+  push:
+    branches:
+      - feat/aggressive-sales-v2
   pull_request:
     branches: [main]
   workflow_dispatch:
 
 concurrency:
-  group: sales-conversion-v2-${{ github.event.pull_request.number || github.ref }}
+  group: sales-conversion-v2-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 permissions:
@@ -15,7 +18,7 @@ permissions:
 
 jobs:
   build-preview-bundle:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -57,13 +60,12 @@ jobs:
           grep -Fq 'sm-visual-compare-v2' public/index.html
           grep -Fq 'sm-proof-power-v2' public/index.html
           grep -Fq 'Mais de <strong>20 mil pessoas</strong>' public/index.html
-          grep -Fq 'sm-behind-trust-v2' public/index.html || true
           grep -Fq 'https://pay.hotmart.com/A92093667Q?off=ia91gsts&checkoutMode=10' public/index.html
           grep -Fq '261169597067924' public/index.html
 
       - name: Materialize sales conversion v2 preview
         env:
-          PREVIEW_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PREVIEW_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
         run: |
           rm -rf vercel-static
           cp -a public vercel-static
@@ -74,5 +76,5 @@ jobs:
             echo "Sales conversion preview already materialized"
             exit 0
           fi
-          git commit -m "Materialize sales conversion v2 preview"
+          git commit -m "Materialize sales conversion v2 preview [skip ci]"
           git push origin "HEAD:${PREVIEW_BRANCH}"
