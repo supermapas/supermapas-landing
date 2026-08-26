@@ -14,22 +14,35 @@ const style = `<style id="sm-content-index-polish-v1">
 @media (max-width:760px){
   .sm-catalog-search input{font-size:16px!important;line-height:1.3}
 
+  .sm-proof-v2-reasons{
+    display:block!important;
+  }
+  .sm-proof-v2-reasons>p,
+  .sm-proof-v2-reasons>h3,
+  .sm-proof-v2-reasons>strong{
+    margin-bottom:18px!important;
+  }
   .sm-proof-v2-reasons>div{
     display:grid!important;
     grid-template-columns:repeat(4,minmax(0,1fr))!important;
     gap:6px!important;
-    align-items:center!important;
-    margin:0 0 18px!important;
-    padding:0 0 18px!important;
+    align-items:stretch!important;
+    margin:0!important;
+    padding:0 0 22px!important;
     border-bottom:1px solid rgba(255,255,255,.18)!important;
   }
   .sm-proof-v2-reasons>div>span{
+    box-sizing:border-box!important;
     min-width:0!important;
     width:100%!important;
-    padding:9px 4px!important;
+    height:42px!important;
+    padding:0 3px!important;
     border-radius:999px!important;
-    font-size:10.5px!important;
-    line-height:1.15!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    font-size:10px!important;
+    line-height:1!important;
     text-align:center!important;
     white-space:nowrap!important;
   }
@@ -37,8 +50,9 @@ const style = `<style id="sm-content-index-polish-v1">
     display:flex!important;
     align-items:center!important;
     gap:10px!important;
-    margin:0!important;
-    padding-top:2px!important;
+    margin:22px 0 0!important;
+    padding:0!important;
+    border:0!important;
   }
 }
 </style>`;
