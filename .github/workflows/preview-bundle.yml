@@ -18,163 +18,53 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
 
-      - name: Restore approved hydrated React bundle
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Start from current approved Production bundle
         run: |
-          mkdir -p public /tmp/sm-approved
-          curl --fail --location --retry 4 --retry-delay 2 \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/9548938058/zip" \
-            -o /tmp/sm-approved/github-pages.zip
-          unzip -o /tmp/sm-approved/github-pages.zip -d /tmp/sm-approved/artifact
-          test -f /tmp/sm-approved/artifact/artifact.tar
-          tar -xf /tmp/sm-approved/artifact/artifact.tar -C public
+          test -f vercel-static/index.html
+          rm -rf public
+          cp -a vercel-static public
 
-      - name: Apply exact approved landing patches
+      - name: Normalize every Hotmart CTA to checkout mode 10
         run: |
           python - <<'PY'
           from pathlib import Path
 
-          workflow = Path('.github/workflows/deploy-pages.yml').read_text(encoding='utf-8')
-          start_marker = "          python - <<'PY'\n"
-          start = workflow.find(start_marker)
-          if start < 0:
-              raise SystemExit('approved patch heredoc start not found')
-          start += len(start_marker)
-          end = workflow.find("\n          PY\n", start)
-          if end < 0:
-              raise SystemExit('approved patch heredoc end not found')
-
-          lines = workflow[start:end].splitlines()
-          script = '\n'.join(line[10:] if line.startswith('          ') else line for line in lines) + '\n'
-          compile(script, '<approved-wix-patches>', 'exec')
-          exec(script, {'__name__': '__main__'})
+          root = Path('public')
+          target = 'https://pay.hotmart.com/A92093667Q?off=ia91gsts&checkoutMode=10'
+          sources = (
+              'https://pay.hotmart.com/A92093667Q?checkoutMode=2&off=ia91gsts',
+              'https://pay.hotmart.com/A92093667Q?checkoutMode=10',
+          )
+          replaced = 0
+          for path in root.rglob('*'):
+              if not path.is_file() or path.suffix.lower() not in {'.html','.js','.json','.txt'}:
+                  continue
+              try:
+                  text = path.read_text(encoding='utf-8')
+              except (UnicodeDecodeError, OSError):
+                  continue
+              original = text
+              for old in sources:
+                  count = text.count(old)
+                  if count:
+                      text = text.replace(old, target)
+                      replaced += count
+              if text != original:
+                  path.write_text(text, encoding='utf-8')
+          if replaced < 1:
+              raise SystemExit('No Hotmart checkout URLs were replaced')
+          print(f'Hotmart checkout URLs normalized: {replaced}')
           PY
 
-      - name: Apply direct-production hardening
-        run: python scripts/harden-production.py
-
-      - name: Start near-fold format images earlier
-        run: python scripts/optimize-near-fold-images.py
-
-      - name: Trim unrelated application CSS
-        run: python scripts/trim-landing-css.py
-
-      - name: Replace Next hydration with static interactions
-        run: python scripts/strip-next-runtime.py
-
-      - name: Harden legacy routes and SEO files
-        run: python scripts/harden-legacy-routes.py
-
-      - name: Validate approved visual bundle invariants
+      - name: Validate checkout URLs
         run: |
-          test -f public/index.html
-          test $(wc -c < public/index.html) -gt 20000
-          grep -q 'sm-section-nav' public/index.html
-          grep -q '/_next/static/' public/index.html
-          ! grep -R -q '/supermapas-landing' public
-          grep -q 'sm-wix-audience-eager' public/index.html
-          grep -q 'sm-wix-parent-overlay-bridge' public/index.html
-          grep -q 'O que está incluso no acesso?' public/index.html
-          ! grep -R -q 'O que está incluído no acesso?' public
-          grep -q 'URLSearchParams(location.search).get("embed")&&j()' public/_next/static/chunks/0cnqcucz7h_pk.js
-          grep -Fq 'let r=t.matches&&o;' public/_next/static/chunks/0cnqcucz7h_pk.js
-          grep -Fq 'right:-8px;touch-action:none!important' public/_next/static/chunks/3qg_tgjt67qum.css
-          grep -R -q 'setPointerCapture' public/_next/static
-          grep -R -q 'IntersectionObserver' public/_next/static
-
-      - name: Validate landing CSS trim
-        run: |
-          css=public/_next/static/chunks/06-3g1k36rw0y.css
-          test -f "$css"
-          grep -Fq '.sm-sales-shell{' "$css"
-          grep -Fq '.sm-sales-dock{' "$css"
-          grep -Fq '.sm-desktop-hero{' "$css"
-          grep -Fq '.sm-mobile-hero{' "$css"
-          grep -Fq '.sm-dh-primary{' "$css"
-          grep -Fq '.sm-mh-cta' "$css"
-          grep -Fq '@font-face{font-family:Manrope' "$css"
-          ! grep -Fq '.auth-shell{' "$css"
-          ! grep -Fq '.dashboard-page' "$css"
-          ! grep -Fq '.editor-page' "$css"
-          ! grep -Fq '.billing-page' "$css"
-          ! grep -Fq '.library-page' "$css"
-          test $(wc -c < "$css") -lt 93500
-          test $(wc -c < "$css") -gt 20000
-
-      - name: Validate static runtime optimization
-        run: |
-          grep -Fq 'id="sm-static-interactions"' public/index.html
-          ! grep -Fq 'self.__next_f' public/index.html
-          ! grep -Eq '<script[^>]+src="/_next/static/chunks/[^\"]+\.js' public/index.html
-          ! grep -Eq '<link[^>]+as="script"[^>]+/_next/static/chunks/' public/index.html
-          grep -Fq 'sm-image-lightbox' public/index.html
+          grep -Fq 'https://pay.hotmart.com/A92093667Q?off=ia91gsts&checkoutMode=10' public/index.html
+          ! grep -R -q 'checkoutMode=2' public
           grep -Fq 'sm-dock-checkout' public/index.html
-          grep -Fq 'setPointerCapture' public/index.html
-          grep -Fq 'IntersectionObserver' public/index.html
-          grep -Fq 'scrollIntoView' public/index.html
-          test $(wc -c < public/index.html) -lt 90000
-          test -f public/_next/static/chunks/0cnqcucz7h_pk.js
-          test -f public/_next/static/chunks/14mumt5_n0xhi.js
-          python - <<'PY'
-          import re
-          from pathlib import Path
-          html = Path('public/index.html').read_text(encoding='utf-8')
-          match = re.search(r'<script id="sm-static-interactions">(.*?)</script>', html, re.S)
-          if not match:
-              raise SystemExit('static interaction script not found for syntax check')
-          Path('/tmp/sm-static-runtime.js').write_text(match.group(1), encoding='utf-8')
-          PY
-          node --check /tmp/sm-static-runtime.js
-
-      - name: Validate legacy routes and SEO files
-        run: |
-          test -f public/robots.txt
-          test -f public/sitemap.xml
-          test -f public/404.html
-          grep -Fq 'User-agent: *' public/robots.txt
-          grep -Fq 'Sitemap: https://www.supermapas.com.br/sitemap.xml' public/robots.txt
-          grep -Fq '<loc>https://www.supermapas.com.br/</loc>' public/sitemap.xml
-          grep -Fq 'noindex,follow' public/404.html
-          grep -Fq 'Página não encontrada' public/404.html
-          ! grep -Fq '/_next/static/' public/404.html
-          ! grep -Fq 'googletagmanager' public/404.html
-          ! grep -Fq 'connect.facebook.net' public/404.html
-          test $(wc -c < public/404.html) -lt 5000
-
-      - name: Validate direct-production hardening
-        run: |
-          grep -Fq 'https://pay.hotmart.com/A92093667Q?checkoutMode=2&off=ia91gsts' public/index.html
-          ! grep -R -q 'checkoutMode=10' public
+          grep -Fq 'sm-checkout-attribution' public/index.html
           grep -Fq '261169597067924' public/index.html
-          grep -Fq 'rel="canonical" href="https://www.supermapas.com.br/"' public/index.html
-          grep -Fq 'property="og:title"' public/index.html
-          grep -Fq 'property="og:image"' public/index.html
-          grep -Fq 'id="sm-checkout-attribution"' public/index.html
-          grep -Fq "'utm_campaign'" public/index.html
-          grep -Fq "'fbclid'" public/index.html
-          grep -Fq 'id="sm-hero-preload"' public/index.html
-          grep -Fq 'id="sm-format-near-eager"' public/index.html
-          grep -Fq '1a67b8_3ac74c621b754162abd32de5d6843052~mv2.png/v1/fit/w_1600,h_1200/file.webp' public/index.html
-          grep -Fq '1a67b8_65fd23abbd49440aa523bd8d2b7142df~mv2.png/v1/fit/w_1200,h_844/file.webp' public/index.html
-          ! grep -q 'static.hotmart.com/checkout/widget.min.js' public/index.html
-          ! grep -q 'hotmart__button-checkout' public/index.html
-          ! grep -q 'sm-restore-scroll' public/index.html
-          touch public/.nojekyll
 
-      - name: Upload validated bundle only
-        uses: actions/upload-artifact@v4
-        with:
-          name: supermapas-production-ready-${{ github.sha }}
-          path: public
-          if-no-files-found: error
-          retention-days: 7
-
-      - name: Materialize exact validated bundle for isolated hosting
-        if: github.event_name == 'pull_request'
+      - name: Materialize checkout test bundle
         env:
           PREVIEW_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
@@ -184,8 +74,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add vercel-static
           if git diff --cached --quiet; then
-            echo "Validated bundle already materialized"
+            echo "Checkout test bundle already materialized"
             exit 0
           fi
-          git commit -m "Materialize validated landing bundle"
+          git commit -m "Materialize Hotmart checkout mode 10 preview"
           git push origin "HEAD:${PREVIEW_BRANCH}"
