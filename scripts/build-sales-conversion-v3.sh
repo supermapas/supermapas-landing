@@ -30,5 +30,6 @@ node scripts/proof-real-screenshots-v1.mjs dist/index.html
 node scripts/offer-value-stack-v1.mjs dist/index.html
 node scripts/offer-checkout-benefits-polish-v1.mjs dist/index.html
 node scripts/offer-value-contrast-polish-v1.mjs dist/index.html
+node scripts/cta-offer-routing-v1.mjs dist/index.html
 
 echo "Sales conversion v3 preview built from production base."
