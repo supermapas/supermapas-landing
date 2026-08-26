@@ -1,4 +1,5 @@
 from pathlib import Path
+import runpy
 
 PUBLIC = Path("public")
 PUBLIC.mkdir(parents=True, exist_ok=True)
@@ -13,6 +14,9 @@ sitemap = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.supermapas.com.br/</loc>
+  </url>
+  <url>
+    <loc>https://www.supermapas.com.br/mapas-gratuitos</loc>
   </url>
 </urlset>
 """
@@ -43,11 +47,15 @@ not_found = """<!doctype html>
 (PUBLIC / "sitemap.xml").write_text(sitemap, encoding="utf-8")
 (PUBLIC / "404.html").write_text(not_found, encoding="utf-8")
 
+runpy.run_path("scripts/build-free-maps-page.py", run_name="__main__")
+
 assert "Sitemap: https://www.supermapas.com.br/sitemap.xml" in robots
 assert "https://www.supermapas.com.br/" in sitemap
+assert "https://www.supermapas.com.br/mapas-gratuitos" in sitemap
 assert "noindex,follow" in not_found
 assert "_next/static" not in not_found
 assert "googletagmanager" not in not_found
 assert "connect.facebook.net" not in not_found
+assert (PUBLIC / "mapas-gratuitos" / "index.html").exists()
 
 print("legacy route hardening assets generated")
