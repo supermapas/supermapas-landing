@@ -24,16 +24,25 @@ jobs:
           rm -rf public
           cp -a vercel-static public
 
-      - name: Apply sales conversion v2 iteration
+      - name: Apply sales conversion v2 carousels
         run: python scripts/apply-aggressive-sales-v2.py
 
-      - name: Validate first carousel iteration
+      - name: Apply aggressive marketing v2
+        run: python scripts/apply-aggressive-marketing-v2.py
+
+      - name: Validate sales conversion v2 preview
         run: |
-          grep -Fq 'sm-format-v2-map-carousel' public/index.html
+          grep -Fq 'data-sm-carousel="maps"' public/index.html
+          grep -Fq 'data-sm-carousel="summaries"' public/index.html
+          grep -Fq 'data-sm-carousel="cards"' public/index.html
           grep -Fq 'data-sm-carousel-slide="7"' public/index.html
           grep -Fq '1a67b8_b19132c7753849e08a076d81791245a4~mv2.png/v1/fit/w_1200,h_848/file.webp' public/index.html
           ! grep -Fq 'id="amostras"' public/index.html
           ! grep -Fq 'href="#amostras"' public/index.html
+          grep -Fq 'QUERO DOMINAR PORTUGUÊS' public/index.html
+          grep -Fq 'BÔNUS 1' public/index.html
+          grep -Fq 'BÔNUS 2' public/index.html
+          grep -Fq '98 SUPERMAPAS + 2 BÔNUS' public/index.html
           grep -Fq 'https://pay.hotmart.com/A92093667Q?off=ia91gsts&checkoutMode=10' public/index.html
           grep -Fq '261169597067924' public/index.html
 
