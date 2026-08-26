@@ -12,6 +12,11 @@
       "source": "/c%C3%B3pia-mapas-mentais-de-l%C3%ADngua-portug",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/mapas-gratuitos",
+      "destination": "https://supermapas.wixsite.com/website/mapas-gratuitos",
+      "permanent": false
     }
   ],
   "headers": [
