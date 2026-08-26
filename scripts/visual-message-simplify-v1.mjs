@@ -99,22 +99,13 @@ const css = `<style id="sm-visual-message-simplify-v1">
   font-weight:820!important;
 }
 #publicos .sm-study-bridge-copy h3 strong{
-  position:relative!important;
   display:inline!important;
-  color:#28232f!important;
+  color:#6b50d2!important;
   font-weight:900!important;
-  z-index:0!important;
 }
 #publicos .sm-study-bridge-copy h3 strong:after{
-  content:""!important;
-  position:absolute!important;
-  left:-.02em!important;
-  right:-.02em!important;
-  bottom:.04em!important;
-  height:.18em!important;
-  border-radius:999px!important;
-  background:rgba(112,86,217,.18)!important;
-  z-index:-1!important;
+  content:none!important;
+  display:none!important;
 }
 #publicos .sm-study-bridge-copy p{
   margin:14px 0 0!important;
