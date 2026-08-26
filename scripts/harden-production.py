@@ -12,11 +12,12 @@ OG_IMAGE = 'https://static.wixstatic.com/media/1a67b8_3ac74c621b754162abd32de5d6
 FAVICON = 'https://static.wixstatic.com/media/1a67b8_4f097583af86427db8e4168a1012c7a3~mv2.png'
 META_PIXEL_ID = '261169597067924'
 GOOGLE_TAG_ID = 'AW-18370953717'
-CHECKOUT_OLD = 'https://pay.hotmart.com/A92093667Q?checkoutMode=2&off=ia91gsts'
+CHECKOUT_SOURCES = (
+    'https://pay.hotmart.com/A92093667Q?checkoutMode=10',
+    'https://pay.hotmart.com/A92093667Q?checkoutMode=2&off=ia91gsts',
+)
 CHECKOUT = 'https://pay.hotmart.com/A92093667Q?off=ia91gsts&checkoutMode=10'
 
-# Keep the approved visuals, but request appropriately sized WebP variants from the same Wix CDN.
-# Replacements are applied across the hydrated bundle so React cannot restore the heavier PNG URLs.
 HERO_IMAGE_ORIGINAL = 'https://static.wixstatic.com/media/1a67b8_3ac74c621b754162abd32de5d6843052~mv2.png'
 HERO_IMAGE_WEBP = 'https://static.wixstatic.com/media/1a67b8_3ac74c621b754162abd32de5d6843052~mv2.png/v1/fit/w_1600,h_1200/file.webp'
 IMAGE_REWRITES = {
@@ -35,8 +36,6 @@ IMAGE_REWRITES = {
         'https://static.wixstatic.com/media/1a67b8_4906fb8fd7ef4ec1b33346f2b3ce670d~mv2.png/v1/fit/w_640,h_904/file.webp',
 }
 
-# Replace stale checkout references and the selected image URLs everywhere React may hydrate from,
-# not only index.html.
 replaced = 0
 image_replacements = 0
 for path in ROOT.rglob('*'):
@@ -49,11 +48,12 @@ for path in ROOT.rglob('*'):
 
     changed = False
 
-    count = text.count(CHECKOUT_OLD)
-    if count:
-        text = text.replace(CHECKOUT_OLD, CHECKOUT)
-        replaced += count
-        changed = True
+    for old_checkout in CHECKOUT_SOURCES:
+        count = text.count(old_checkout)
+        if count:
+            text = text.replace(old_checkout, CHECKOUT)
+            replaced += count
+            changed = True
 
     for old, new in IMAGE_REWRITES.items():
         count = text.count(old)
