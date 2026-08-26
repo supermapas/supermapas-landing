@@ -13,37 +13,45 @@ const css=`<style id="sm-mobile-hero-summary-polish-v1">
 .sm-format-carousel-frame{filter:none!important;background:#fff!important;box-shadow:0 14px 28px rgba(51,37,88,.13),0 4px 10px rgba(51,37,88,.07)!important}
 .sm-format-carousel-slide{filter:none!important;box-shadow:none!important}
 .sm-mobile-hero-break{display:inline}
+
+/* Balanced offer badge: shorter, narrower, and equal typography on both sides. */
 .sm-hero-offer-badge-v3{
-  width:min(88vw,610px)!important;
+  width:min(76vw,520px)!important;
   max-width:100%!important;
-  min-height:64px!important;
+  min-height:52px!important;
   margin-left:auto!important;
   margin-right:auto!important;
-  padding:8px 10px!important;
+  padding:5px 7px!important;
   display:flex!important;
   align-items:center!important;
   justify-content:space-between!important;
-  gap:10px!important;
+  gap:8px!important;
   box-sizing:border-box!important;
   text-transform:uppercase!important;
 }
-.sm-hero-offer-badge-v3 strong{
-  padding:11px 18px!important;
-  font-size:18px!important;
+.sm-hero-offer-badge-v3 strong,
+.sm-hero-offer-badge-v3 span{
+  font-size:15px!important;
   line-height:1!important;
-  white-space:nowrap!important;
+  font-weight:800!important;
   letter-spacing:.01em!important;
+  text-transform:uppercase!important;
+  white-space:nowrap!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:38px!important;
+}
+.sm-hero-offer-badge-v3 strong{
+  padding:8px 15px!important;
 }
 .sm-hero-offer-badge-v3 span{
   flex:1!important;
   text-align:center!important;
-  font-size:16px!important;
-  line-height:1.05!important;
-  font-weight:800!important;
-  letter-spacing:.015em!important;
-  text-transform:uppercase!important;
-  white-space:nowrap!important;
+  padding:8px 6px!important;
 }
+
 @media(max-width:640px){
   .sm-mobile-hero,.sm-mh-copy{overflow:hidden!important}
   .sm-mh-title{width:calc(100% - 12px)!important;max-width:none!important;margin:0 auto!important;padding:0!important;transform:none!important;left:auto!important;right:auto!important;font-size:clamp(34px,9vw,42px)!important;line-height:.96!important;letter-spacing:-.035em!important;text-align:center!important;overflow:visible!important;overflow-wrap:normal!important;word-break:normal!important}
@@ -56,9 +64,11 @@ const css=`<style id="sm-mobile-hero-summary-polish-v1">
   .sm-mh-title-line-accent{font-size:.78em!important;white-space:nowrap!important;letter-spacing:-.04em!important;color:#6b4de6!important}
   .sm-mh-title-tail{font-size:.90em!important;line-height:1!important;white-space:nowrap!important;color:#201d25!important}
 
-  .sm-hero-offer-badge-v3{width:calc(100% - 28px)!important;min-height:66px!important;padding:7px 8px!important;gap:7px!important}
-  .sm-hero-offer-badge-v3 strong{padding:12px 15px!important;font-size:17px!important}
-  .sm-hero-offer-badge-v3 span{font-size:14px!important;letter-spacing:.01em!important}
+  .sm-hero-offer-badge-v3{width:calc(100% - 42px)!important;min-height:50px!important;padding:4px 6px!important;gap:6px!important}
+  .sm-hero-offer-badge-v3 strong,
+  .sm-hero-offer-badge-v3 span{font-size:13.5px!important;min-height:36px!important}
+  .sm-hero-offer-badge-v3 strong{padding:7px 12px!important}
+  .sm-hero-offer-badge-v3 span{padding:7px 4px!important}
 
   .sm-format-v2-summary-visual.sm-format-carousel .sm-format-carousel-frame{width:82%!important;max-width:430px!important;transform:none!important}
   .sm-format-v2-summary-visual.sm-format-carousel .sm-carousel-prev{left:7%!important}
@@ -75,9 +85,9 @@ const css=`<style id="sm-mobile-hero-summary-polish-v1">
   .sm-mh-title{width:calc(100% - 10px)!important;font-size:clamp(33px,8.9vw,39px)!important}
   .sm-mh-title-line-accent{font-size:.76em!important}
   .sm-mh-title-tail{font-size:.89em!important}
-  .sm-hero-offer-badge-v3{width:calc(100% - 20px)!important;min-height:64px!important}
-  .sm-hero-offer-badge-v3 strong{padding:11px 14px!important;font-size:16px!important}
-  .sm-hero-offer-badge-v3 span{font-size:13.5px!important}
+  .sm-hero-offer-badge-v3{width:calc(100% - 34px)!important;min-height:48px!important}
+  .sm-hero-offer-badge-v3 strong,
+  .sm-hero-offer-badge-v3 span{font-size:13px!important;min-height:34px!important}
   .sm-format-v2-summary-visual.sm-format-carousel .sm-format-carousel-frame{width:86%!important}
   .sm-format-v2-summary-visual.sm-format-carousel .sm-carousel-prev{left:5%!important}
   .sm-format-v2-summary-visual.sm-format-carousel .sm-carousel-next{right:5%!important}
@@ -85,4 +95,4 @@ const css=`<style id="sm-mobile-hero-summary-polish-v1">
 </style>`;
 html=html.replace('</head>',css+'</head>');
 fs.writeFileSync(target,html);
-console.log('Hero offer badge enlarged and uppercased; mobile polish applied.');
+console.log('Hero offer badge rebalanced with equal text sizing and shorter height.');
