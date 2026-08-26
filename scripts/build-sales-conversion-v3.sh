@@ -22,6 +22,7 @@ node scripts/audience-pain-balance-v4.mjs dist/index.html
 node scripts/audience-message-polish-v1.mjs dist/index.html
 node scripts/audience-nav-mobile-polish-v1.mjs dist/index.html
 node scripts/visual-section-order-v1.mjs dist/index.html
+node scripts/audience-visual-transition-polish-v1.mjs dist/index.html
 node scripts/nav-order-hard-fix-v1.mjs dist/index.html
 
 echo "Sales conversion v3 preview built from production base."
