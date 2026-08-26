@@ -27,7 +27,7 @@
     .hero{display:grid;grid-template-columns:minmax(0,1.06fr) minmax(390px,.94fr);gap:70px;align-items:center;padding:48px 0 76px;min-height:calc(100vh - 88px)}
     .eyebrow{display:inline-flex;align-items:center;gap:9px;margin-bottom:20px;padding:8px 12px;border-radius:999px;background:#eee9ff;color:#654db9;font-size:12px;line-height:1;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
     .eyebrow:before{content:"";width:8px;height:8px;border-radius:50%;background:#7057c8;box-shadow:0 0 0 5px rgba(112,87,200,.10)}
-    h1{font-size:clamp(44px,5.2vw,72px);line-height:.99;letter-spacing:-.045em;margin:0;max-width:760px}
+    h1{font-size:clamp(44px,5.2vw,72px);line-height:.99;letter-spacing:-.045em;margin:0;max-width:760px;text-wrap:balance}
     h1 span{color:var(--purple)}
     .lead{font-size:clamp(18px,1.8vw,22px);line-height:1.58;color:#625c6e;max-width:670px;margin:28px 0 26px}
     .benefits{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 34px;padding:0;list-style:none}
@@ -98,7 +98,7 @@
     <section class="shell hero">
       <div class="copy">
         <span class="eyebrow">Versão gratuita</span>
-        <h1>Conheça os <span>SuperMapas</span> antes de acessar o acervo completo.</h1>
+        <h1>Conheça gratuitamente os <span>SuperMapas</span> de Língua Portuguesa.</h1>
         <p class="lead">Baixe gratuitamente uma versão em PDF e veja de perto como os conteúdos de Língua Portuguesa são organizados de forma visual, clara e prática.</p>
         <ul class="benefits" aria-label="Benefícios da versão gratuita">
           <li><b>✓</b> PDF gratuito</li>
@@ -130,7 +130,7 @@
             <div class="success-icon" aria-hidden="true">✓</div>
             <h2>Tudo certo! Seu PDF está liberado.</h2>
             <p>Seu cadastro foi recebido. Toque no botão abaixo para abrir a versão gratuita dos SuperMapas.</p>
-            <a class="download" id="download-link" href="#" target="_blank" rel="noopener">BAIXAR PDF AGORA <span aria-hidden="true">↓</span></a>
+            <a class="download" id="download-link" href="#" download="Supermapas-versao-gratuita.pdf" target="_blank" rel="noopener">BAIXAR PDF AGORA <span aria-hidden="true">↓</span></a>
             <a class="complete js-preserve" href="/">Depois, conheça a versão completa →</a>
           </div>
         </section>
