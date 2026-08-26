@@ -62,9 +62,9 @@ const css = `<style id="sm-audience-visual-transition-polish-v1">
   font-weight:900!important;
 }
 .sm-visual-compare-v3 .sm-vc-title-line{display:inline!important}
-.sm-visual-compare-v3 .sm-vc-title-line-1{color:#211c2b!important}
-.sm-visual-compare-v3 .sm-vc-title-line-2,
-.sm-visual-compare-v3 .sm-vc-title-line-3{color:#7056d9!important}
+.sm-visual-compare-v3 .sm-vc-intro h2 .sm-vc-title-line-1{color:#211c2b!important}
+.sm-visual-compare-v3 .sm-vc-intro h2 .sm-vc-title-line-2,
+.sm-visual-compare-v3 .sm-vc-intro h2 .sm-vc-title-line-3{color:#7056d9!important}
 .sm-visual-compare-v3 .sm-vc-intro p{
   margin:0 auto!important;
   font-size:17px!important;
