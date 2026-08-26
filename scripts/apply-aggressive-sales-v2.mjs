@@ -30,56 +30,94 @@ const CARDS = [
   ['1a67b8_3aacfaaf9b404c65a03f7687cc68c3d3~mv2.png','Perda, perca, em vez de e ao invés de'],
 ];
 
-function slideMarkup(items, kind, fit){
-  return items.map(([mediaId,title],i)=>{
-    const active=i===0?' is-active':'';
-    const loading=i===0?'eager':'lazy';
-    const src=`https://static.wixstatic.com/media/${mediaId}/v1/fit/${fit}/file.webp`;
-    return `<img class="sm-format-carousel-slide${active}" data-sm-carousel-slide="${i}" alt="${kind}: ${title}" loading="${loading}" fetchpriority="low" decoding="async" src="${src}"/>`;
+function slides(items, label, fit) {
+  return items.map(([mediaId,title], i) => {
+    const active = i === 0 ? ' is-active' : '';
+    const loading = i === 0 ? 'eager' : 'lazy';
+    const src = `https://static.wixstatic.com/media/${mediaId}/v1/fit/${fit}/file.webp`;
+    return `<img class="sm-format-carousel-slide${active}" data-sm-carousel-slide="${i}" alt="${label}: ${title}" loading="${loading}" fetchpriority="low" decoding="async" src="${src}"/>`;
   }).join('');
 }
 
-function carousel(kind,key,items,fit,glow){
-  return `<div class="sm-format-v2-visual sm-format-v2-${kind}-visual sm-format-carousel" data-sm-carousel="${key}" aria-label="Amostras em carrossel"><div class="${glow}"></div><div class="sm-format-carousel-track">${slideMarkup(items,kind==='card'?'Supercard':kind==='summary'?'Super-resumo':'Supermapa',fit)}</div></div>`;
+function visual(kind, key, items, label, fit, glow) {
+  return `<div class="sm-format-v2-visual sm-format-v2-${kind}-visual sm-format-carousel" data-sm-carousel="${key}" aria-label="Amostras em carrossel"><div class="${glow}"></div><div class="sm-format-carousel-track">${slides(items,label,fit)}</div></div>`;
 }
 
-const mapCopy='<div class="sm-format-v2-copy"><div class="sm-format-v2-kicker"><span class="sm-format-v2-index">01</span><span class="sm-format-v2-purpose">ENTENDER E CONSULTAR</span></div><h3 class="sm-format-v2-title"><strong>98</strong><span>Supermapas</span></h3><p>Regras, relações e exemplos organizados visualmente para compreender e consultar conteúdos completos.</p></div>';
-const summaryCopy='<div class="sm-format-v2-copy"><div class="sm-format-v2-kicker"><span class="sm-format-v2-index">02</span><span class="sm-format-v2-purpose">REVISAR</span></div><h3 class="sm-format-v2-title"><strong>50</strong><span>Super-resumos</span></h3><p>O essencial de cada tema condensado para retomar pontos importantes com rapidez e clareza.</p></div>';
-const cardCopy='<div class="sm-format-v2-copy"><div class="sm-format-v2-kicker"><span class="sm-format-v2-index">03</span><span class="sm-format-v2-purpose">REFORÇAR</span></div><h3 class="sm-format-v2-title"><strong>190</strong><span>Supercards</span></h3><p>Conceitos-chave em cards objetivos para reforçar conteúdos e fazer revisões curtas ao longo da rotina.</p></div>';
+const mapCopy = '<div class="sm-format-v2-copy"><div class="sm-format-v2-kicker"><span class="sm-format-v2-index">01</span><span class="sm-format-v2-purpose">ENTENDER E CONSULTAR</span></div><h3 class="sm-format-v2-title"><strong>98</strong><span>Supermapas</span></h3><p>Regras, relações e exemplos organizados visualmente para compreender e consultar conteúdos completos.</p></div>';
+const summaryCopy = '<div class="sm-format-v2-copy"><div class="sm-format-v2-kicker"><span class="sm-format-v2-index">02</span><span class="sm-format-v2-purpose">REVISAR</span></div><h3 class="sm-format-v2-title"><strong>50</strong><span>Super-resumos</span></h3><p>O essencial de cada tema condensado para retomar pontos importantes com rapidez e clareza.</p></div>';
+const cardCopy = '<div class="sm-format-v2-copy"><div class="sm-format-v2-kicker"><span class="sm-format-v2-index">03</span><span class="sm-format-v2-purpose">REFORÇAR</span></div><h3 class="sm-format-v2-title"><strong>190</strong><span>Supercards</span></h3><p>Conceitos-chave em cards objetivos para reforçar conteúdos e fazer revisões curtas ao longo da rotina.</p></div>';
 
-const replacements = [
-  [/\<article class="sm-format-v2-unit sm-format-v2-unit-map"\>[\s\S]*?\<\/article\>/, `<article class="sm-format-v2-unit sm-format-v2-unit-map">${mapCopy}${carousel('map','maps',MAPS,'w_1200,h_848','sm-format-v2-map-glow')}</article>`],
-  [/\<article class="sm-format-v2-unit sm-format-v2-unit-summary"\>[\s\S]*?\<\/article\>/, `<article class="sm-format-v2-unit sm-format-v2-unit-summary">${carousel('summary','summaries',SUMMARIES,'w_760,h_1080','sm-format-v2-summary-glow')}${summaryCopy}</article>`],
-  [/\<article class="sm-format-v2-unit sm-format-v2-unit-card"\>[\s\S]*?\<\/article\>/, `<article class="sm-format-v2-unit sm-format-v2-unit-card">${cardCopy}${carousel('card','cards',CARDS,'w_1000,h_667','sm-format-v2-card-glow')}</article>`],
-];
-for(const [re,replacement] of replacements){
-  if(!re.test(html)) throw new Error(`Format article not found: ${re}`);
-  html=html.replace(re,replacement);
+function replaceArticle(className, replacement) {
+  const startMarker = `<article class="${className}">`;
+  const start = html.indexOf(startMarker);
+  if (start < 0) throw new Error(`Article not found: ${className}`);
+  const end = html.indexOf('</article>', start);
+  if (end < 0) throw new Error(`Article closing tag not found: ${className}`);
+  html = html.slice(0, start) + replacement + html.slice(end + '</article>'.length);
 }
 
-html=html.replace(/\<section class="sm-inside" id="amostras"[\s\S]*?\<\/section\>(?=\<section class="sm-coverage)/,'');
-html=html.replace('<a href="#amostras">Veja o material</a>','');
-html=html.replace(/\<button type="button" class="sm-section-nav-stop"[^>]*aria-label="Ir para Veja o material"[^>]*\>\<span aria-hidden="true"\>\<\/span\>\<\/button\>/,'');
-html=html.replace("['Veja o material','amostras'],",'');
-const navGuard="if(!label||!rail||!progress||!thumb||stops.length!==items.length)return;";
-const navReflow="stops.forEach(function(stop,index){stop.style.top=(index/(items.length-1)*100)+'%';});";
-if(html.includes(navGuard)&&!html.includes(navReflow)) html=html.replace(navGuard,navGuard+navReflow);
+replaceArticle(
+  'sm-format-v2-unit sm-format-v2-unit-map',
+  `<article class="sm-format-v2-unit sm-format-v2-unit-map">${mapCopy}${visual('map','maps',MAPS,'Supermapa','w_1200,h_848','sm-format-v2-map-glow')}</article>`
+);
+replaceArticle(
+  'sm-format-v2-unit sm-format-v2-unit-summary',
+  `<article class="sm-format-v2-unit sm-format-v2-unit-summary">${visual('summary','summaries',SUMMARIES,'Super-resumo','w_760,h_1080','sm-format-v2-summary-glow')}${summaryCopy}</article>`
+);
+replaceArticle(
+  'sm-format-v2-unit sm-format-v2-unit-card',
+  `<article class="sm-format-v2-unit sm-format-v2-unit-card">${cardCopy}${visual('card','cards',CARDS,'Supercard','w_1000,h_667','sm-format-v2-card-glow')}</article>`
+);
 
-const oldTune="document.querySelectorAll('.sm-format-v2-visual img').forEach(function(img){try{img.loading='eager';img.fetchPriority='low'}catch(_){}})";
-const newTune="document.querySelectorAll('.sm-format-v2-visual img:not([data-sm-carousel-slide]),.sm-format-carousel img[data-sm-carousel-slide=\"0\"]').forEach(function(img){try{img.loading='eager';img.fetchPriority='low'}catch(_){}})";
-html=html.replace(oldTune,newTune);
-
-if(!html.includes('id="sm-format-carousels-v2"')){
-  const css='<style id="sm-format-carousels-v2">.sm-format-carousel{position:relative!important;overflow:hidden!important}.sm-format-carousel .sm-format-carousel-track{position:relative;width:100%;height:100%;min-height:inherit}.sm-format-carousel .sm-format-carousel-slide{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;object-fit:contain!important;opacity:0;transform:scale(.992)!important;transition:opacity .65s ease,transform .8s ease!important;pointer-events:none}.sm-format-carousel .sm-format-carousel-slide.is-active{opacity:1;transform:scale(1)!important}@media (prefers-reduced-motion:reduce){.sm-format-carousel .sm-format-carousel-slide{transition:none!important}}</style>';
-  html=html.replace('</head>',css+'</head>');
+const insideStart = html.indexOf('<section class="sm-inside" id="amostras"');
+if (insideStart >= 0) {
+  const nextSection = html.indexOf('<section class="sm-coverage', insideStart);
+  if (nextSection < 0) throw new Error('Could not find section after old samples');
+  html = html.slice(0, insideStart) + html.slice(nextSection);
 }
-if(!html.includes('id="sm-format-carousels-v2-js"')){
-  const js='<script id="sm-format-carousels-v2-js">(function(){var roots=[].slice.call(document.querySelectorAll(\'[data-sm-carousel]\'));if(!roots.length)return;var reduced=window.matchMedia&&window.matchMedia(\'(prefers-reduced-motion: reduce)\').matches;roots.forEach(function(root,ri){var slides=[].slice.call(root.querySelectorAll(\'[data-sm-carousel-slide]\'));if(slides.length<2)return;var index=0,timer=null;function show(n){slides[index].classList.remove(\'is-active\');index=(n+slides.length)%slides.length;slides[index].classList.add(\'is-active\')}function stop(){if(timer){clearInterval(timer);timer=null}}function start(){if(reduced||document.hidden||timer)return;timer=setInterval(function(){show(index+1)},3600)}document.addEventListener(\'visibilitychange\',function(){if(document.hidden)stop();else start()});root.addEventListener(\'mouseenter\',stop);root.addEventListener(\'mouseleave\',start);if(!reduced)setTimeout(start,ri*700)})})();</script>';
-  html=html.replace('</body>',js+'</body>');
-}
 
-for(const key of ['maps','summaries','cards']) if(!html.includes(`data-sm-carousel="${key}"`)) throw new Error(`Missing ${key} carousel`);
-if(html.includes('id="amostras"')) throw new Error('Old samples section still present');
+html = html.replace('<a href="#amostras">Veja o material</a>', '');
+html = html.replace('<button type="button" class="sm-section-nav-stop" style="top:30%" aria-label="Ir para Veja o material"><span aria-hidden="true"></span></button>', '');
+html = html.replace("['Veja o material','amostras'],", '');
+
+const navGuard = "if(!label||!rail||!progress||!thumb||stops.length!==items.length)return;";
+const navReflow = "stops.forEach(function(stop,index){stop.style.top=(index/(items.length-1)*100)+'%';});";
+if (html.includes(navGuard) && !html.includes(navReflow)) html = html.replace(navGuard, navGuard + navReflow);
+
+const oldTune = "document.querySelectorAll('.sm-format-v2-visual img').forEach(function(img){try{img.loading='eager';img.fetchPriority='low'}catch(_){}})";
+const newTune = "document.querySelectorAll('.sm-format-v2-visual img:not([data-sm-carousel-slide]),.sm-format-carousel img[data-sm-carousel-slide=\"0\"]').forEach(function(img){try{img.loading='eager';img.fetchPriority='low'}catch(_){}})";
+html = html.replace(oldTune, newTune);
+
+const css = `<style id="sm-format-carousels-v2">
+.sm-format-carousel{position:relative!important;overflow:hidden!important}
+.sm-format-carousel .sm-format-carousel-track{position:relative;width:100%;height:100%;min-height:inherit}
+.sm-format-carousel .sm-format-carousel-slide{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;object-fit:contain!important;opacity:0;transform:scale(.992)!important;transition:opacity .65s ease,transform .8s ease!important;pointer-events:none}
+.sm-format-carousel .sm-format-carousel-slide.is-active{opacity:1;transform:scale(1)!important}
+@media (prefers-reduced-motion:reduce){.sm-format-carousel .sm-format-carousel-slide{transition:none!important}}
+</style>`;
+if (!html.includes('id="sm-format-carousels-v2"')) html = html.replace('</head>', css + '</head>');
+
+const autoplay = `<script id="sm-format-carousels-v2-js">(function(){
+var roots=[].slice.call(document.querySelectorAll('[data-sm-carousel]'));
+var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+roots.forEach(function(root,rootIndex){
+var slides=[].slice.call(root.querySelectorAll('[data-sm-carousel-slide]'));
+if(slides.length<2)return;
+var index=0,timer=null;
+function show(next){slides[index].classList.remove('is-active');index=(next+slides.length)%slides.length;slides[index].classList.add('is-active')}
+function stop(){if(timer){clearInterval(timer);timer=null}}
+function start(){if(reduced||document.hidden||timer)return;timer=setInterval(function(){show(index+1)},3600)}
+document.addEventListener('visibilitychange',function(){if(document.hidden)stop();else start()});
+root.addEventListener('mouseenter',stop);root.addEventListener('mouseleave',start);
+if(!reduced)setTimeout(start,rootIndex*700);
+});
+})();</script>`;
+if (!html.includes('id="sm-format-carousels-v2-js"')) html = html.replace('</body>', autoplay + '</body>');
+
+for (const key of ['maps','summaries','cards']) {
+  if (!html.includes(`data-sm-carousel="${key}"`)) throw new Error(`Missing ${key} carousel`);
+}
+if (html.includes('id="amostras"')) throw new Error('Old samples section still present');
 
 fs.writeFileSync(target, html, 'utf8');
 console.log('Applied sales v2 carousels in Node.');
