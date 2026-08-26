@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "rm -rf dist && cp -R vercel-static dist && node scripts/production-50off-cta-v1.mjs dist/index.html && node scripts/real-content-index-v1.mjs dist/index.html && node scripts/content-index-polish-v1.mjs dist/index.html",
+  "buildCommand": "rm -rf dist && cp -R vercel-static dist && node scripts/production-50off-cta-v1.mjs dist/index.html && node scripts/real-content-index-v1.mjs dist/index.html && node scripts/content-index-polish-v1.mjs dist/index.html && cp dist/index.html public-index-before-sales-v2.html && mkdir -p public && cp dist/index.html public/index.html && python3 scripts/apply-aggressive-sales-v2.py && python3 scripts/apply-aggressive-marketing-v2.py && python3 scripts/apply-visual-comparison-v2.py && python3 scripts/apply-trust-proof-v2.py && cp public/index.html dist/index.html",
   "outputDirectory": "dist",
   "redirects": [
     {
