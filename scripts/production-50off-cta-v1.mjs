@@ -58,6 +58,12 @@ replaceAtLeast('Acessar agora', 'Garantir 50% OFF', 1);
 replaceRequired('<small>✓ 7 dias de garantia</small>', '<small>✓ 50% OFF já aplicado · 7 dias de garantia</small>');
 replaceRequired('<div class="sm-mh-guarantee">✓ 7 dias de garantia</div>', '<div class="sm-mh-guarantee">✓ 50% OFF já aplicado · 7 dias de garantia</div>');
 
+const deliveryNote = '<div class="sm-format-delivery-note" role="note" aria-label="Informações sobre formato e entrega"><span class="sm-format-delivery-icon" aria-hidden="true">PDF</span><p><strong>Todos os arquivos são enviados em formato PDF.</strong> O acesso é enviado para o seu e-mail logo após a confirmação do pagamento.</p></div>';
+replaceRequired(
+  '</div></section><section class="sm-visual-study"',
+  `</div>${deliveryNote}</section><section class="sm-visual-study"`
+);
+
 // The section-nav label should start hidden and only appear through the same
 // interactions/state changes used by the other sections.
 replaceRequired('<nav class="sm-section-nav is-label-visible"', '<nav class="sm-section-nav"');
@@ -71,8 +77,11 @@ const css = `
 .sm-price-was s{opacity:.72;text-decoration-thickness:1.5px}.sm-price-was b{color:#e55721!important;font-weight:900!important}
 .sm-offer-close-discount{display:flex;align-items:center;justify-content:flex-start;gap:9px;width:100%;margin-bottom:6px;font-size:13px;font-weight:800;color:#7a7489;text-align:left}
 .sm-offer-close-discount s{text-decoration-thickness:1.5px}.sm-offer-close-discount b{display:inline-flex;padding:5px 8px;border-radius:999px;background:#f36a2d;color:#fff;font-size:11px;letter-spacing:.04em}
+.sm-format-delivery-note{display:flex;align-items:center;gap:16px;width:min(1080px,calc(100% - 48px));margin:30px auto 0;padding:17px 20px;border:1px solid rgba(112,87,200,.14);border-radius:18px;background:rgba(247,244,255,.88);box-shadow:0 12px 34px rgba(61,43,119,.06);color:#5f586c}
+.sm-format-delivery-icon{display:grid;place-items:center;flex:0 0 auto;width:48px;height:42px;border-radius:12px;background:#eee8ff;color:#6b50c2;font-size:12px;font-weight:900;letter-spacing:.04em}
+.sm-format-delivery-note p{margin:0;font-size:14px;line-height:1.55}.sm-format-delivery-note strong{color:#332c42}
 .sm-dh-primary,.sm-mh-cta,.sm-mh-offer-cta,.sm-offer-close-cta,.sm-faq-closing a,.sm-dh-offer>a,.sm-dh-header-cta{font-weight:900!important}
-@media(max-width:640px){.sm-mh-copy>.sm-offer-pill{display:flex;width:100%;max-width:none;box-sizing:border-box;justify-content:space-between;margin:0 0 18px;padding:8px 8px 8px 16px;font-size:12px;letter-spacing:.09em}.sm-mh-copy>.sm-offer-pill strong{font-size:14px;padding:9px 14px}.sm-price-was{font-size:10px!important}.sm-offer-close-discount{justify-content:flex-start!important;text-align:left!important}}
+@media(max-width:640px){.sm-mh-copy>.sm-offer-pill{display:flex;width:100%;max-width:none;box-sizing:border-box;justify-content:space-between;margin:0 0 18px;padding:8px 8px 8px 16px;font-size:12px;letter-spacing:.09em}.sm-mh-copy>.sm-offer-pill strong{font-size:14px;padding:9px 14px}.sm-price-was{font-size:10px!important}.sm-offer-close-discount{justify-content:flex-start!important;text-align:left!important}.sm-format-delivery-note{align-items:flex-start;width:calc(100% - 28px);margin-top:22px;padding:15px 16px;gap:12px;border-radius:16px}.sm-format-delivery-icon{width:42px;height:38px;font-size:11px}.sm-format-delivery-note p{font-size:13px;line-height:1.5}}
 </style>`;
 replaceRequired('</head>', `${css}\n</head>`);
 
