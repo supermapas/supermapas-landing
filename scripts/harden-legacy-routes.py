@@ -48,6 +48,7 @@ not_found = """<!doctype html>
 (PUBLIC / "404.html").write_text(not_found, encoding="utf-8")
 
 runpy.run_path("scripts/build-free-maps-page.py", run_name="__main__")
+runpy.run_path("scripts/polish-free-maps-page.py", run_name="__main__")
 
 assert "Sitemap: https://www.supermapas.com.br/sitemap.xml" in robots
 assert "https://www.supermapas.com.br/" in sitemap
@@ -57,5 +58,9 @@ assert "_next/static" not in not_found
 assert "googletagmanager" not in not_found
 assert "connect.facebook.net" not in not_found
 assert (PUBLIC / "mapas-gratuitos" / "index.html").exists()
+
+free_page = (PUBLIC / "mapas-gratuitos" / "index.html").read_text(encoding="utf-8")
+assert "Conheça gratuitamente os <span>SuperMapas</span> de Língua Portuguesa." in free_page
+assert 'download="Supermapas-versao-gratuita.pdf"' in free_page
 
 print("legacy route hardening assets generated")
