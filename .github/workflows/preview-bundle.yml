@@ -30,6 +30,9 @@ jobs:
       - name: Apply aggressive marketing v2
         run: python scripts/apply-aggressive-marketing-v2.py
 
+      - name: Apply visual before-after comparison
+        run: python scripts/apply-visual-comparison-v2.py
+
       - name: Validate sales conversion v2 preview
         run: |
           grep -Fq 'data-sm-carousel="maps"' public/index.html
@@ -43,6 +46,8 @@ jobs:
           grep -Fq 'BÔNUS 1' public/index.html
           grep -Fq 'BÔNUS 2' public/index.html
           grep -Fq '98 SUPERMAPAS + 2 BÔNUS' public/index.html
+          grep -Fq 'data-sm-before-after' public/index.html
+          grep -Fq 'sm-visual-compare-v2' public/index.html
           grep -Fq 'https://pay.hotmart.com/A92093667Q?off=ia91gsts&checkoutMode=10' public/index.html
           grep -Fq '261169597067924' public/index.html
 
