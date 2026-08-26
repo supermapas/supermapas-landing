@@ -18,6 +18,9 @@ html = html.replace(
   '<h3>Aldair Diniz</h3><p>Criador do Superdicas de Português e colaborador dos Supermapas, participa da pesquisa, troca de ideias e construção do projeto desde a sua trajetória inicial.</p>'
 );
 
+html = html.replaceAll('Retrato de Odair Diniz', 'Retrato de Aldair Diniz');
+html = html.replaceAll('Abrir Instagram de Odair Diniz:', 'Abrir Instagram de Aldair Diniz:');
+
 // Slightly refine the section intro to support authority instead of sentimentality alone.
 html = html.replace(
   '<p>Um projeto que nasceu de uma ideia, cresceu com incentivo e continua sendo construído em família.</p>',
