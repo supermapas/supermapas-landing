@@ -4,15 +4,42 @@ const target = process.argv[2];
 if (!target) throw new Error('Usage: node scripts/offer-redundancy-cleanup-v1.mjs <html-file>');
 let html = fs.readFileSync(target, 'utf8');
 
+function removeDivByClass(source, className) {
+  const openRe = new RegExp(`<div\\b[^>]*class="[^"]*\\b${className}\\b[^"]*"[^>]*>`);
+  const open = openRe.exec(source);
+  if (!open) return { html: source, removed: false };
+
+  const start = open.index;
+  const tokenRe = /<div\b[^>]*>|<\/div>/g;
+  tokenRe.lastIndex = start;
+  let depth = 0;
+  let end = -1;
+  let token;
+  while ((token = tokenRe.exec(source))) {
+    if (token[0].startsWith('</div')) depth -= 1;
+    else depth += 1;
+    if (depth === 0) {
+      end = tokenRe.lastIndex;
+      break;
+    }
+  }
+  if (end < 0) throw new Error(`Unbalanced div while removing ${className}.`);
+  return { html: source.slice(0, start) + source.slice(end), removed: true };
+}
+
 // Remove the redundant offer-summary panels from both hero variants.
 // Their content is already communicated by the hero and later dedicated sections.
-const desktopBefore = html;
-html = html.replace(/<div class="sm-dh-offer"\b[\s\S]*?<\/div><\/section>(?=<section class="sm-mobile-hero")/, '</section>');
-if (html === desktopBefore) throw new Error('Desktop hero offer summary not found.');
+let result = removeDivByClass(html, 'sm-dh-offer');
+html = result.html;
+const desktopRemoved = result.removed;
 
-const mobileBefore = html;
-html = html.replace(/<div class="sm-mh-offer"\b[\s\S]*?<\/div><\/section>(?=<section)/, '</section>');
-if (html === mobileBefore) throw new Error('Mobile hero offer summary not found.');
+result = removeDivByClass(html, 'sm-mh-offer');
+html = result.html;
+const mobileRemoved = result.removed;
+
+if (!desktopRemoved && !mobileRemoved) {
+  throw new Error('No redundant hero offer summary found.');
+}
 
 // The fixed dock should sell the current offer without exposing price before
 // the dedicated offer section. Keep the existing checkout + WhatsApp actions.
@@ -43,4 +70,4 @@ const css = `<style id="sm-offer-redundancy-cleanup-v1">
 html = html.replace('</head>', css + '</head>');
 
 fs.writeFileSync(target, html);
-console.log('Redundant hero offer panels removed; fixed dock simplified to 50% OFF + actions.');
+console.log(`Redundant hero offer panels removed (desktop=${desktopRemoved}, mobile=${mobileRemoved}); fixed dock simplified to 50% OFF + actions.`);
