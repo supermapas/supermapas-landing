@@ -1,4 +1,4 @@
-name: Validate production-ready landing bundle
+name: Validate sales conversion v2 preview
 
 on:
   pull_request:
@@ -24,47 +24,20 @@ jobs:
           rm -rf public
           cp -a vercel-static public
 
-      - name: Normalize every Hotmart CTA to checkout mode 10
-        run: |
-          python - <<'PY'
-          from pathlib import Path
+      - name: Apply sales conversion v2 iteration
+        run: python scripts/apply-aggressive-sales-v2.py
 
-          root = Path('public')
-          target = 'https://pay.hotmart.com/A92093667Q?off=ia91gsts&checkoutMode=10'
-          sources = (
-              'https://pay.hotmart.com/A92093667Q?checkoutMode=2&off=ia91gsts',
-              'https://pay.hotmart.com/A92093667Q?checkoutMode=10',
-          )
-          replaced = 0
-          for path in root.rglob('*'):
-              if not path.is_file() or path.suffix.lower() not in {'.html','.js','.json','.txt'}:
-                  continue
-              try:
-                  text = path.read_text(encoding='utf-8')
-              except (UnicodeDecodeError, OSError):
-                  continue
-              original = text
-              for old in sources:
-                  count = text.count(old)
-                  if count:
-                      text = text.replace(old, target)
-                      replaced += count
-              if text != original:
-                  path.write_text(text, encoding='utf-8')
-          if replaced < 1:
-              raise SystemExit('No Hotmart checkout URLs were replaced')
-          print(f'Hotmart checkout URLs normalized: {replaced}')
-          PY
-
-      - name: Validate checkout URLs
+      - name: Validate first carousel iteration
         run: |
+          grep -Fq 'sm-format-v2-map-carousel' public/index.html
+          grep -Fq 'data-sm-carousel-slide="7"' public/index.html
+          grep -Fq '1a67b8_b19132c7753849e08a076d81791245a4~mv2.png/v1/fit/w_1200,h_848/file.webp' public/index.html
+          ! grep -Fq 'id="amostras"' public/index.html
+          ! grep -Fq 'href="#amostras"' public/index.html
           grep -Fq 'https://pay.hotmart.com/A92093667Q?off=ia91gsts&checkoutMode=10' public/index.html
-          ! grep -R -q 'checkoutMode=2' public
-          grep -Fq 'sm-dock-checkout' public/index.html
-          grep -Fq 'sm-checkout-attribution' public/index.html
           grep -Fq '261169597067924' public/index.html
 
-      - name: Materialize checkout test bundle
+      - name: Materialize sales conversion v2 preview
         env:
           PREVIEW_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
@@ -74,8 +47,8 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add vercel-static
           if git diff --cached --quiet; then
-            echo "Checkout test bundle already materialized"
+            echo "Sales conversion preview already materialized"
             exit 0
           fi
-          git commit -m "Materialize Hotmart checkout mode 10 preview"
+          git commit -m "Materialize sales conversion v2 preview"
           git push origin "HEAD:${PREVIEW_BRANCH}"
