@@ -81,9 +81,9 @@ const style = `<style id="sm-content-index-polish-v1">
     grid-template-columns:40px minmax(0,1fr);
     align-items:center;
     width:100%;
-    min-height:104px;
+    min-height:0;
     margin-top:24px;
-    padding:20px 20px 22px;
+    padding:18px 20px;
     column-gap:14px;
     border-radius:20px;
   }
