@@ -41,5 +41,6 @@ node scripts/preview-offer-57-60off-from-production-v2.mjs dist/index.html
 node scripts/preview-dock-exact-production-size-v1.mjs dist/index.html
 node scripts/preview-offer-value-urgency-v3.mjs dist/index.html
 node scripts/preview-offer-price-white-v1.mjs dist/index.html
+node scripts/preview-offer-value-list-simplify-v1.mjs dist/index.html
 
-echo 'Sales conversion v3 preview built from exact production base with R$57 / 60% offer, balanced dock and refined price hierarchy.'
+echo 'Sales conversion v3 preview built from exact production base with R$57 / 60% offer, balanced dock and simplified offer-value hierarchy.'
