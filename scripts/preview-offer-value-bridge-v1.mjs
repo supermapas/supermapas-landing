@@ -11,7 +11,7 @@ html = html.replace(
 );
 
 const checkoutNeedle = `      </div>\n\n      <aside class="sm-offer-value-checkout" aria-label="Preço final dos Supermapas">`;
-const bridge = `      </div>\n\n      <div class="sm-offer-value-bridge" aria-label="Transição para a condição especial">\n        <span class="sm-offer-value-bridge-line" aria-hidden="true"></span>\n        <p><span>E agora vem a melhor parte:</span><strong> você não paga R$ 221,90.</strong></p>\n        <b aria-hidden="true">↓</b>\n      </div>\n\n      <aside class="sm-offer-value-checkout" aria-label="Preço final dos Supermapas">`;
+const bridge = `      </div>\n\n      <div class="sm-offer-value-bridge" aria-label="Transição para a condição especial">\n        <span class="sm-offer-value-bridge-line" aria-hidden="true"></span>\n        <p><span>E agora vem a melhor parte: você </span><strong class="sm-offer-value-bridge-alert">não</strong><span> paga </span><strong class="sm-offer-value-bridge-alert">R$ 221,90</strong><span>.</span></p>\n        <b aria-hidden="true">↓</b>\n      </div>\n\n      <aside class="sm-offer-value-checkout" aria-label="Preço final dos Supermapas">`;
 
 if (!html.includes('sm-offer-value-bridge')) {
   if (!html.includes(checkoutNeedle)) throw new Error('Offer checkout boundary not found.');
@@ -30,7 +30,7 @@ const css = `
     align-items:center;
     justify-content:center;
     min-height:112px;
-    padding:20px 16px 18px;
+    padding:20px 10px 18px;
     text-align:center;
   }
   .sm-offer-value-bridge-line{
@@ -44,14 +44,18 @@ const css = `
     background:linear-gradient(180deg,#cfc4f4,#7056d9);
   }
   .sm-offer-value-bridge p{
+    width:max-content;
+    max-width:none;
     margin:4px 0 0;
     color:#5f5768;
     font-size:15px;
     line-height:1.34;
     letter-spacing:-.012em;
+    white-space:nowrap;
   }
   .sm-offer-value-bridge p span{font-weight:700}
-  .sm-offer-value-bridge p strong{color:#2d2635;font-weight:950}
+  .sm-offer-value-bridge p strong{font-weight:950}
+  .sm-offer-value-bridge p .sm-offer-value-bridge-alert{color:#d94343!important}
   .sm-offer-value-bridge>b{
     display:grid;
     place-items:center;
@@ -70,8 +74,8 @@ const css = `
 @media(max-width:640px){
   .sm-offer-value-head h2{max-width:360px!important;font-size:clamp(34px,9.2vw,41px)!important;line-height:1.01!important}
   .sm-offer-value-head p{max-width:350px!important;margin-top:13px!important}
-  .sm-offer-value-bridge{min-height:106px;padding:19px 12px 16px}
-  .sm-offer-value-bridge p{max-width:330px;font-size:14px}
+  .sm-offer-value-bridge{min-height:106px;padding:19px 6px 16px}
+  .sm-offer-value-bridge p{font-size:14px}
 }
 </style>`;
 
