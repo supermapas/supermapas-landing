@@ -45,5 +45,6 @@ node scripts/preview-offer-value-list-simplify-v1.mjs dist/index.html
 node scripts/preview-offer-value-unified-panel-v1.mjs dist/index.html
 node scripts/preview-offer-value-bridge-v1.mjs dist/index.html
 node scripts/preview-offer-value-math-correction-v1.mjs dist/index.html
+node scripts/preview-offer-calendar-clock-v1.mjs dist/index.html
 
-echo 'Sales conversion v3 preview built from exact production base with R$57 / 60% offer, corrected R$142,50 reference and R$226,50 summed value.'
+echo 'Sales conversion v3 preview built from exact production base with R$57 / 60% offer, corrected values and calendar-safe America/Fortaleza midnight reset.'
