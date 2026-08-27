@@ -14,7 +14,7 @@ html = html.replace(dockFn, `function dockMarkup(){\n    return '${newDockMarkup
 const css = `
 <style id="sm-preview-dock-exact-production-size-v1">
 @media(max-width:640px){
-  /* Keep the exact Production outer geometry; rebalance only the content inside it. */
+  /* Keep the exact Production outer geometry; distribute the remaining width evenly between both actions. */
   .sm-sales-dock{
     box-sizing:border-box!important;
     width:calc(100% - 14px)!important;
@@ -45,8 +45,8 @@ const css = `
   }
   .sm-dock-urgency{
     display:flex!important;
-    flex:0 1 82px!important;
-    min-width:72px!important;
+    flex:0 0 82px!important;
+    min-width:82px!important;
     max-width:82px!important;
     min-height:43px!important;
     box-sizing:border-box!important;
@@ -80,81 +80,101 @@ const css = `
   .sm-sales-dock .sm-dock-actions{
     display:flex!important;
     align-items:center!important;
-    justify-content:flex-end!important;
+    justify-content:stretch!important;
     gap:5px!important;
-    flex:0 0 auto!important;
+    flex:1 1 0!important;
+    width:auto!important;
     min-width:0!important;
-    margin-left:auto!important;
+    margin-left:0!important;
   }
-  .sm-sales-dock .sm-dock-actions>a{height:43px!important;min-height:43px!important;box-sizing:border-box!important}
+  .sm-sales-dock .sm-dock-actions>a{
+    box-sizing:border-box!important;
+    flex:1 1 0!important;
+    width:0!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:43px!important;
+    min-height:43px!important;
+  }
   .sm-sales-dock .sm-dock-checkout{
     display:flex!important;
     align-items:center!important;
     justify-content:center!important;
-    flex:0 0 82px!important;
-    width:82px!important;
-    min-width:82px!important;
-    max-width:82px!important;
     padding:0 7px!important;
     gap:0!important;
     border-radius:12px!important;
     white-space:nowrap!important;
+    text-align:center!important;
   }
-  .sm-sales-dock .sm-dock-checkout span{font-size:9.6px!important;line-height:1!important;font-weight:950!important;letter-spacing:0!important;white-space:nowrap!important}
+  .sm-sales-dock .sm-dock-checkout span{
+    display:block!important;
+    width:100%!important;
+    font-size:9.8px!important;
+    line-height:1!important;
+    font-weight:950!important;
+    letter-spacing:0!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+  }
   .sm-sales-dock .sm-dock-checkout b{display:none!important}
   .sm-sales-dock .sm-dock-whatsapp{
     display:flex!important;
     align-items:center!important;
     justify-content:center!important;
-    flex:0 0 92px!important;
-    width:92px!important;
-    min-width:92px!important;
-    max-width:92px!important;
     padding:0 7px!important;
     gap:5px!important;
     border-radius:12px!important;
     overflow:hidden!important;
     white-space:nowrap!important;
+    text-align:center!important;
   }
   .sm-sales-dock .sm-dock-whatsapp span{
-    display:inline!important;
+    display:inline-block!important;
+    flex:0 1 auto!important;
     min-width:0!important;
-    font-size:9.3px!important;
+    font-size:9.5px!important;
     line-height:1!important;
     font-weight:900!important;
     letter-spacing:-.01em!important;
+    text-align:center!important;
     white-space:nowrap!important;
   }
-  .sm-sales-dock .sm-dock-whatsapp svg{flex:0 0 15px!important;width:15px!important;height:15px!important;margin:0!important}
+  .sm-sales-dock .sm-dock-whatsapp svg{
+    display:block!important;
+    flex:0 0 15px!important;
+    width:15px!important;
+    height:15px!important;
+    margin:0!important;
+  }
 }
 @media(max-width:390px){
   .sm-sales-dock{gap:5px!important;padding-left:10px!important;padding-right:5px!important}
   .sm-sales-dock .sm-dock-discount{font-size:11.8px!important}
-  .sm-dock-urgency{flex-basis:76px!important;min-width:68px!important;max-width:76px!important}
+  .sm-dock-urgency{flex-basis:76px!important;min-width:76px!important;max-width:76px!important}
   .sm-dock-urgency span{font-size:7px!important}
   .sm-dock-urgency strong{font-size:10.7px!important}
   .sm-sales-dock .sm-dock-actions{gap:4px!important}
-  .sm-sales-dock .sm-dock-checkout{flex-basis:78px!important;width:78px!important;min-width:78px!important;max-width:78px!important;padding-left:5px!important;padding-right:5px!important}
-  .sm-sales-dock .sm-dock-checkout span{font-size:9.2px!important}
-  .sm-sales-dock .sm-dock-whatsapp{flex-basis:86px!important;width:86px!important;min-width:86px!important;max-width:86px!important;padding-left:5px!important;padding-right:5px!important;gap:4px!important}
-  .sm-sales-dock .sm-dock-whatsapp span{font-size:8.9px!important}
+  .sm-sales-dock .sm-dock-checkout{padding-left:5px!important;padding-right:5px!important}
+  .sm-sales-dock .sm-dock-checkout span{font-size:9.3px!important}
+  .sm-sales-dock .sm-dock-whatsapp{padding-left:5px!important;padding-right:5px!important;gap:4px!important}
+  .sm-sales-dock .sm-dock-whatsapp span{font-size:9px!important}
   .sm-sales-dock .sm-dock-whatsapp svg{flex-basis:14px!important;width:14px!important;height:14px!important}
 }
 @media(max-width:360px){
   .sm-sales-dock{padding-left:8px!important;padding-right:5px!important;gap:4px!important}
   .sm-sales-dock .sm-dock-discount{font-size:11.1px!important}
-  .sm-dock-urgency{flex-basis:62px!important;min-width:60px!important;max-width:62px!important;padding-left:2px!important;padding-right:2px!important}
+  .sm-dock-urgency{flex-basis:62px!important;min-width:62px!important;max-width:62px!important;padding-left:2px!important;padding-right:2px!important}
   .sm-dock-urgency span{font-size:6.5px!important;letter-spacing:0!important}
   .sm-dock-urgency strong{font-size:10px!important}
   .sm-sales-dock .sm-dock-actions{gap:3px!important}
-  .sm-sales-dock .sm-dock-checkout{flex-basis:72px!important;width:72px!important;min-width:72px!important;max-width:72px!important;padding-left:4px!important;padding-right:4px!important}
-  .sm-sales-dock .sm-dock-checkout span{font-size:8.6px!important}
-  .sm-sales-dock .sm-dock-whatsapp{flex-basis:78px!important;width:78px!important;min-width:78px!important;max-width:78px!important;padding-left:4px!important;padding-right:4px!important;gap:3px!important}
-  .sm-sales-dock .sm-dock-whatsapp span{font-size:8.2px!important}
+  .sm-sales-dock .sm-dock-checkout{padding-left:4px!important;padding-right:4px!important}
+  .sm-sales-dock .sm-dock-checkout span{font-size:8.8px!important}
+  .sm-sales-dock .sm-dock-whatsapp{padding-left:4px!important;padding-right:4px!important;gap:3px!important}
+  .sm-sales-dock .sm-dock-whatsapp span{font-size:8.5px!important}
   .sm-sales-dock .sm-dock-whatsapp svg{flex-basis:13px!important;width:13px!important;height:13px!important}
 }
 </style>`;
 html = html.replace('</head>', css + '\n</head>');
 
 fs.writeFileSync(target, html);
-console.log('Dock rebalanced: exact Production outer geometry, TERMINA HOJE and restored WhatsApp label.');
+console.log('Dock actions equalized: CTA and WhatsApp split all remaining width 50/50 and stay centered.');
