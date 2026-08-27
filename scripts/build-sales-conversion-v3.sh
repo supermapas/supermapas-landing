@@ -37,5 +37,6 @@ node scripts/creators-authority-polish-v1.mjs dist/index.html
 node scripts/desktop-hero-transition-polish-v1.mjs dist/index.html
 node scripts/mobile-side-rail-touch-lock-v1.mjs dist/index.html
 node scripts/favicon-local-fix-v1.mjs dist/index.html
+node scripts/preview-offer-57-60off-from-production-v2.mjs dist/index.html
 
-echo "Sales conversion v3 preview built from production base."
+echo 'Sales conversion v3 preview built from exact production base with R$57 / 60% offer.'
