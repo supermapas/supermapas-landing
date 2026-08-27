@@ -8,7 +8,7 @@ let html = fs.readFileSync(target, 'utf8');
 const css = `
 <style id="sm-preview-offer-price-white-v1">
 .sm-offer-price-today{margin-top:13px!important;gap:8px!important;align-items:center!important}
-.sm-offer-price-today strong{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:29px!important;padding:0 11px!important;border-radius:999px!important;background:#087e59!important;color:#fff!important;font-size:12px!important;font-weight:950!important;line-height:1!important;letter-spacing:.10em!important;box-shadow:0 7px 18px rgba(8,126,89,.24)!important;text-shadow:none!important}
+.sm-offer-price-today strong{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:29px!important;padding:0 11px!important;border-radius:999px!important;background:#2ab47f!important;color:#fff!important;font-size:12px!important;font-weight:950!important;line-height:1!important;letter-spacing:.10em!important;box-shadow:0 7px 18px rgba(42,180,127,.24)!important;text-shadow:none!important}
 .sm-offer-price-today em{color:#fff!important;font-size:11px!important;font-weight:900!important}
 .sm-offer-value-final{align-items:flex-start!important;margin-top:5px!important;margin-bottom:3px!important;color:#fff!important}
 .sm-offer-value-final sup{margin:13px 6px 0 0!important;color:#fff!important;font-size:24px!important;font-weight:900!important}
@@ -34,4 +34,4 @@ const css = `
 
 html = html.replace('</head>', css + '\n</head>');
 fs.writeFileSync(target, html);
-console.log('Offer price refined: white HOJE inside strong green capsule, white R$57,00 and balanced spacing.');
+console.log('Offer price refined: HOJE uses the same #2AB47F green as the GRÁTIS badge, with white label and white R$57,00.');
