@@ -26,8 +26,7 @@ html = html.replace(
   '$157$2'
 );
 
-// Add urgency only inside the existing price card. Do not inject new layout
-// blocks into the mobile hero or fixed dock; this keeps Production geometry intact.
+// Main countdown stays inside the existing price card.
 const checkoutUrgency = `
 <div class="sm-daily-urgency sm-daily-urgency--checkout" role="note" aria-label="Prazo da oferta de hoje">
   <span>O valor promocional termina <strong>hoje, <b data-sm-offer-date>--</b></strong></span>
@@ -50,7 +49,33 @@ const css = `<style id="sm-preview-offer-57-60off-from-production-v2">
 .sm-daily-countdown{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:7px;box-sizing:border-box;width:100%;max-width:100%;min-width:0;overflow:hidden}
 .sm-daily-countdown>div{display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:center;min-height:58px;padding:7px 5px;border-radius:12px;background:#fff;color:#34293e;box-shadow:0 8px 22px rgba(20,12,31,.14)}
 .sm-daily-countdown>div strong{font-variant-numeric:tabular-nums;font-size:23px;line-height:1;font-weight:950}.sm-daily-countdown>div small{margin-top:5px;color:#817789;font-size:7px;font-weight:900;letter-spacing:.11em}.sm-daily-countdown>i{color:#e5d9ee;font-style:normal;font-size:20px;font-weight:900}
+.sm-dock-urgency{display:none}
 @media(max-width:720px){.sm-daily-urgency--checkout{margin-top:13px;padding:12px}.sm-daily-countdown{gap:5px}.sm-daily-countdown>div{min-height:52px;padding:6px 3px}.sm-daily-countdown>div strong{font-size:20px}.sm-daily-countdown>i{font-size:17px}}
+@media(max-width:640px){
+  .sm-sales-dock{box-sizing:border-box!important;width:auto!important;max-width:calc(100vw - 12px)!important;min-width:0!important;gap:6px!important;padding-left:8px!important;padding-right:8px!important;overflow:hidden!important}
+  .sm-sales-dock .sm-dock-discount{flex:0 0 auto!important;font-size:11.5px!important;letter-spacing:0!important;white-space:nowrap!important}
+  .sm-sales-dock .sm-dock-inventory{display:none!important}
+  .sm-dock-urgency{display:flex;flex:0 1 84px;min-width:68px;max-width:84px;box-sizing:border-box;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 5px;border-left:1px solid rgba(96,82,112,.12);border-right:1px solid rgba(96,82,112,.12);color:#615969;line-height:1;overflow:hidden}
+  .sm-dock-urgency span{display:block;max-width:100%;color:#736b7b;font-size:7px;font-weight:900;letter-spacing:.06em;white-space:nowrap}
+  .sm-dock-urgency strong{display:block;max-width:100%;color:#ef641f;font-variant-numeric:tabular-nums;font-size:10.5px;font-weight:950;letter-spacing:-.01em;white-space:nowrap}
+  .sm-sales-dock .sm-dock-actions{display:flex!important;align-items:center!important;gap:5px!important;flex:0 0 auto!important;min-width:0!important;margin-left:auto!important}
+  .sm-sales-dock .sm-dock-checkout{box-sizing:border-box!important;width:auto!important;min-width:0!important;max-width:96px!important;min-height:38px!important;padding:0 9px!important;gap:4px!important;border-radius:11px!important;white-space:nowrap!important}
+  .sm-sales-dock .sm-dock-checkout span{font-size:9.5px!important;line-height:1!important;letter-spacing:0!important;white-space:nowrap!important}
+  .sm-sales-dock .sm-dock-checkout b{font-size:14px!important;line-height:1!important}
+  .sm-sales-dock .sm-dock-whatsapp{box-sizing:border-box!important;display:grid!important;place-items:center!important;flex:0 0 34px!important;width:34px!important;min-width:34px!important;max-width:34px!important;height:34px!important;min-height:34px!important;padding:0!important;border-radius:10px!important;overflow:hidden!important}
+  .sm-sales-dock .sm-dock-whatsapp span{display:none!important}
+  .sm-sales-dock .sm-dock-whatsapp svg{width:17px!important;height:17px!important;margin:0!important}
+}
+@media(max-width:360px){
+  .sm-sales-dock{gap:5px!important;padding-left:6px!important;padding-right:6px!important}
+  .sm-sales-dock .sm-dock-discount{font-size:10.5px!important}
+  .sm-dock-urgency{flex-basis:66px;min-width:60px;max-width:66px;padding-left:3px;padding-right:3px}
+  .sm-dock-urgency span{font-size:6.5px;letter-spacing:.02em}
+  .sm-dock-urgency strong{font-size:9.5px}
+  .sm-sales-dock .sm-dock-checkout{max-width:84px!important;padding-left:7px!important;padding-right:7px!important}
+  .sm-sales-dock .sm-dock-checkout span{font-size:8.8px!important}
+  .sm-sales-dock .sm-dock-whatsapp{flex-basis:31px!important;width:31px!important;min-width:31px!important;max-width:31px!important;height:31px!important;min-height:31px!important}
+}
 </style>`;
 html = html.replace('</head>', css + '\n</head>');
 
@@ -66,15 +91,35 @@ const runtime = `<script id="sm-preview-offer-57-60off-from-production-v2-runtim
     var nextUtc=nextLocalMidnight+OFFSET_MS;
     return Math.max(0,Math.floor((nextUtc-nowMs)/1000));
   }
+  function ensureDock(){
+    var dock=document.querySelector('.sm-sales-dock');
+    if(!dock)return;
+    if(!dock.querySelector('.sm-dock-urgency')){
+      var urgency=document.createElement('div');
+      urgency.className='sm-dock-urgency';
+      urgency.setAttribute('aria-label','Oferta acaba hoje');
+      urgency.innerHTML='<span>ACABA HOJE</span><strong data-sm-dock-countdown>--:--:--</strong>';
+      var actions=dock.querySelector('.sm-dock-actions');
+      dock.insertBefore(urgency,actions||null);
+    }
+    var checkout=dock.querySelector('.sm-dock-checkout');
+    if(checkout&&!checkout.dataset.smCompactOffer){
+      checkout.dataset.smCompactOffer='1';
+      checkout.innerHTML='<span>QUERO AGORA</span><b aria-hidden="true">→</b>';
+    }
+  }
   function tick(){
+    ensureDock();
     var now=new Date();
     var label=dateFmt.format(now);
     document.querySelectorAll('[data-sm-offer-date]').forEach(function(el){el.textContent=label;});
     var left=remaining(now.getTime());
     var h=Math.floor(left/3600),m=Math.floor((left%3600)/60),s=left%60;
+    var clock=pad(h)+':'+pad(m)+':'+pad(s);
     document.querySelectorAll('[data-sm-countdown-hours]').forEach(function(el){el.textContent=pad(h);});
     document.querySelectorAll('[data-sm-countdown-minutes]').forEach(function(el){el.textContent=pad(m);});
     document.querySelectorAll('[data-sm-countdown-seconds]').forEach(function(el){el.textContent=pad(s);});
+    document.querySelectorAll('[data-sm-dock-countdown]').forEach(function(el){el.textContent=clock;});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tick,{once:true});else tick();
   setInterval(tick,500);
@@ -83,4 +128,4 @@ const runtime = `<script id="sm-preview-offer-57-60off-from-production-v2-runtim
 html = html.replace('</body>', runtime + '\n</body>');
 
 fs.writeFileSync(target, html);
-console.log('Preview applied safely from production base: targeted offer copy only; production layout preserved.');
+console.log('Preview applied safely: compact mobile dock with 60% OFF, daily urgency and smaller CTA.');
