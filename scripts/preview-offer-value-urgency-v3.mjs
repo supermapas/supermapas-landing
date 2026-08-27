@@ -39,19 +39,22 @@ const oldUrgency = `<div class="sm-daily-urgency sm-daily-urgency--checkout" rol
   </div>
 </div>`;
 
-const newUrgency = `<div class="sm-offer-compact" role="note" aria-label="Condição e prazo da oferta">
-  <span class="sm-offer-compact-kicker">OFERTA ESPECIAL</span>
-  <div class="sm-offer-compact-benefits"><strong>60% OFF</strong><i>+</i><strong>2 BÔNUS GRÁTIS</strong></div>
-  <p>Termina hoje, <strong data-sm-offer-date>--</strong></p>
-  <div class="sm-offer-compact-countdown" aria-label="Contagem regressiva até meia-noite">
+const newUrgency = `<div class="sm-offer-clear" role="note" aria-label="Período e encerramento da oferta">
+  <span class="sm-offer-clear-label">OFERTA VÁLIDA NOS DIAS</span>
+  <strong class="sm-offer-clear-range" data-sm-date-range>--</strong>
+  <span class="sm-offer-clear-today">TERMINA HOJE</span>
+  <div class="sm-offer-clear-countdown" aria-label="Contagem regressiva até meia-noite">
     <div><strong data-sm-countdown-hours>--</strong><small>HORAS</small></div><i>:</i>
     <div><strong data-sm-countdown-minutes>--</strong><small>MIN</small></div><i>:</i>
     <div><strong data-sm-countdown-seconds>--</strong><small>SEG</small></div>
   </div>
-  <small class="sm-offer-compact-range">Oferta válida de <strong data-sm-date-range>--</strong></small>
+  <div class="sm-offer-clear-benefits" aria-label="Benefícios da oferta">
+    <div><strong>60% OFF</strong><span>nos 98 Supermapas</span></div>
+    <div><strong>+ 2 BÔNUS GRÁTIS</strong><span>50 Super-resumos + 190 Supercards</span></div>
+  </div>
 </div>`;
 
-if (!html.includes('sm-offer-compact')) {
+if (!html.includes('sm-offer-clear')) {
   if (!html.includes(oldUrgency)) throw new Error('Existing checkout urgency block not found.');
   html = html.replace(oldUrgency, newUrgency);
 }
@@ -70,10 +73,12 @@ const css = `
 <style id="sm-preview-offer-value-urgency-v3">
 .sm-offer-value-total{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:5px;padding:20px 21px;border:1.5px solid rgba(112,86,217,.25);border-radius:20px;background:linear-gradient(135deg,#f8f5ff 0%,#fff 70%);box-shadow:0 14px 32px rgba(58,43,103,.075)}
 .sm-offer-value-total>div:first-child{min-width:0}.sm-offer-value-total>div:first-child>span{display:block;color:#6048c4;font-size:10.5px;font-weight:950;letter-spacing:.13em}.sm-offer-value-total>div:first-child>small{display:block;margin-top:5px;color:#746d7b;font-size:11px;line-height:1.35}.sm-offer-value-total>div:first-child>b{display:inline-flex;margin-top:9px;padding:5px 8px;border-radius:999px;background:#f1edff;color:#6b50d2;font-size:8px;line-height:1;font-weight:950;letter-spacing:.09em}.sm-offer-value-total-price{display:flex;flex:0 0 auto;flex-direction:column;align-items:flex-end}.sm-offer-value-total-price small{color:#7d7585;font-size:9px;font-weight:900;letter-spacing:.10em}.sm-offer-value-total-price s{margin-top:3px;color:#463d50;font-size:30px;line-height:1;font-weight:950;text-decoration-color:#ef641f;text-decoration-thickness:3.5px}.sm-offer-value-price .sm-offer-value-free{padding-left:8px!important;padding-right:8px!important;font-size:9px!important;letter-spacing:.025em!important}
-.sm-offer-compact{position:relative;z-index:1;margin:10px 0 5px;padding:3px 0 15px;border-bottom:1px solid rgba(255,255,255,.13);text-align:center}.sm-offer-compact-kicker{display:block;color:#d8ccff;font-size:8px;font-weight:950;letter-spacing:.16em}.sm-offer-compact-benefits{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;line-height:1}.sm-offer-compact-benefits strong:first-child{color:#ffd0b7;font-size:17px;font-weight:950}.sm-offer-compact-benefits strong:last-child{color:#bff1dd;font-size:13px;font-weight:950}.sm-offer-compact-benefits i{color:rgba(255,255,255,.42);font-style:normal;font-size:15px;font-weight:800}.sm-offer-compact>p{margin:12px 0 9px;color:#e9e2ee;font-size:11.5px;line-height:1.25}.sm-offer-compact>p strong{color:#fff;font-weight:950}.sm-offer-compact-countdown{display:flex;align-items:flex-start;justify-content:center;gap:9px}.sm-offer-compact-countdown>div{display:flex;min-width:52px;flex-direction:column;align-items:center}.sm-offer-compact-countdown>div>strong{color:#fff;font-variant-numeric:tabular-nums;font-size:33px;line-height:.94;font-weight:950;letter-spacing:-.04em}.sm-offer-compact-countdown>div>small{margin-top:5px;color:#bdb3c7;font-size:6px;font-weight:900;letter-spacing:.13em}.sm-offer-compact-countdown>i{margin-top:1px;color:#ef9b70;font-style:normal;font-size:26px;line-height:1;font-weight:900}.sm-offer-compact-range{display:block;margin-top:10px;color:#aaa0b4;font-size:7.5px;line-height:1.3}.sm-offer-compact-range strong{color:#d9d0e2;font-weight:850}
-.sm-offer-value-was--total{margin:13px 0 2px!important}.sm-offer-value-was--total span{font-weight:800;color:#eee7f4}.sm-offer-value-was--total s{color:#ffd0b8;font-size:14px;font-weight:900;text-decoration-thickness:2px}.sm-offer-price-today{position:relative;z-index:1;display:block;margin-top:8px;color:#d8ccff;font-size:8.5px;font-weight:950;letter-spacing:.15em}.sm-offer-value-final{margin-top:3px!important}.sm-offer-value-bonus-summary--compact{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;padding:12px 13px!important}.sm-offer-value-bonus-summary--compact strong{font-size:10.5px;line-height:1.25;color:#fff}.sm-offer-value-bonus-summary--compact b{flex:0 0 auto!important;margin:0!important}
-@media(max-width:640px){.sm-offer-value-total{padding:16px 14px;gap:10px;border-radius:18px}.sm-offer-value-total>div:first-child>span{font-size:9.4px}.sm-offer-value-total>div:first-child>small{font-size:9.5px}.sm-offer-value-total>div:first-child>b{margin-top:7px;font-size:7px}.sm-offer-value-total-price s{font-size:23px}.sm-offer-compact{margin-top:7px;padding-bottom:13px}.sm-offer-compact-benefits{gap:7px;margin-top:7px}.sm-offer-compact-benefits strong:first-child{font-size:16px}.sm-offer-compact-benefits strong:last-child{font-size:12px}.sm-offer-compact>p{margin:10px 0 8px;font-size:11px}.sm-offer-compact-countdown{gap:7px}.sm-offer-compact-countdown>div{min-width:49px}.sm-offer-compact-countdown>div>strong{font-size:31px}.sm-offer-compact-countdown>i{font-size:24px}.sm-offer-compact-range{margin-top:9px;font-size:7px}.sm-offer-value-bonus-summary--compact strong{font-size:9.8px}}
-@media(max-width:390px){.sm-offer-value-total{align-items:flex-end}.sm-offer-value-total>div:first-child>small{max-width:175px}.sm-offer-value-total-price s{font-size:21px}.sm-offer-compact-benefits strong:first-child{font-size:15px}.sm-offer-compact-benefits strong:last-child{font-size:11px}.sm-offer-compact-countdown{gap:5px}.sm-offer-compact-countdown>div{min-width:46px}.sm-offer-compact-countdown>div>strong{font-size:29px}.sm-offer-compact-countdown>i{font-size:22px}.sm-offer-value-price .sm-offer-value-free{font-size:8.5px!important}}
+.sm-offer-clear{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;margin:3px 0 7px;padding:18px 6px 20px;border-bottom:1px solid rgba(255,255,255,.14);text-align:center}.sm-offer-clear-label{display:block;color:#d7cbea;font-size:11px;font-weight:950;line-height:1;letter-spacing:.16em}.sm-offer-clear-range{display:block;margin-top:9px;color:#fff;font-size:24px;line-height:1.08;font-weight:950;letter-spacing:-.025em}.sm-offer-clear-today{display:inline-flex;align-items:center;justify-content:center;min-height:34px;margin-top:16px;padding:0 15px;border-radius:999px;background:#ef641f;color:#fff;font-size:11px;line-height:1;font-weight:950;letter-spacing:.10em;box-shadow:0 8px 20px rgba(239,100,31,.22)}
+.sm-offer-clear-countdown{display:flex;align-items:flex-start;justify-content:center;gap:11px;width:100%;margin-top:15px}.sm-offer-clear-countdown>div{display:flex;min-width:67px;flex-direction:column;align-items:center}.sm-offer-clear-countdown>div>strong{color:#fff;font-variant-numeric:tabular-nums;font-size:48px;line-height:.92;font-weight:950;letter-spacing:-.045em;text-shadow:0 9px 24px rgba(0,0,0,.10)}.sm-offer-clear-countdown>div>small{margin-top:8px;color:#c9c0d1;font-size:8px;font-weight:950;letter-spacing:.16em}.sm-offer-clear-countdown>i{margin-top:0;color:#ef9b70;font-style:normal;font-size:39px;line-height:.9;font-weight:900}
+.sm-offer-clear-benefits{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.10)}.sm-offer-clear-benefits>div{display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:center;padding:11px 9px;border-radius:14px;background:rgba(255,255,255,.075)}.sm-offer-clear-benefits strong{font-size:14px;line-height:1.05;font-weight:950}.sm-offer-clear-benefits>div:first-child strong{color:#ffd0b7}.sm-offer-clear-benefits>div:last-child strong{color:#bff1dd}.sm-offer-clear-benefits span{margin-top:5px;color:#e8e0ee;font-size:9.5px;line-height:1.25;font-weight:700}
+.sm-offer-value-was--total{margin:15px 0 2px!important}.sm-offer-value-was--total span{font-weight:800;color:#eee7f4}.sm-offer-value-was--total s{color:#ffd0b8;font-size:14px;font-weight:900;text-decoration-thickness:2px}.sm-offer-price-today{position:relative;z-index:1;display:block;margin-top:8px;color:#d8ccff;font-size:9px;font-weight:950;letter-spacing:.15em}.sm-offer-value-final{margin-top:3px!important}.sm-offer-value-bonus-summary--compact{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;padding:12px 13px!important}.sm-offer-value-bonus-summary--compact strong{font-size:10.5px;line-height:1.25;color:#fff}.sm-offer-value-bonus-summary--compact b{flex:0 0 auto!important;margin:0!important}
+@media(max-width:640px){.sm-offer-value-total{padding:16px 14px;gap:10px;border-radius:18px}.sm-offer-value-total>div:first-child>span{font-size:9.4px}.sm-offer-value-total>div:first-child>small{font-size:9.5px}.sm-offer-value-total>div:first-child>b{margin-top:7px;font-size:7px}.sm-offer-value-total-price s{font-size:23px}.sm-offer-clear{margin-top:0;padding:20px 2px 20px}.sm-offer-clear-label{font-size:10.5px}.sm-offer-clear-range{margin-top:10px;font-size:24px}.sm-offer-clear-today{min-height:35px;margin-top:17px;padding:0 16px;font-size:11px}.sm-offer-clear-countdown{gap:9px;margin-top:17px}.sm-offer-clear-countdown>div{min-width:64px}.sm-offer-clear-countdown>div>strong{font-size:46px}.sm-offer-clear-countdown>div>small{margin-top:7px;font-size:7.5px}.sm-offer-clear-countdown>i{font-size:37px}.sm-offer-clear-benefits{gap:8px;margin-top:21px;padding-top:17px}.sm-offer-clear-benefits>div{min-height:58px;padding:10px 7px}.sm-offer-clear-benefits strong{font-size:13.2px}.sm-offer-clear-benefits span{font-size:9px}.sm-offer-value-bonus-summary--compact strong{font-size:9.8px}}
+@media(max-width:390px){.sm-offer-value-total{align-items:flex-end}.sm-offer-value-total>div:first-child>small{max-width:175px}.sm-offer-value-total-price s{font-size:21px}.sm-offer-clear{padding-left:0;padding-right:0}.sm-offer-clear-label{font-size:10px}.sm-offer-clear-range{font-size:22px}.sm-offer-clear-countdown{gap:7px}.sm-offer-clear-countdown>div{min-width:59px}.sm-offer-clear-countdown>div>strong{font-size:43px}.sm-offer-clear-countdown>i{font-size:34px}.sm-offer-clear-benefits{gap:7px}.sm-offer-clear-benefits strong{font-size:12.2px}.sm-offer-clear-benefits span{font-size:8.6px}.sm-offer-value-price .sm-offer-value-free{font-size:8.5px!important}}
 </style>`;
 html = html.replace('</head>', css + '\n</head>');
 
@@ -84,15 +89,17 @@ const runtime = `
   var datePartsFmt=new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'});
   var dayFmt=new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC',day:'numeric'});
   var monthLongFmt=new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC',month:'long'});
-  var offerDateFmt=new Intl.DateTimeFormat('pt-BR',{timeZone:TZ,day:'numeric',month:'long'});
   function zonedToday(){var parts=datePartsFmt.formatToParts(new Date()),x={};parts.forEach(function(p){if(p.type!=='literal')x[p.type]=Number(p.value);});return new Date(Date.UTC(x.year,x.month-1,x.day,12,0,0));}
   function fill(selector,value){document.querySelectorAll(selector).forEach(function(el){el.textContent=value;});}
   function render(){
-    var now=new Date();
-    fill('[data-sm-offer-date]',offerDateFmt.format(now));
-    var d3=zonedToday(),d1=new Date(d3);d1.setUTCDate(d1.getUTCDate()-2);
+    var d3=zonedToday(),d2=new Date(d3),d1=new Date(d3);d2.setUTCDate(d2.getUTCDate()-1);d1.setUTCDate(d1.getUTCDate()-2);
     var sameMonth=d1.getUTCMonth()===d3.getUTCMonth()&&d1.getUTCFullYear()===d3.getUTCFullYear();
-    var range=sameMonth?dayFmt.format(d1)+' a '+dayFmt.format(d3)+' de '+monthLongFmt.format(d3):dayFmt.format(d1)+' de '+monthLongFmt.format(d1)+' a '+dayFmt.format(d3)+' de '+monthLongFmt.format(d3);
+    var range;
+    if(sameMonth){
+      range=dayFmt.format(d1)+', '+dayFmt.format(d2)+' e '+dayFmt.format(d3)+' de '+monthLongFmt.format(d3);
+    }else{
+      range=dayFmt.format(d1)+' de '+monthLongFmt.format(d1)+', '+dayFmt.format(d2)+' de '+monthLongFmt.format(d2)+' e '+dayFmt.format(d3)+' de '+monthLongFmt.format(d3);
+    }
     fill('[data-sm-date-range]',range);
   }
   render();setInterval(render,1000);
@@ -101,4 +108,4 @@ const runtime = `
 html = html.replace('</body>', runtime + '\n</body>');
 
 fs.writeFileSync(target, html);
-console.log('Offer value simplified to benefit, deadline, countdown, date window and final price.');
+console.log('Offer value rebuilt with spacious date window, clear deadline, large countdown and readable benefits.');
