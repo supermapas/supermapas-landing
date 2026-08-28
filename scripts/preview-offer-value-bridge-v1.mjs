@@ -7,7 +7,7 @@ let html = fs.readFileSync(target, 'utf8');
 
 html = html.replace(
   '<h2 id="sm-offer-value-title">Veja tudo o que está <span>incluído na sua compra.</span></h2>\n      <p>98 Supermapas + 50 Super-resumos + 190 Supercards de Língua Portuguesa.</p>',
-  '<h2 id="sm-offer-value-title">Tudo isso faz parte do <span>seu acesso.</span></h2>\n      <p>98 Supermapas + 50 Super-resumos + 190 Supercards de Língua Portuguesa.</p>'
+  '<h2 id="sm-offer-value-title">Veja quanto vale <span>tudo o que você recebe.</span></h2>\n      <p>98 Supermapas + 50 Super-resumos + 190 Supercards de Língua Portuguesa.</p>'
 );
 
 const checkoutNeedle = `      </div>\n\n      <aside class="sm-offer-value-checkout" aria-label="Preço final dos Supermapas">`;
@@ -21,6 +21,8 @@ if (!html.includes('sm-offer-value-bridge')) {
 const css = `
 <style id="sm-preview-offer-value-bridge-v1">
 .sm-offer-value-bridge{display:none}
+.sm-offer-value-head{max-width:1040px!important}
+.sm-offer-value-head h2{max-width:920px!important;margin-left:auto!important;margin-right:auto!important}
 @media(max-width:820px){
   .sm-offer-value-layout{gap:0!important}
   .sm-offer-value-bridge{
@@ -72,8 +74,9 @@ const css = `
   .sm-offer-value-checkout{margin-top:0!important}
 }
 @media(max-width:640px){
-  .sm-offer-value-head h2{max-width:360px!important;font-size:clamp(34px,9.2vw,41px)!important;line-height:1.01!important}
-  .sm-offer-value-head p{max-width:350px!important;margin-top:13px!important}
+  .sm-offer-value-head{width:100%!important;max-width:none!important}
+  .sm-offer-value-head h2{width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important;padding:0 2px!important;font-size:clamp(34px,9.2vw,41px)!important;line-height:1.01!important;text-wrap:balance!important}
+  .sm-offer-value-head p{width:100%!important;max-width:none!important;margin-top:13px!important;padding:0 4px!important}
   .sm-offer-value-bridge{min-height:106px;padding:19px 6px 16px}
   .sm-offer-value-bridge p{font-size:14px}
 }
@@ -81,4 +84,4 @@ const css = `
 
 html = html.replace('</head>', css + '\n</head>');
 fs.writeFileSync(target, html);
-console.log('Offer title simplified and total connected visually to the final-price card.');
+console.log('Offer headline updated to emphasize value and use more of the available mobile width.');
