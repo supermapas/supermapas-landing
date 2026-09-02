@@ -42,16 +42,15 @@ const runtime = `<script id="sm-preview-offer-calendar-clock-v1-runtime">
   }
   function calendarDate(y,m,d){return new Date(Date.UTC(y,m-1,d,12,0,0));}
   function shiftDay(date,delta){var x=new Date(date.getTime());x.setUTCDate(x.getUTCDate()+delta);return x;}
-  function sameMonth(a,b){return a.getUTCFullYear()===b.getUTCFullYear()&&a.getUTCMonth()===b.getUTCMonth();}
   function day(d){return d.getUTCDate();}
-  function month(d){return monthFmt.format(d);}
+  function month(d){
+    var name=monthFmt.format(d);
+    return name.charAt(0).toUpperCase()+name.slice(1);
+  }
   function rangeText(p){
     var today=calendarDate(p.year,p.month,p.day);
     var d1=shiftDay(today,-2),d2=shiftDay(today,-1),d3=today;
-    if(sameMonth(d1,d3)) return day(d1)+', '+day(d2)+' e '+day(d3)+' de '+month(d3);
-    if(sameMonth(d1,d2)) return day(d1)+' e '+day(d2)+' de '+month(d1)+' e '+day(d3)+' de '+month(d3);
-    if(sameMonth(d2,d3)) return day(d1)+' de '+month(d1)+', '+day(d2)+' e '+day(d3)+' de '+month(d3);
-    return day(d1)+' de '+month(d1)+', '+day(d2)+' de '+month(d2)+' e '+day(d3)+' de '+month(d3);
+    return day(d1)+', '+day(d2)+' e '+day(d3)+' de '+month(d3);
   }
   function remainingSeconds(now,p){
     var tomorrow=calendarDate(p.year,p.month,p.day+1);
@@ -115,4 +114,4 @@ for(const [y,m,d,expected] of checks){
 }
 
 fs.writeFileSync(target, html);
-console.log('Offer calendar/countdown centralized in America/Fortaleza with real month lengths, leap-year handling and midnight reset.');
+console.log('Offer calendar/countdown centralized in America/Fortaleza with compact three-day range using only the final day month label.');
