@@ -47,4 +47,8 @@ node scripts/preview-offer-value-bridge-v1.mjs dist/index.html
 node scripts/preview-offer-value-math-correction-v1.mjs dist/index.html
 node scripts/preview-offer-calendar-clock-v1.mjs dist/index.html
 
-echo 'Sales conversion v3 preview built from exact production base with R$57 / 60% offer, corrected values and calendar-safe America/Fortaleza midnight reset.'
+# Final hard gate for the Mapas da Ale bootstrap branch.
+# This must remain the LAST transformation before any preview/deploy is allowed.
+node scripts/mapas-da-ale-sanitize-bootstrap.mjs dist/index.html
+
+echo 'Mapas da Ale bootstrap build complete with Supermapas tracking/checkout isolation enforced.'
