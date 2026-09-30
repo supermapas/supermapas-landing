@@ -24,9 +24,23 @@ body.board-dragging{overflow:hidden!important;overscroll-behavior:none!important
 
 /* V0.1.1: show a useful message even when a file preview does not run scripts. */
 .startup-notice{max-width:1112px;margin:16px auto 0;padding:16px 20px;border:1px solid #d8bd80;border-radius:16px;background:#fff6df;color:#604c29;font-size:13px;line-height:1.6}.startup-notice strong{display:block;margin-bottom:4px}.startup-notice p{margin:6px 0 0}.startup-notice code{font:12px ui-monospace,monospace;overflow-wrap:anywhere}.startup-notice[hidden]{display:none!important}#play-main:disabled{opacity:.6;box-shadow:none;cursor:default}@media(max-width:1150px){.startup-notice{margin:12px 18px 0}}
+
+/* V0.2: private family profiles + cloud progress */
+.cloud-gate{position:fixed;inset:0;z-index:220;background:linear-gradient(155deg,#f7f4e9 0%,#e7efe4 100%);display:flex;align-items:center;justify-content:center;padding:22px;overflow:auto}
+.cloud-gate[hidden]{display:none!important}.cloud-card{width:min(100%,470px);background:#fffefa;border:1px solid #dce5d8;border-radius:28px;padding:28px;box-shadow:0 24px 80px #163c2c22}.cloud-brand{display:flex;align-items:center;gap:12px;margin-bottom:24px}.cloud-brand .brand-mark{flex:0 0 auto}.cloud-card h2{font-size:28px;letter-spacing:-.9px;line-height:1.15;margin:0 0 10px}.cloud-card p{font-size:13px;line-height:1.65;color:var(--muted);margin:8px 0 18px}.cloud-field{display:block;margin:14px 0}.cloud-field span{display:block;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;font-weight:850;color:#647875;margin:0 0 7px}.cloud-input,.cloud-select{width:100%;border:1px solid #d5dfd2;background:white;border-radius:13px;min-height:49px;padding:0 14px;font:inherit;font-size:15px;color:var(--ink);outline:none}.cloud-input:focus,.cloud-select:focus{border-color:#6fa58d;box-shadow:0 0 0 3px #bcd8ca55}.cloud-error{background:#fff0ea;color:#884b3c;border:1px solid #f1c7b9;border-radius:11px;padding:10px 12px;font-size:12px;line-height:1.45;margin:10px 0}.cloud-profiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:17px 0}.cloud-profile{border:1px solid #dce5d8;background:#f8faf4;border-radius:16px;padding:12px;text-align:left;display:flex;align-items:center;gap:10px;color:var(--ink);min-width:0}.cloud-profile:hover{background:#eef5e9}.cloud-avatar{width:39px;height:39px;border-radius:13px;background:#dcead6;display:grid;place-items:center;font-size:20px;flex:0 0 auto}.cloud-profile strong{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cloud-profile small{display:block;color:var(--muted);font-size:9px;margin-top:3px}.cloud-back{border:0;background:none;color:var(--green);font-weight:800;font-size:12px;padding:7px 0;margin-bottom:11px}.cloud-actions{display:grid;gap:10px;margin-top:16px}.cloud-note{font-size:10px!important;background:#f4f4e9;border-radius:11px;padding:11px 12px;color:#748276!important}.profile-chip{border:1px solid #d6e2d5;background:#f8fbf5;border-radius:999px;padding:7px 10px 7px 8px;display:flex;align-items:center;gap:7px;color:var(--ink);font-size:10px;font-weight:800;max-width:150px}.profile-chip .cloud-avatar{width:25px;height:25px;border-radius:9px;font-size:13px}.profile-chip span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:650px){.cloud-card{padding:23px;border-radius:24px}.cloud-card h2{font-size:25px}.cloud-profiles{grid-template-columns:1fr}.profile-chip{max-width:112px}.header-tools .tag{display:none}}
+
 </style>
 </head>
 <body>
+
+<div id="cloud-gate" class="cloud-gate">
+  <section class="cloud-card" aria-labelledby="cloud-title">
+    <div class="cloud-brand"><span class="brand-mark" data-icon="crown"></span><div><strong class="brand-title">Reino da Família</strong><span class="brand-sub">Nosso grupo privado</span></div></div>
+    <div id="cloud-view"><h2 id="cloud-title">Conectando ao reino…</h2><p>Carregando seu perfil e progresso.</p></div>
+  </section>
+</div>
+
 <div id="startup-notice" class="startup-notice" role="status" aria-live="polite">
 <strong id="startup-title">O jogo ainda não iniciou.</strong>
 <span id="startup-message">Se este aviso permanecer, a programação do jogo não foi carregada. Um visualizador de arquivos pode mostrar a tela sem permitir jogar.</span>
@@ -81,7 +95,7 @@ body.board-dragging{overflow:hidden!important;overscroll-behavior:none!important
 <button class="brand" id="brand-home" aria-label="Reino da Família, ir ao mapa">
 <span class="brand-mark" data-icon="crown"></span><span><span class="brand-title">Reino da Família</span><span class="brand-sub">Pequenas grandes aventuras</span></span>
 </button>
-<div class="header-tools"><span class="tag"><span class="tag-dot"></span> Protótipo local</span><button id="settings" class="icon-btn" aria-label="Configurações" data-icon="settings"></button></div>
+<div class="header-tools"><button id="profile-chip" class="profile-chip" hidden aria-label="Perfil atual"></button><span class="tag"><span class="tag-dot"></span> Online</span><button id="settings" class="icon-btn" aria-label="Configurações" data-icon="settings"></button></div>
 </header>
 <main>
 <section id="home-screen">
@@ -371,17 +385,22 @@ body.board-dragging{overflow:hidden!important;overscroll-behavior:none!important
 });
 
 </script><script>
-/* Interface original — protótipo local, sem conta, rede, rastreadores ou recursos externos. */
+/* Interface do jogo + perfis privados e progresso na nuvem. */
 (() => {
 'use strict';
 const { Game, LEVELS, N, SIZE, adjacent } = window.FamilyMatch;
 const $ = id => document.getElementById(id);
 const fmt = n => new Intl.NumberFormat('pt-BR').format(n);
 const STORE_KEY = 'reino-familia-v01';
+const CLOUD_SESSION_KEY='reino-familia-cloud-session-v1';
+const CLOUD_GROUP_KEY='reino-familia-group-code-v1';
+const SUPABASE_URL='https://axtnqxyhdkbxafsglztd.supabase.co';
+const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4dG5xeHloZGtieGFmc2dsenRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3Mjk0OTUsImV4cCI6MjEwNjMwNTQ5NX0.WEQheIDps4wk9I04VfX7icd94R7CyWX3wl8w0l6RQXw';
 const DEFAULT = {version:1,unlocked:1,results:{},active:null,settings:{sound:false,motion:true}};
 const clone = value => JSON.parse(JSON.stringify(value));
 let saved=clone(DEFAULT), storageWorks=true, game=null, busy=false, selected=null, focusCell=0, pointer=null, lastTap=-1, screen='home', lastFocus=null, toastTimer, hintTimer, audio;
 let nodeMap=new Map(), view=null, modalClosable=true;
+let cloudToken=null,cloudProfile=null,cloudGroup=null,cloudOnline=false,cloudSaveTimer=null,cloudCode=null,cloudBootstrap=null;
 const runtimeErrors=[];
 window.addEventListener('error', e => runtimeErrors.push(e.message));
 window.addEventListener('unhandledrejection', e => runtimeErrors.push(String(e.reason)));
@@ -423,8 +442,8 @@ function art(piece){
 function iceArt(){return '<svg viewBox="0 0 52 52" aria-hidden="true"><rect x="6" y="6" width="40" height="40" rx="9" fill="#A8DDE9" stroke="#6EB4CB" stroke-width="1.5"/><path d="m9 34 25-25h9L12 43H9Z" fill="#E4F9FB"/><path d="M26 14v24M15 20l22 12M15 32l22-12" stroke="#80BCD0" stroke-width="2"/><rect x="10" y="10" width="32" height="32" rx="5" stroke="#EEFFFF" fill="none"/></svg>';}
 function goalIcon(g){return g.type==='crate'?art({kind:'crate',hp:1}):g.type==='ice'?iceArt():art({kind:'gem',color:g.color});}
 function goalText(g){return g.type==='crate'?'caixas':g.type==='ice'?'camadas de gelo':colorNames[g.color];}
-function syncStorageNotice(){const el=document.querySelector('.game-footer');if(el)el.textContent=storageWorks?'Protótipo 0.1 · Partida salva neste navegador.':'Protótipo 0.1 · Salvamento indisponível neste navegador.';}
-function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(saved));}catch{storageWorks=false;$('storage-warning').hidden=false;}syncStorageNotice();}
+function syncStorageNotice(){const el=document.querySelector('.game-footer');if(!el)return;el.textContent=cloudProfile?(cloudOnline?`Perfil ${cloudProfile.name} · progresso salvo online.`:`Perfil ${cloudProfile.name} · sem conexão; tentativa guardada neste aparelho.`):(storageWorks?'Partida temporária salva neste navegador.':'Salvamento indisponível neste navegador.');}
+function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(saved));}catch{storageWorks=false;$('storage-warning').hidden=false;}syncStorageNotice();cloudScheduleSave();}
 let recoveredSave=false;
 try{
  const raw=localStorage.getItem(STORE_KEY);
@@ -437,6 +456,96 @@ try{
  }catch{saved=clone(DEFAULT);recoveredSave=true;}}
  localStorage.setItem(STORE_KEY,JSON.stringify(saved));
 }catch{storageWorks=false;$('storage-warning').hidden=false;}
+
+const avatarEmoji={leaf:'🌿',crown:'👑',star:'⭐',gem:'💎',flower:'🌼',sun:'☀️'};
+function cloudAvatar(seed){return avatarEmoji[seed]||'🌿';}
+function cloudErrMessage(err){return String(err?.message||err||'Não foi possível concluir esta ação.').replace(/^P0001:\s*/,'');}
+async function cloudRpc(name,payload={}){
+ const res=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`,{method:'POST',headers:{apikey:SUPABASE_ANON,Authorization:`Bearer ${SUPABASE_ANON}`,'Content-Type':'application/json'},body:JSON.stringify(payload)});
+ let data=null;try{data=await res.json();}catch{}
+ if(!res.ok)throw new Error(data?.message||data?.error_description||`Falha de conexão (${res.status})`);
+ return data;
+}
+function cloudSetView(html){$('cloud-view').innerHTML=html;hydrateIcons($('cloud-view'));}
+function cloudErrorNode(msg){return msg?`<div class="cloud-error">${msg}</div>`:'';}
+function cloudShowGroup(msg=''){
+ let remembered='';try{remembered=localStorage.getItem(CLOUD_GROUP_KEY)||'';}catch{}
+ cloudSetView(`<h2 id="cloud-title">Entre no reino da família</h2><p>Use o código privado compartilhado com a família. Depois você poderá criar seu próprio perfil ou entrar em um que já existe.</p>${cloudErrorNode(msg)}<label class="cloud-field"><span>Código da família</span><input id="cloud-code" class="cloud-input" autocomplete="off" autocapitalize="characters" spellcheck="false" value="${remembered.replace(/"/g,'&quot;')}" placeholder="REINO-XXXX-XXXX"></label><div class="cloud-actions"><button id="cloud-enter" class="primary">Entrar no grupo ${icon('arrow')}</button></div><p class="cloud-note">O grupo não aparece em buscas públicas. É preciso conhecer o código para ver os perfis.</p>`);
+ $('cloud-enter').onclick=cloudEnterGroup;$('cloud-code').addEventListener('keydown',e=>{if(e.key==='Enter')cloudEnterGroup();});setTimeout(()=>$('cloud-code')?.focus(),20);
+}
+async function cloudEnterGroup(){
+ const input=$('cloud-code');const code=(input?.value||'').trim().toUpperCase();if(!code)return;
+ const btn=$('cloud-enter');if(btn){btn.disabled=true;btn.textContent='Entrando…';}
+ try{const data=await cloudRpc('family_bootstrap',{p_code:code});cloudCode=code;cloudBootstrap=data;try{localStorage.setItem(CLOUD_GROUP_KEY,code);}catch{}cloudShowProfiles();}
+ catch(e){cloudShowGroup(cloudErrMessage(e));}
+}
+function cloudShowProfiles(msg=''){
+ const profiles=cloudBootstrap?.profiles||[];
+ cloudSetView(`<button class="cloud-back" id="cloud-back-code">← Trocar código</button><h2 id="cloud-title">${cloudBootstrap?.groupName||'Reino da Família'}</h2><p>Escolha seu perfil ou crie um novo. Não há limite de participantes.</p>${cloudErrorNode(msg)}<div class="cloud-profiles">${profiles.map(p=>`<button class="cloud-profile" data-profile="${p.id}"><span class="cloud-avatar">${cloudAvatar(p.avatar)}</span><span><strong>${escapeHtml(p.name)}</strong><small>Entrar com PIN</small></span></button>`).join('')}</div><div class="cloud-actions"><button id="cloud-create" class="primary">Criar meu perfil</button></div>`);
+ $('cloud-back-code').onclick=()=>{cloudBootstrap=null;cloudShowGroup();};$('cloud-create').onclick=cloudShowCreate;
+ $('cloud-view').querySelectorAll('[data-profile]').forEach(btn=>btn.onclick=()=>{const p=profiles.find(x=>x.id===btn.dataset.profile);if(p)cloudShowPin(p);});
+}
+function cloudShowPin(profile,msg=''){
+ cloudSetView(`<button class="cloud-back" id="cloud-back-profiles">← Perfis</button><div class="cloud-avatar" style="width:56px;height:56px;font-size:28px;margin-bottom:14px">${cloudAvatar(profile.avatar)}</div><h2 id="cloud-title">${escapeHtml(profile.name)}</h2><p>Digite o PIN desse perfil para carregar o progresso.</p>${cloudErrorNode(msg)}<label class="cloud-field"><span>PIN</span><input id="cloud-pin" class="cloud-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off" placeholder="4 a 8 números"></label><div class="cloud-actions"><button id="cloud-login" class="primary">Entrar neste perfil</button></div>`);
+ $('cloud-back-profiles').onclick=cloudShowProfiles;$('cloud-login').onclick=()=>cloudLogin(profile);$('cloud-pin').addEventListener('keydown',e=>{if(e.key==='Enter')cloudLogin(profile);});setTimeout(()=>$('cloud-pin')?.focus(),20);
+}
+async function cloudLogin(profile){
+ const pin=$('cloud-pin')?.value||'';const btn=$('cloud-login');if(btn){btn.disabled=true;btn.textContent='Carregando…';}
+ try{const data=await cloudRpc('family_login_profile',{p_code:cloudCode,p_profile_id:profile.id,p_pin:pin});await cloudAcceptToken(data.token);}
+ catch(e){cloudShowPin(profile,cloudErrMessage(e));}
+}
+function cloudShowCreate(msg=''){
+ cloudSetView(`<button class="cloud-back" id="cloud-back-profiles">← Perfis</button><h2 id="cloud-title">Crie seu perfil</h2><p>Seu progresso, estrelas e partidas ficarão ligados a este perfil.</p>${cloudErrorNode(msg)}<label class="cloud-field"><span>Seu nome</span><input id="cloud-name" class="cloud-input" maxlength="30" autocomplete="name" placeholder="Como quer aparecer no jogo?"></label><label class="cloud-field"><span>Avatar provisório</span><select id="cloud-avatar" class="cloud-select"><option value="leaf">🌿 Folha</option><option value="crown">👑 Coroa</option><option value="star">⭐ Estrela</option><option value="gem">💎 Cristal</option><option value="flower">🌼 Flor</option><option value="sun">☀️ Sol</option></select></label><label class="cloud-field"><span>Crie um PIN</span><input id="cloud-new-pin" class="cloud-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="new-password" placeholder="4 a 8 números"></label><div class="cloud-actions"><button id="cloud-create-submit" class="primary">Criar perfil e jogar</button></div><p class="cloud-note">Guarde seu PIN. O administrador da família poderá redefini-lo depois, mas não consegue ver o PIN atual.</p>`);
+ $('cloud-back-profiles').onclick=cloudShowProfiles;$('cloud-create-submit').onclick=cloudCreateProfile;setTimeout(()=>$('cloud-name')?.focus(),20);
+}
+async function cloudCreateProfile(){
+ const name=($('cloud-name')?.value||'').trim(),pin=$('cloud-new-pin')?.value||'',avatar=$('cloud-avatar')?.value||'leaf';
+ const btn=$('cloud-create-submit');if(btn){btn.disabled=true;btn.textContent='Criando…';}
+ try{const data=await cloudRpc('family_create_profile',{p_code:cloudCode,p_name:name,p_pin:pin,p_avatar:avatar});await cloudAcceptToken(data.token);}
+ catch(e){cloudShowCreate(cloudErrMessage(e));}
+}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+async function cloudAcceptToken(token){
+ cloudToken=token;try{localStorage.setItem(CLOUD_SESSION_KEY,token);}catch{}
+ const state=await cloudRpc('family_get_state',{p_token:token});cloudApplyState(state);
+}
+function cloudApplyState(state){
+ const settings=saved.settings||DEFAULT.settings;saved=clone(DEFAULT);saved.settings=settings;
+ const p=state?.progress||{};saved.unlocked=Math.max(1,Math.min(10,Number(p.unlocked)||1));
+ for(const level of LEVELS){const rr=p.results?.[level.id]||p.results?.[String(level.id)];if(rr&&Number.isInteger(rr.stars)&&rr.stars>=1&&rr.stars<=3&&Number.isSafeInteger(rr.score)&&rr.score>=0&&Number.isInteger(rr.moves)&&rr.moves>=0&&rr.moves<=level.moves)saved.results[level.id]={stars:rr.stars,score:rr.score,moves:rr.moves};}
+ if(p.active){try{const active=Game.restore(p.active);if(active.status==='playing'&&active.moves>0&&active.level.id<=saved.unlocked)saved.active=active.snapshot();}catch{}}
+ cloudProfile=state.profile;cloudGroup=state.group;cloudOnline=true;
+ try{localStorage.setItem(STORE_KEY,JSON.stringify(saved));}catch{}
+ $('cloud-gate').hidden=true;const chip=$('profile-chip');chip.hidden=false;chip.innerHTML=`<span class="cloud-avatar">${cloudAvatar(cloudProfile.avatar)}</span><span>${escapeHtml(cloudProfile.name)}</span>`;chip.onclick=cloudAccountMenu;
+ makeMap();syncStorageNotice();
+}
+function cloudScheduleSave(){if(!cloudToken||!cloudProfile)return;clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(cloudPush,450);}
+async function cloudPush(){
+ if(!cloudToken||!cloudProfile)return;
+ clearTimeout(cloudSaveTimer);
+ try{await cloudRpc('family_save_progress',{p_token:cloudToken,p_unlocked:saved.unlocked,p_results:saved.results,p_active:saved.active});cloudOnline=true;syncStorageNotice();}
+ catch(e){cloudOnline=false;syncStorageNotice();console.warn('Cloud save failed',e);}
+}
+function cloudAccountMenu(){
+ if(busy)return;
+ showModal(`<p class="modal-eyebrow">Perfil conectado</p><h2 id="modal-title">${escapeHtml(cloudProfile?.name||'Meu perfil')}</h2><p>Seu progresso é sincronizado com o Reino da Família.</p><div class="save-note"><strong>${escapeHtml(cloudGroup?.name||'Reino da Família')}</strong><br>Você pode usar este perfil em outro aparelho escolhendo-o e digitando o mesmo PIN.</div><button class="secondary" id="cloud-switch">Trocar de perfil</button><button class="text-btn" id="cloud-logout">Sair deste aparelho</button><button class="primary" id="cloud-account-close">Continuar jogando</button>`);
+ $('cloud-switch').onclick=()=>cloudLeave(false);$('cloud-logout').onclick=()=>cloudLeave(true);$('cloud-account-close').onclick=closeModal;
+}
+async function cloudLeave(revoke){
+ const old=cloudToken;closeModal();cloudToken=null;cloudProfile=null;cloudGroup=null;cloudOnline=false;try{localStorage.removeItem(CLOUD_SESSION_KEY);}catch{}
+ if(revoke&&old)cloudRpc('family_logout',{p_token:old}).catch(()=>{});
+ const chip=$('profile-chip');chip.hidden=true;chip.innerHTML='';$('cloud-gate').hidden=false;
+ const remembered=(()=>{try{return localStorage.getItem(CLOUD_GROUP_KEY)||'';}catch{return'';}})();
+ if(remembered){cloudCode=remembered;try{cloudBootstrap=await cloudRpc('family_bootstrap',{p_code:remembered});cloudShowProfiles();}catch{cloudShowGroup();}}else cloudShowGroup();
+}
+async function cloudInit(){
+ hydrateIcons($('cloud-gate'));
+ let token=null;try{token=localStorage.getItem(CLOUD_SESSION_KEY);}catch{}
+ if(token){try{cloudToken=token;const state=await cloudRpc('family_get_state',{p_token:token});cloudApplyState(state);return;}catch{try{localStorage.removeItem(CLOUD_SESSION_KEY);}catch{}cloudToken=null;}}
+ cloudShowGroup();
+}
+window.addEventListener('online',()=>{if(cloudProfile)cloudPush();});
+
 function toast(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3000);}
 function announce(text){$('live').textContent=text;}
 function applySettings(){document.body.classList.toggle('reduced-motion',!saved.settings.motion);}
@@ -601,7 +710,7 @@ function showHelp(){
  $('help-done').onclick=closeModal;
 }
 function showSettings(){if(busy){toast('Conclua esta combinação para abrir as configurações.');return;}
- showModal(`<p class="modal-eyebrow">Do seu jeito</p><h2 id="modal-title">Um reino tranquilo.</h2><div class="settings-row"><div><strong>Efeitos sonoros</strong><small>Sons leves nas combinações e vitórias.</small></div><button class="toggle ${saved.settings.sound?'on':''}" id="toggle-sound" role="switch" aria-checked="${saved.settings.sound}" aria-label="Efeitos sonoros"></button></div><div class="settings-row"><div><strong>Animações</strong><small>Desative para reduzir movimentos.${systemReduced?' O sistema já pede movimento reduzido.':''}</small></div><button class="toggle ${saved.settings.motion?'on':''}" id="toggle-motion" role="switch" aria-checked="${saved.settings.motion}" aria-label="Animações"></button></div><div class="divider"></div><p class="save-note"><strong>Protótipo local 0.1</strong><br>As 10 fases estão nesta versão. O progresso fica neste navegador, quando o armazenamento está disponível. Não há conta, sincronização, Copa ou personagens da família ainda. Nenhum dado é enviado a um servidor.</p>${screen==='game'?'<button class="secondary" id="restart-settings">Recomeçar esta fase</button><button class="secondary" id="map-settings">Salvar e voltar ao mapa</button>':''}<button class="text-btn" id="reset-all">Apagar progresso deste navegador</button><button class="primary" id="settings-done">Tudo certo</button>`);
+ showModal(`<p class="modal-eyebrow">Do seu jeito</p><h2 id="modal-title">Um reino tranquilo.</h2><div class="settings-row"><div><strong>Efeitos sonoros</strong><small>Sons leves nas combinações e vitórias.</small></div><button class="toggle ${saved.settings.sound?'on':''}" id="toggle-sound" role="switch" aria-checked="${saved.settings.sound}" aria-label="Efeitos sonoros"></button></div><div class="settings-row"><div><strong>Animações</strong><small>Desative para reduzir movimentos.${systemReduced?' O sistema já pede movimento reduzido.':''}</small></div><button class="toggle ${saved.settings.motion?'on':''}" id="toggle-motion" role="switch" aria-checked="${saved.settings.motion}" aria-label="Animações"></button></div><div class="divider"></div><p class="save-note"><strong>Protótipo conectado 0.2</strong><br>As 10 fases estão nesta versão. O progresso deste perfil é sincronizado online. A Copa e os personagens da família ainda serão adicionados.</p>${screen==='game'?'<button class="secondary" id="restart-settings">Recomeçar esta fase</button><button class="secondary" id="map-settings">Salvar e voltar ao mapa</button>':''}<button class="text-btn" id="reset-all">Apagar progresso deste navegador</button><button class="primary" id="settings-done">Tudo certo</button>`);
  for(const [id,property]of[['toggle-sound','sound'],['toggle-motion','motion']])$(id).onclick=()=>{saved.settings[property]=!saved.settings[property];$(id).classList.toggle('on',saved.settings[property]);$(id).setAttribute('aria-checked',saved.settings[property]);save();applySettings();if(property==='sound'&&saved.settings.sound)sound('match');};
  $('settings-done').onclick=closeModal;$('reset-all').onclick=confirmReset;
  if(screen==='game'){$('restart-settings').onclick=()=>confirmRestart(game.level.id);$('map-settings').onclick=showHome;}
@@ -619,7 +728,7 @@ document.addEventListener('keydown',e=>{
  if(e.key==='Escape'&&modalClosable){e.preventDefault();closeModal();}
  if(e.key==='Tab'){const focusable=[...modal.querySelectorAll('button:not(:disabled),a[href],[tabindex="0"]')];if(!focusable.length){e.preventDefault();return;}const first=focusable[0],last=focusable[focusable.length-1];if(e.shiftKey&&(document.activeElement===first||document.activeElement===modal)){e.preventDefault();last.focus();}else if(!e.shiftKey&&(document.activeElement===last||document.activeElement===modal)){e.preventDefault();first.focus();}}
 });
-syncStorageNotice();applySettings();hydrateIcons();makeMap();
+syncStorageNotice();applySettings();hydrateIcons();makeMap();cloudInit();
 if(window.__FAMILY_STARTUP__)window.__FAMILY_STARTUP__.complete();
 if(recoveredSave)toast('Dados locais inválidos foram descartados. O jogo está pronto para continuar.');
 // Exposed only under an explicit local QA query. Never used as game authentication.
