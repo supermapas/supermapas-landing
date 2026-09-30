@@ -400,7 +400,7 @@ const DEFAULT = {version:1,unlocked:1,results:{},active:null,settings:{sound:fal
 const clone = value => JSON.parse(JSON.stringify(value));
 let saved=clone(DEFAULT), storageWorks=true, game=null, busy=false, selected=null, focusCell=0, pointer=null, lastTap=-1, screen='home', lastFocus=null, toastTimer, hintTimer, audio;
 let nodeMap=new Map(), view=null, modalClosable=true;
-let cloudToken=null,cloudProfile=null,cloudGroup=null,cloudOnline=false,cloudSaveTimer=null,cloudCode=null,cloudBootstrap=null;
+let cloudToken=null,cloudProfile=null,cloudGroup=null,cloudOnline=false,cloudSaveTimer=null,cloudCode=null,cloudBootstrap=null,cloudAdminToken=null;
 const runtimeErrors=[];
 window.addEventListener('error', e => runtimeErrors.push(e.message));
 window.addEventListener('unhandledrejection', e => runtimeErrors.push(String(e.reason)));
@@ -528,9 +528,36 @@ async function cloudPush(){
 }
 function cloudAccountMenu(){
  if(busy)return;
- showModal(`<p class="modal-eyebrow">Perfil conectado</p><h2 id="modal-title">${escapeHtml(cloudProfile?.name||'Meu perfil')}</h2><p>Seu progresso é sincronizado com o Reino da Família.</p><div class="save-note"><strong>${escapeHtml(cloudGroup?.name||'Reino da Família')}</strong><br>Você pode usar este perfil em outro aparelho escolhendo-o e digitando o mesmo PIN.</div><button class="secondary" id="cloud-switch">Trocar de perfil</button><button class="text-btn" id="cloud-logout">Sair deste aparelho</button><button class="primary" id="cloud-account-close">Continuar jogando</button>`);
- $('cloud-switch').onclick=()=>cloudLeave(false);$('cloud-logout').onclick=()=>cloudLeave(true);$('cloud-account-close').onclick=closeModal;
+ showModal(`<p class="modal-eyebrow">Perfil conectado</p><h2 id="modal-title">${escapeHtml(cloudProfile?.name||'Meu perfil')}</h2><p>Seu progresso é sincronizado com o Reino da Família.</p><div class="save-note"><strong>${escapeHtml(cloudGroup?.name||'Reino da Família')}</strong><br>Você pode usar este perfil em outro aparelho escolhendo-o e digitando o mesmo PIN.</div><button class="secondary" id="cloud-switch">Trocar de perfil</button><button class="secondary" id="cloud-admin">Administrar perfis</button><button class="text-btn" id="cloud-logout">Sair deste aparelho</button><button class="primary" id="cloud-account-close">Continuar jogando</button>`);
+ $('cloud-switch').onclick=()=>cloudLeave(false);$('cloud-admin').onclick=cloudShowAdminLogin;$('cloud-logout').onclick=()=>cloudLeave(true);$('cloud-account-close').onclick=closeModal;
 }
+
+function cloudShowAdminLogin(msg=''){
+ let remembered='';try{remembered=localStorage.getItem(CLOUD_GROUP_KEY)||'';}catch{}
+ showModal(`<p class="modal-eyebrow">Administração da família</p><h2 id="modal-title">Gerenciar perfis</h2><p>Use as credenciais de administrador para renomear perfis, redefinir PINs ou excluir um perfil criado por engano.</p>${cloudErrorNode(msg)}<label class="cloud-field"><span>Código da família</span><input id="admin-code" class="cloud-input" value="${escapeHtml(remembered)}" autocomplete="off"></label><label class="cloud-field"><span>Chave do administrador</span><input id="admin-secret" class="cloud-input" type="password" autocomplete="off"></label><button class="primary" id="admin-enter">Abrir administração</button><button class="secondary" id="admin-cancel">Cancelar</button>`);
+ $('admin-enter').onclick=cloudAdminLogin;$('admin-cancel').onclick=cloudAccountMenu;
+}
+async function cloudAdminLogin(){
+ const code=($('admin-code')?.value||'').trim().toUpperCase(),secret=$('admin-secret')?.value||'';
+ const btn=$('admin-enter');if(btn){btn.disabled=true;btn.textContent='Verificando…';}
+ try{const data=await cloudRpc('family_admin_login',{p_code:code,p_pin:secret});cloudAdminToken=data.token;cloudCode=code;try{localStorage.setItem(CLOUD_GROUP_KEY,code);}catch{}cloudBootstrap=await cloudRpc('family_bootstrap',{p_code:code});cloudRenderAdmin();}
+ catch(e){cloudShowAdminLogin(cloudErrMessage(e));}
+}
+function cloudRenderAdmin(msg=''){
+ const profiles=cloudBootstrap?.profiles||[];
+ showModal(`<p class="modal-eyebrow">Administração da família</p><h2 id="modal-title">Perfis do reino</h2><p>${profiles.length} perfil${profiles.length===1?'':'is'} cadastrado${profiles.length===1?'':'s'}. As alterações abaixo afetam o grupo inteiro.</p>${cloudErrorNode(msg)}<div class="cloud-actions">${profiles.map(p=>`<div class="cloud-profile" style="cursor:default"><span class="cloud-avatar">${cloudAvatar(p.avatar)}</span><span style="flex:1;min-width:0"><strong>${escapeHtml(p.name)}</strong><small>Perfil da família</small></span><button class="tool-btn" data-admin-menu="${p.id}" style="padding:0 9px">Editar</button></div>`).join('')||'<p class="cloud-note">Nenhum perfil criado ainda.</p>'}</div><button class="primary" id="admin-done">Concluir</button>`);
+ $('admin-done').onclick=cloudAccountMenu;
+ $('modal-root').querySelectorAll('[data-admin-menu]').forEach(btn=>btn.onclick=()=>cloudAdminProfileMenu(profiles.find(p=>p.id===btn.dataset.adminMenu)));
+}
+function cloudAdminProfileMenu(profile){
+ if(!profile)return;
+ showModal(`<p class="modal-eyebrow">Perfil da família</p><h2 id="modal-title">${escapeHtml(profile.name)}</h2><p>Escolha o que deseja alterar.</p><button class="secondary" id="admin-rename">Renomear perfil</button><button class="secondary" id="admin-reset-pin">Redefinir PIN</button><button class="secondary" id="admin-delete" style="color:#914a39">Excluir perfil</button><button class="primary" id="admin-profile-back">Voltar</button>`);
+ $('admin-profile-back').onclick=()=>cloudRenderAdmin();
+ $('admin-rename').onclick=async()=>{const name=prompt('Novo nome do perfil:',profile.name);if(name===null)return;try{await cloudRpc('family_admin_rename_profile',{p_token:cloudAdminToken,p_profile_id:profile.id,p_name:name});cloudBootstrap=await cloudRpc('family_bootstrap',{p_code:cloudCode});cloudRenderAdmin('Perfil renomeado.');}catch(e){cloudRenderAdmin(cloudErrMessage(e));}};
+ $('admin-reset-pin').onclick=async()=>{const pin=prompt('Novo PIN (4 a 8 números):','');if(pin===null)return;try{await cloudRpc('family_admin_reset_pin',{p_token:cloudAdminToken,p_profile_id:profile.id,p_new_pin:pin});cloudBootstrap=await cloudRpc('family_bootstrap',{p_code:cloudCode});cloudRenderAdmin('PIN redefinido. O perfil precisará entrar novamente nos outros aparelhos.');}catch(e){cloudRenderAdmin(cloudErrMessage(e));}};
+ $('admin-delete').onclick=async()=>{if(!confirm(`Excluir o perfil "${profile.name}" e todo o progresso dele? Essa ação não pode ser desfeita.`))return;try{await cloudRpc('family_admin_delete_profile',{p_token:cloudAdminToken,p_profile_id:profile.id});cloudBootstrap=await cloudRpc('family_bootstrap',{p_code:cloudCode});if(cloudProfile?.id===profile.id){cloudToken=null;cloudProfile=null;try{localStorage.removeItem(CLOUD_SESSION_KEY);}catch{}closeModal();$('cloud-gate').hidden=false;cloudShowProfiles();}else cloudRenderAdmin('Perfil excluído.');}catch(e){cloudRenderAdmin(cloudErrMessage(e));}};
+}
+
 async function cloudLeave(revoke){
  const old=cloudToken;closeModal();cloudToken=null;cloudProfile=null;cloudGroup=null;cloudOnline=false;try{localStorage.removeItem(CLOUD_SESSION_KEY);}catch{}
  if(revoke&&old)cloudRpc('family_logout',{p_token:old}).catch(()=>{});
