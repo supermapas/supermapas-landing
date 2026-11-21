@@ -46,6 +46,6 @@ node scripts/preview-offer-value-unified-panel-v1.mjs dist/index.html
 node scripts/preview-offer-value-bridge-v1.mjs dist/index.html
 node scripts/preview-offer-value-math-correction-v1.mjs dist/index.html
 node scripts/preview-offer-calendar-clock-v1.mjs dist/index.html
-node scripts/preview-black-friday-campaign-v2.mjs dist/index.html
+node scripts/preview-black-friday-campaign-v3.mjs dist/index.html
 
-echo 'Black Friday preview: R$57, 12x R$5,90, 70% OFF, R$190 reference and R$274 bundle; daily countdown restored.'
+echo 'Black Friday v3 preview: R$57, 12x R$5,90, 70% OFF, R$190 reference and R$274 bundle; coordinated color system and daily countdown.'
