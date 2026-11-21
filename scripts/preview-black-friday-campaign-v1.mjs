@@ -48,6 +48,7 @@ const css = [
 '@media(max-width:640px){.sm-black-ribbon{min-height:40px;gap:8px;padding:8px 6px;font-size:8.2px;letter-spacing:.04em}.sm-black-ribbon strong{font-size:9px;letter-spacing:.055em}.sm-black-ribbon-dot{width:6px;height:6px;flex:0 0 6px}.sm-mobile-hero{padding-top:0!important}.sm-black-offer-title{font-size:29px}.sm-black-offer-head{padding-top:14px!important;padding-bottom:20px!important}.sm-black-offer-pill{font-size:10px}.sm-sales-dock .sm-dock-discount{font-size:10px!important}.sm-sales-dock .sm-dock-checkout span{font-size:8.8px!important}}',
 '</style>'
 ].join('\n');
+html = html.replace('<head>', '<head><meta name="robots" content="noindex,nofollow">');
 html = html.replace('</head>', css + '\n</head>');
 if (!html.includes('sm-black-offer-title') || !html.includes('BLACK FRIDAY SUPERM')) throw new Error('Black campaign markup missing');
 fs.writeFileSync(target, html);
