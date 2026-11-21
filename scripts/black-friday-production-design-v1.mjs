@@ -49,7 +49,7 @@ const css = [
 '@media(max-width:820px){.sm-offer-value-layout{grid-template-columns:minmax(0,1fr)!important;min-width:0!important}.sm-offer-value-layout>.sm-offer-value-list,.sm-offer-value-layout>.sm-offer-value-bridge,.sm-offer-value-layout>.sm-offer-value-checkout{min-width:0!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important}.sm-offer-value-bridge p{width:100%!important;max-width:100%!important;white-space:normal!important;overflow-wrap:normal!important}}',
 '@media(max-width:640px){.sm-section-nav-label{display:none!important}}',
 '/* Accessibility audit: original orange buttons had white labels below 4.5:1. Keep orange gradients and center alignment; use dark ink consistently on label and arrow. */',
-'.sm-dh-header-cta{color:#211b2d!important;-webkit-text-fill-color:#211b2d!important}',
+'.sm-desktop-hero .sm-dh-header .sm-dh-header-cta{color:#211b2d!important;-webkit-text-fill-color:#211b2d!important}',
 '.sm-offer-value-cta,.sm-offer-value-cta span,.sm-offer-value-cta b{color:#211b2d!important;-webkit-text-fill-color:#211b2d!important}',
 '/* Avoid the original desktop valuation panel stretching into a large empty white rectangle. */',
 '@media(min-width:821px){.sm-offer-value-list--unified{align-self:start!important}}',
