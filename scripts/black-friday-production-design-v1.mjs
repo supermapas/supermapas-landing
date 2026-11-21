@@ -48,7 +48,12 @@ const css = [
 '/* Fix an existing Production bug: max-content bridge text forces the mobile grid to 438px and clips the entire price card. */',
 '@media(max-width:820px){.sm-offer-value-layout{grid-template-columns:minmax(0,1fr)!important;min-width:0!important}.sm-offer-value-layout>.sm-offer-value-list,.sm-offer-value-layout>.sm-offer-value-bridge,.sm-offer-value-layout>.sm-offer-value-checkout{min-width:0!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important}.sm-offer-value-bridge p{width:100%!important;max-width:100%!important;white-space:normal!important;overflow-wrap:normal!important}}',
 '@media(max-width:640px){.sm-section-nav-label{display:none!important}}',
-'/* No changes to any existing CTA, its nested text/icon, the price typography or the dock. */',
+'/* Accessibility audit: original orange buttons had white labels below 4.5:1. Keep orange gradients and center alignment; use dark ink consistently on label and arrow. */',
+'.sm-dh-header-cta{color:#211b2d!important;-webkit-text-fill-color:#211b2d!important}',
+'.sm-offer-value-cta,.sm-offer-value-cta span,.sm-offer-value-cta b{color:#211b2d!important;-webkit-text-fill-color:#211b2d!important}',
+'/* Avoid the original desktop valuation panel stretching into a large empty white rectangle. */',
+'@media(min-width:821px){.sm-offer-value-list--unified{align-self:start!important}}',
+
 '@media(max-width:640px){.sm-bf-campaign{min-height:38px;padding:6px 7px;gap:7px;font-size:10px;letter-spacing:.02em}.sm-bf-campaign-mark{width:18px;height:18px;flex-basis:18px;font-size:10px}.sm-bf-campaign>strong{font-size:10px;letter-spacing:.05em}.sm-bf-campaign-brand{display:none}.sm-bf-campaign-separator{display:none}.sm-bf-campaign-discount{min-height:24px;padding:4px 9px;font-size:10px}}',
 '@media(max-width:640px){.sm-hero-offer-badge-v3{width:calc(100vw - 28px)!important;max-width:calc(100vw - 28px)!important;min-width:0!important;box-sizing:border-box!important}.sm-hero-offer-badge-v3 span{min-width:0!important}}',
 '@media(max-width:360px){.sm-hero-offer-badge-v3 strong,.sm-hero-offer-badge-v3 span{font-size:11px!important;letter-spacing:0!important}}',
