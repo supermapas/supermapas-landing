@@ -50,6 +50,8 @@ const css = [
 '@media(max-width:640px){.sm-section-nav-label{display:none!important}}',
 '/* No changes to any existing CTA, its nested text/icon, the price typography or the dock. */',
 '@media(max-width:640px){.sm-bf-campaign{min-height:38px;padding:6px 7px;gap:7px;font-size:10px;letter-spacing:.02em}.sm-bf-campaign-mark{width:18px;height:18px;flex-basis:18px;font-size:10px}.sm-bf-campaign>strong{font-size:10px;letter-spacing:.05em}.sm-bf-campaign-brand{display:none}.sm-bf-campaign-separator{display:none}.sm-bf-campaign-discount{min-height:24px;padding:4px 9px;font-size:10px}}',
+'@media(max-width:640px){.sm-hero-offer-badge-v3{width:calc(100vw - 28px)!important;max-width:calc(100vw - 28px)!important;min-width:0!important;box-sizing:border-box!important}.sm-hero-offer-badge-v3 span{min-width:0!important}}',
+'@media(max-width:360px){.sm-hero-offer-badge-v3 strong,.sm-hero-offer-badge-v3 span{font-size:11px!important;letter-spacing:0!important}}',
 '@media(max-width:360px){.sm-bf-campaign{gap:6px}.sm-bf-campaign-mark{display:none}.sm-bf-campaign>strong{font-size:10px}.sm-bf-campaign-discount{padding:4px 7px}}',
 '</style>'
 ].join('\n');
