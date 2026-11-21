@@ -63,7 +63,18 @@ for (const width of widths) {
     }
     const fg=rgb(item.color),bg=rgb(item.bg);
     if(fg && bg && item.gradient==='none' && contrast(fg,bg)<3.0 && (sel.includes('bf-campaign')||sel.includes('badge'))) failures.push(width+': contrast low '+sel+' '+contrast(fg,bg).toFixed(2));
-    if(sel==='.sm-bf-campaign-discount' && fg && bg && contrast(fg,bg)<4.5) failures.push(width+': campaign discount contrast low');
+    if(item.sel==='.sm-bf-campaign-discount' && fg && bg && contrast(fg,bg)<4.5) failures.push(width+': campaign discount contrast low');
+    if(['.sm-dh-header-cta','.sm-dh-primary','.sm-mh-cta','.sm-offer-value-cta'].includes(item.sel)){
+      const label=item.descendants.find(d=>d.tag==='SPAN');
+      const labelColor=rgb(label?.color||item.color);
+      const stops=[...item.gradient.matchAll(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/g)].map(m=>[+m[1],+m[2],+m[3]]);
+      for(const stop of stops)if(labelColor && contrast(labelColor,stop)<4.5)failures.push(width+': CTA label contrast '+item.sel+' '+contrast(labelColor,stop).toFixed(2));
+      if(item.sel==='.sm-offer-value-cta'){
+        const arrow=item.descendants.find(d=>d.tag==='B');
+        const arrowColor=rgb(arrow?.color||'');
+        for(const stop of stops)if(arrowColor && contrast(arrowColor,stop)<4.5)failures.push(width+': CTA arrow contrast '+item.sel);
+      }
+    }
   }
   if(width===390||width===1440){
     await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
