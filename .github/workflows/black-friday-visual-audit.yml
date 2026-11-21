@@ -23,7 +23,7 @@ jobs:
           command -v google-chrome
       - name: Test Production-based Preview in real Chrome
         env:
-          PREVIEW_URL: https://supermapas-landing-8rct2nn1r-supermapas.vercel.app/
+          PREVIEW_URL: https://supermapas-landing-bpym5cuqo-supermapas.vercel.app/
         run: node tests/visual-audit.mjs
       - name: Save responsive screenshots and report
         if: always()
