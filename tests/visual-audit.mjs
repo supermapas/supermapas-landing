@@ -48,6 +48,31 @@ for (const width of widths) {
   results.push(summary);
   if(width===390||width===1440)console.log('CTA_COMPUTED_STYLES '+JSON.stringify({width,items:report.items.map(({sel,text,color,bg,gradient,rect,descendants})=>({sel,text,color,bg,gradient,rect,descendants:descendants.map(x=>({tag:x.tag,text:x.text,color:x.color,fill:x.fill}))}))}));
   if(report.scrollWidth>width+2) failures.push(width+': document horizontal overflow '+report.scrollWidth);
+  // The visible hero badge must fit inside its clipping parent. Previous tests missed this
+  // because they queried the hidden desktop badge first and only checked document scrollWidth.
+  const badgeGeometry=await page.evaluate(()=>{
+    const mobile=window.matchMedia('(max-width:720px)').matches;
+    const badge=document.querySelector((mobile?'.sm-mobile-hero ':'.sm-desktop-hero ')+'.sm-hero-offer-badge-v3');
+    if(!badge)return {missing:true};
+    const parent=badge.closest('.sm-mh-copy,.sm-dh-copy')||badge.parentElement;
+    const b=badge.getBoundingClientRect(),p=parent.getBoundingClientRect(),cs=getComputedStyle(badge);
+    const children=[...badge.children].map(el=>{const r=el.getBoundingClientRect();return {text:el.textContent?.trim(),x:r.x,right:r.right,scrollWidth:el.scrollWidth,clientWidth:el.clientWidth}});
+    return {mobile,viewport:innerWidth,badge:{x:b.x,right:b.right,width:b.width},parent:{x:p.x,right:p.right,width:p.width},borderRadius:cs.borderTopRightRadius,children};
+  });
+  if(badgeGeometry.missing)failures.push(width+': hero badge missing');
+  else{
+    console.log('HERO_BADGE_GEOMETRY '+JSON.stringify({width,...badgeGeometry}));
+    if(badgeGeometry.badge.x<badgeGeometry.parent.x-2 || badgeGeometry.badge.right>badgeGeometry.parent.right+2)
+      failures.push(width+': badge clipped by parent '+JSON.stringify(badgeGeometry));
+    if(parseFloat(badgeGeometry.borderRadius)<12)failures.push(width+': badge right border not rounded');
+    for(const child of badgeGeometry.children){
+      if(child.x<badgeGeometry.badge.x-2||child.right>badgeGeometry.badge.right+2)
+        failures.push(width+': badge label outside pill '+JSON.stringify(child));
+      if(child.clientWidth&&child.scrollWidth>child.clientWidth+3)
+        failures.push(width+': badge text clipped '+JSON.stringify(child));
+    }
+  }
+  
   if(width<=820){const geometry=await page.evaluate(()=>{const sels=['.sm-offer-value-list--unified','.sm-offer-value-bridge','.sm-offer-value-checkout','.sm-offer-value-cta','.sm-offer-value-bridge p'];return sels.map(sel=>{const e=document.querySelector(sel);if(!e)return {sel,missing:true};const r=e.getBoundingClientRect();return {sel,x:r.x,right:r.right,w:r.width}})});for(const g of geometry){if(g.missing||g.x< -2||g.right>width+2)failures.push(width+': clipped offer region '+JSON.stringify(g));}}
   if(report.price!=='57') failures.push(width+': price not R$57');
   if(!report.installments?.includes('12x de R$ 5,90')) failures.push(width+': installment mismatch');
