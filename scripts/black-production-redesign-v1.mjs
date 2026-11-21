@@ -8,7 +8,7 @@ let html = fs.readFileSync(target, 'utf8');
 // all CTA copy and destinations, offer layout, and midnight-reset countdown.
 const desktop = '<section class="sm-desktop-hero" id="inicio-desktop" aria-label="Supermapas de Língua Portuguesa">';
 const mobile = '<section class="sm-mobile-hero" id="inicio-mobile" aria-label="Supermapas de Língua Portuguesa">';
-const ribbon = '<div class="sm-bf2026-banner" role="note" aria-label="Campanha Black Friday Supermapas"><span class="sm-bf2026-spark" aria-hidden="true">✦</span><strong>BLACK FRIDAY</strong><span class="sm-bf2026-rule" aria-hidden="true"></span><span class="sm-bf2026-message">SUPERM​APAS <b>70% OFF</b></span></div>';
+const ribbon = '<div class="sm-bf2026-banner" role="note" aria-label="Campanha Black Friday Supermapas"><span class="sm-bf2026-spark" aria-hidden="true">✦</span><strong>BLACK FRIDAY</strong><span class="sm-bf2026-rule" aria-hidden="true"></span><span class="sm-bf2026-message">SUPERMAPAS <b>70% OFF</b></span></div>';
 if (html.split(desktop).length !== 2 || html.split(mobile).length !== 2) throw new Error('Production hero markup changed');
 html = html.replace(desktop, desktop + ribbon).replace(mobile, mobile + ribbon);
 
@@ -18,7 +18,7 @@ html = html.replaceAll(badgeText, '<span>BLACK FRIDAY + 2 BÔNUS</span>');
 
 const originalOfferLabel = '<span class="sm-offer-clear-label">OFERTA VÁLIDA NOS DIAS</span>';
 if (!html.includes(originalOfferLabel)) throw new Error('Original offer date heading missing');
-html = html.replace(originalOfferLabel, '<span class="sm-offer-clear-label">BLACK FRIDAY SUPERM​APAS</span>');
+html = html.replace(originalOfferLabel, '<span class="sm-offer-clear-label">BLACK FRIDAY SUPERMAPAS</span>');
 
 const offerEyebrow = '<span class="sm-offer-value-eyebrow">O QUE VOCÊ RECEBE</span>';
 if (!html.includes(offerEyebrow)) throw new Error('Original offer eyebrow missing');
