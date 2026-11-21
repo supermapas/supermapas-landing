@@ -46,6 +46,7 @@ for (const width of widths) {
   const summary={width,scrollWidth:report.scrollWidth,overflow:report.scrollWidth-width,mainClock:report.mainClock,dockClock:report.dockClock,price:report.price,installments:report.installments,discount:report.discount,components:report.items.length};
   results.push(summary);
   if(report.scrollWidth>width+2) failures.push(width+': document horizontal overflow '+report.scrollWidth);
+  if(width<=820){const geometry=await page.evaluate(()=>{const sels=['.sm-offer-value-list--unified','.sm-offer-value-bridge','.sm-offer-value-checkout','.sm-offer-value-cta','.sm-offer-value-bridge p'];return sels.map(sel=>{const e=document.querySelector(sel);if(!e)return {sel,missing:true};const r=e.getBoundingClientRect();return {sel,x:r.x,right:r.right,w:r.width}})});for(const g of geometry){if(g.missing||g.x< -2||g.right>width+2)failures.push(width+': clipped offer region '+JSON.stringify(g));}}
   if(report.price!=='57') failures.push(width+': price not R$57');
   if(!report.installments?.includes('12x de R$ 5,90')) failures.push(width+': installment mismatch');
   if(report.discount!=='70% OFF') failures.push(width+': discount mismatch');
