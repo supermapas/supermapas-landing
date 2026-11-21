@@ -1,0 +1,34 @@
+name: Black Friday visual audit
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual:
+    name: Chrome visual and contrast audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser automation
+        run: |
+          npm install --prefix tests/.playwright-ci --no-save playwright-core@1.58.2
+          command -v google-chrome
+      - name: Test Production-based Preview in real Chrome
+        env:
+          PREVIEW_URL: https://supermapas-landing-cssi0vaz0-supermapas.vercel.app/
+        run: node tests/visual-audit.mjs
+      - name: Save responsive screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: black-friday-visual-audit
+          path: visual-artifacts/
+          retention-days: 7
