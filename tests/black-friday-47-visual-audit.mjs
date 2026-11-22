@@ -42,6 +42,19 @@ for (const width of widths) {
     const dockClock=document.querySelector('[data-sm-dock-countdown]');
     return {innerWidth,scrollWidth:document.documentElement.scrollWidth,items:data,dock: dock?{visible:visible(dock),rect:rect(dock)}:null,mainClock:mainClock?.textContent,dockClock:dockClock?.textContent,checkout:document.querySelector('.sm-offer-value-cta')?.getAttribute('href'),price:document.querySelector('.sm-offer-value-final strong')?.textContent,installments:document.querySelector('.sm-offer-value-installments')?.textContent,discount:document.querySelector('.sm-hero-offer-badge-v3 strong')?.textContent};
   },selectors);
+  const bannerAudit=await page.evaluate(()=>{
+    const bars=[...document.querySelectorAll('.sm-black47-strip')].filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&r.height>0;});
+    return bars.map(bar=>{
+      const star=bar.querySelector('.sm-black47-star'),svg=star?.querySelector('svg'),title=bar.querySelector('strong'),flash=bar.querySelector('.sm-black47-flash');
+      const r=bar.getBoundingClientRect(),a=star?.getBoundingClientRect(),b=svg?.getBoundingClientRect();
+      const text=bar.textContent.trim();
+      return {text,aria:bar.getAttribute('aria-label'),width:r.width,scrollWidth:bar.scrollWidth,starCenterOffset:a&&b?Math.max(Math.abs(a.x+a.width/2-b.x-b.width/2),Math.abs(a.y+a.height/2-b.y-b.height/2)):999,titleText:title?.textContent.trim(),flashText:flash?.textContent.trim(),titleWrap:title?title.getBoundingClientRect().height>30:false};
+    });
+  });
+  console.log('BLACK_ANTECIPADA_BANNER_AUDIT '+JSON.stringify({width,bannerAudit}));
+  if(bannerAudit.length!==1||bannerAudit.some(x=>x.titleText!=='BLACK ANTECIPADA'||x.flashText!=='80% OFF'||!x.aria?.includes('Black Antecipada')||x.starCenterOffset>1||x.scrollWidth>x.width+2||x.titleWrap))failures.push(width+': campaign masthead alignment/copy '+JSON.stringify(bannerAudit));
+  const allCampaignCopy=await page.evaluate(()=>document.body.innerText);
+  if(/BLACK FRIDAY/i.test(allCampaignCopy)||!allCampaignCopy.includes('BLACK ANTECIPADA'))failures.push(width+': campaign copy inconsistency');
   const campaignCopy=await page.evaluate(()=>[...document.querySelectorAll('.sm-offer-clear-label,.sm-offer-clear-today,.sm-dock-urgency')].map(e=>e.textContent.trim()).join(' | '));
   if(/RENOVA|CICLO ATUAL/i.test(campaignCopy))failures.push(width+': internal countdown wording exposed '+campaignCopy);
   if(!campaignCopy.includes('TERMINA HOJE'))failures.push(width+': missing original urgency label '+campaignCopy);
