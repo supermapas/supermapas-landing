@@ -41,7 +41,7 @@ for(const required of ['data-sm-countdown-hours','data-sm-countdown-minutes','da
 }
 if(html.includes('QUERO MEU KIT BLACK'))throw new Error('Deprecated copy found');
 
-const css=[
+let css=[
 '<style id="sm-black47-art-direction">',
 ':root{--black47-ink:#1b1630;--black47-violet:#7056d9;--black47-accent:#c9b6ff;--black47-cream:#f8f6ff}',
 '/* Campaign masthead: clean, deliberate spacing and high-contrast type. */',
@@ -164,6 +164,17 @@ const css=[
 '@media(max-width:360px){.sm-black47-strip{gap:6px!important}.sm-black47-star{display:none!important}.sm-black47-strip strong{font-size:10px!important}.sm-black47-flash{font-size:9px!important}.sm-black47-tagline{font-size:8px!important}}',
 '</style>'
 ].join('\n');
+// Keep the approved Production CTA geometry, typography and arrow treatment.
+// Campaign overrides must not replace those rules; only the dock color changes.
+css=css.replace(/([^{}]+)\{([^{}]*)\}/g,(rule,selector)=>
+ /\.sm-dh-header-cta|\.sm-dh-primary|\.sm-mh-cta|\.sm-offer-value-cta|\.sm-dock-checkout/.test(selector)?'':rule);
+css=css.replace('</style>',`
+.sm-sales-dock .sm-dock-checkout{background:#FF914D!important;border-color:#FF914D!important;color:#24172F!important;-webkit-text-fill-color:#24172F!important;box-shadow:0 4px 14px rgba(243,106,45,.25)!important}
+.sm-sales-dock .sm-dock-checkout span,.sm-sales-dock .sm-dock-checkout b{color:#24172F!important;-webkit-text-fill-color:#24172F!important}
+</style>`);
+html=html.replaceAll('GARANTIR MEU ACESSO','APROVEITAR A OFERTA')
+ .replaceAll('QUERO DOMINAR PORTUGUÊS','APROVEITAR A OFERTA')
+ .replaceAll('<span>EU QUERO</span>','<span>QUERO AGORA</span>');
 html=html.replace('<head>','<head><meta name="robots" content="noindex,nofollow">');
 html=html.replace('</head>',css+'\n</head>');
 fs.writeFileSync(target,html);
