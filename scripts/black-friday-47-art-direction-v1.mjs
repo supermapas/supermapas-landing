@@ -160,6 +160,7 @@ const css=[
 '.sm-black47-strip strong{letter-spacing:.055em!important}',
 '@media(max-width:640px){.sm-black47-star{flex-basis:18px!important;width:18px!important;height:18px!important}.sm-black47-star svg{width:11px!important;height:11px!important}.sm-black47-strip strong{font-size:10px!important;letter-spacing:.015em!important}}',
 '@media(max-width:360px){.sm-black47-star{display:grid!important;flex:0 0 16px!important;width:16px!important;height:16px!important}.sm-black47-tagline{display:none!important}.sm-black47-strip strong{font-size:10px!important;letter-spacing:.01em!important}}',
+'@media(max-width:360px){.sm-mobile-hero .sm-hero-offer-badge-v3 span{font-size:9.2px!important;letter-spacing:-.035em!important;white-space:nowrap!important}}',
 '@media(max-width:360px){.sm-black47-strip{gap:6px!important}.sm-black47-star{display:none!important}.sm-black47-strip strong{font-size:10px!important}.sm-black47-flash{font-size:9px!important}.sm-black47-tagline{font-size:8px!important}}',
 '</style>'
 ].join('\n');
