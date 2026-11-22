@@ -23,7 +23,7 @@ jobs:
           command -v google-chrome
       - name: Inspect Black Friday R$47 Preview in Chrome
         env:
-          PREVIEW_URL: https://supermapas-landing-emy1x0v5z-supermapas.vercel.app/
+          PREVIEW_URL: https://supermapas-landing-kto9w50ef-supermapas.vercel.app/
         run: node tests/black-friday-47-visual-audit.mjs
       - name: Save mobile and desktop screenshots
         if: always()
