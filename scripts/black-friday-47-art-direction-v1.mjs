@@ -15,7 +15,7 @@ all('R$ 307,33','R$ 319,00',3);
 // The arithmetic line is updated by the R$ 223,33 replacement above.
 all('12x de R$ 6,93','12x de R$ 4,86',1);
 once('<div class="sm-offer-value-final"><sup>R$</sup><strong>67</strong><span>,00</span></div>','<div class="sm-offer-value-final"><sup>R$</sup><strong>47</strong><span>,00</span></div>','price');
-all('R$ 67 à vista','R$ 47 à vista',1);
+// No price claim outside the main checkout price markup.
 
 // Creative direction: original composition, clear hero, dark campaign accent and carefully scoped CTA styling.
 const desktop='<section class="sm-desktop-hero" id="inicio-desktop" aria-label="Supermapas de Língua Portuguesa">';
