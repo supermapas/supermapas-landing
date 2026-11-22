@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import path from 'node:path';
 
 const target=process.argv[2];
 if(!target)throw new Error('Usage: node scripts/black-friday-47-art-direction-v1.mjs <html>');
@@ -176,6 +177,7 @@ css=css.replace('</style>',`
 .sm-black47-star,.sm-black47-star svg,.sm-offer-clear-label,.sm-sales-dock .sm-dock-discount,.sm-offer-value-item--bonus .sm-offer-value-type{color:#f36a2d!important;-webkit-text-fill-color:#f36a2d!important}
 .sm-black47-star svg{fill:#f36a2d!important}
 .sm-offer-clear-countdown>i{color:#f36a2d!important;-webkit-text-fill-color:#f36a2d!important}
+.sm-format-v2-unit-card .sm-format-v2-bonus-badge{background:linear-gradient(135deg,#f36a2d 0%,#ff7a2f 100%)!important}
 /* Make the campaign recognizable immediately, then repeat at purchase points. */
 .sm-black47-strip{min-height:66px!important;padding:12px 18px!important;gap:16px!important;border-bottom:3px solid #f36a2d!important}
 .sm-black47-strip strong{font-size:clamp(19px,2vw,26px)!important;letter-spacing:.065em!important;line-height:1.15!important}
@@ -199,5 +201,20 @@ html=html.replaceAll('aria-label="Oferta termina hoje"><span>TERMINA HOJE</span>
  'aria-label="Black Antecipada termina hoje"><span>BLACK ANTECIPADA</span>');
 html=html.replace('<head>','<head><meta name="robots" content="noindex,nofollow">');
 html=html.replace('</head>',css+'\n</head>');
+// Normalize existing orange accents in generated CSS, including content sections.
+// Keep the approved gradient endpoint and each color's existing transparency.
+const normalizeOrange=css=>css.replace(/#([a-f\d]{8}|[a-f\d]{6}|[a-f\d]{4}|[a-f\d]{3})\b/gi,(match,hex)=>{
+ const full=hex.length<=4?[...hex].map(c=>c+c).join(''):hex;
+ const [r,g,b]=[0,2,4].map(i=>parseInt(full.slice(i,i+2),16));
+ if(full.slice(0,6).toLowerCase()==='ff7a2f')return match;
+ return r>160&&g>40&&g<190&&b<165&&r>g*1.25&&r>b*1.4?'#f36a2d'+full.slice(6):match;
+});
+html=html.replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/g,(_,open,css,close)=>open+normalizeOrange(css)+close);
+const normalizeCssFiles=dir=>{for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
+ const file=path.join(dir,entry.name);
+ if(entry.isDirectory())normalizeCssFiles(file);
+ else if(entry.name.endsWith('.css'))fs.writeFileSync(file,normalizeOrange(fs.readFileSync(file,'utf8')));
+}};
+normalizeCssFiles(path.dirname(target));
 fs.writeFileSync(target,html);
 console.log('Black Friday 47 preview from Production: 80%, R$47, 12x R$4,86, reference R$235, total R$319; original midnight reset and checkout preserved.');
