@@ -133,6 +133,8 @@ const css=[
 '.sm-sales-dock .sm-dock-checkout span,.sm-sales-dock .sm-dock-checkout b{color:#fff!important;-webkit-text-fill-color:#fff!important}',
 '@media(min-width:821px){.sm-sales-dock .sm-dock-discount{color:#ff91bf!important;-webkit-text-fill-color:#ff91bf!important}}',
 '@media(max-width:640px){.sm-black47-strip{min-height:42px!important;padding:6px 8px!important;gap:7px!important}.sm-black47-strip strong{font-size:11px!important;letter-spacing:.045em!important}.sm-black47-flash{min-height:23px!important;padding:4px 7px!important;font-size:10px!important}.sm-black47-tagline{font-size:9px!important;letter-spacing:.03em!important}.sm-black47-star{flex:0 0 16px!important;width:16px!important;height:16px!important;font-size:10px!important}.sm-offer-value-cta span{font-size:13.5px!important}}',
+'.sm-offer-value-total--simple .sm-offer-value-total-price s{text-decoration-color:#ce206d!important}',
+'.sm-offer-value-item--bonus .sm-offer-value-type{color:#9e205e!important;-webkit-text-fill-color:#9e205e!important}',
 '@media(max-width:360px){.sm-black47-strip{gap:6px!important}.sm-black47-star{display:none!important}.sm-black47-strip strong{font-size:10px!important}.sm-black47-flash{font-size:9px!important}.sm-black47-tagline{font-size:8px!important}}',
 '</style>'
 ].join('\n');
