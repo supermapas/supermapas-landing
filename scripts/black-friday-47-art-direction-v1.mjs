@@ -90,7 +90,7 @@ let css=[
 '/* Mobile dock: same Production dimensions and two-button arrangement. Contrast is explicit for every nested element. */',
 '.sm-sales-dock{background:#1b1630!important;border:1px solid #574368!important;box-shadow:0 10px 28px #17102245!important}',
 '.sm-sales-dock .sm-dock-discount{color:#c9b6ff!important;-webkit-text-fill-color:#c9b6ff!important}',
-'@media(min-width:821px){.sm-sales-dock .sm-dock-discount{color:#1b1630!important;-webkit-text-fill-color:#1b1630!important}.sm-sales-dock .sm-dock-inventory{color:#f0e9f7!important;-webkit-text-fill-color:#f0e9f7!important}}',
+'@media(min-width:821px){.sm-sales-dock .sm-dock-discount{color:#1b1630!important;-webkit-text-fill-color:#1b1630!important}.sm-sales-dock .sm-sales-dock .sm-dock-inventory{color:#f0e9f7!important;-webkit-text-fill-color:#f0e9f7!important}}',
 '.sm-sales-dock .sm-dock-urgency span{color:#f1e6f8!important;-webkit-text-fill-color:#f1e6f8!important}',
 '.sm-sales-dock .sm-dock-urgency strong{color:#fff!important;-webkit-text-fill-color:#fff!important;font-variant-numeric:tabular-nums!important}',
 '.sm-sales-dock .sm-dock-checkout{background:#c9b6ff!important;border-color:#c9b6ff!important;color:#1b1630!important;-webkit-text-fill-color:#1b1630!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important}',
@@ -175,6 +175,7 @@ css=css.replace('</style>',`
 .sm-black47-flash,.sm-hero-offer-badge-v3 strong,.sm-offer-clear-today,.sm-offer-price-today strong,.sm-sales-dock .sm-dock-discount strong{background:linear-gradient(135deg,#f36a2d 0%,#ff7a2f 100%)!important}
 .sm-black47-star,.sm-black47-star svg,.sm-offer-clear-label,.sm-sales-dock .sm-dock-discount,.sm-offer-value-item--bonus .sm-offer-value-type{color:#f36a2d!important;-webkit-text-fill-color:#f36a2d!important}
 .sm-black47-star svg{fill:#f36a2d!important}
+.sm-offer-clear-countdown>i{color:#f36a2d!important;-webkit-text-fill-color:#f36a2d!important}
 /* Make the campaign recognizable immediately, then repeat at purchase points. */
 .sm-black47-strip{min-height:66px!important;padding:12px 18px!important;gap:16px!important;border-bottom:3px solid #f36a2d!important}
 .sm-black47-strip strong{font-size:clamp(19px,2vw,26px)!important;letter-spacing:.065em!important;line-height:1.15!important}
@@ -182,10 +183,10 @@ css=css.replace('</style>',`
 .sm-hero-offer-badge-v3 span{font-size:15px!important;font-weight:950!important;letter-spacing:.025em!important}
 .sm-offer-value-eyebrow{font-size:13px!important;letter-spacing:.07em!important;padding:13px 20px!important}
 .sm-offer-clear-label{font-size:13px!important;letter-spacing:.055em!important;line-height:1.35!important}
-.sm-dock-inventory{display:flex!important;flex-direction:column!important;gap:3px!important}
-.sm-dock-inventory strong{color:#fff!important;font-size:13px!important;letter-spacing:.045em!important}
-.sm-dock-inventory span{font-size:10px!important;opacity:.85}
-@media(max-width:820px){.sm-dock-inventory{display:none!important}.sm-dock-urgency>span{font-size:8px!important;letter-spacing:0!important;white-space:nowrap!important}}
+.sm-sales-dock .sm-dock-inventory{display:flex!important;flex-direction:column!important;gap:3px!important}
+.sm-sales-dock .sm-dock-inventory strong{display:block!important;color:#fff!important;font-size:13px!important;letter-spacing:.045em!important}
+.sm-sales-dock .sm-dock-inventory span{display:block!important;font-size:10px!important;opacity:.85}
+@media(max-width:820px){.sm-sales-dock .sm-dock-inventory{display:none!important}.sm-dock-urgency>span{font-size:8px!important;letter-spacing:0!important;white-space:nowrap!important}}
 @media(max-width:640px){.sm-black47-strip{min-height:76px!important;display:grid!important;grid-template-columns:auto auto!important;gap:6px 10px!important;padding:11px 12px!important}.sm-black47-strip strong{grid-column:1/-1!important;font-size:19px!important;letter-spacing:.045em!important}.sm-black47-star{display:none!important}.sm-black47-flash{font-size:11px!important;min-height:24px!important;padding:4px 9px!important}.sm-black47-tagline{display:block!important;font-size:10px!important}.sm-hero-offer-badge-v3 span{font-size:11px!important;letter-spacing:0!important}.sm-offer-value-eyebrow{font-size:11px!important;padding:11px 14px!important}}
 @media(max-width:360px){.sm-black47-strip strong{font-size:17px!important}.sm-mobile-hero .sm-hero-offer-badge-v3 span{font-size:9.2px!important;letter-spacing:-.035em!important}}
 </style>`);
