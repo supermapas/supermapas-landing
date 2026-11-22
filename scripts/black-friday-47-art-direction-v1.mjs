@@ -20,13 +20,13 @@ once('<div class="sm-offer-value-final"><sup>R$</sup><strong>67</strong><span>,0
 // Creative direction: original composition, clear hero, dark campaign accent and carefully scoped CTA styling.
 const desktop='<section class="sm-desktop-hero" id="inicio-desktop" aria-label="Supermapas de Língua Portuguesa">';
 const mobile='<section class="sm-mobile-hero" id="inicio-mobile" aria-label="Supermapas de Língua Portuguesa">';
-const strip='<div class="sm-black47-strip" role="note" aria-label="Black Friday Supermapas, 80% de desconto"><span class="sm-black47-star" aria-hidden="true">✦</span><strong>BLACK FRIDAY</strong><span class="sm-black47-flash">80% OFF</span><span class="sm-black47-tagline">SUPERMAPAS</span></div>';
+const strip='<div class="sm-black47-strip" role="note" aria-label="Black Antecipada Supermapas, 80% de desconto"><span class="sm-black47-star" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" focusable="false" aria-hidden="true"><path d="M12 2.5 14.9 8.9 22 9.7 16.7 14.5 18.2 21.5 12 17.9 5.8 21.5 7.3 14.5 2 9.7 9.1 8.9Z" fill="currentColor"/></svg></span><strong>BLACK ANTECIPADA</strong><span class="sm-black47-flash">80% OFF</span><span class="sm-black47-tagline">SUPERMAPAS</span></div>';
 once(desktop,desktop+strip,'desktop hero');
 once(mobile,mobile+strip,'mobile hero');
-all('<span>OFERTA ESPECIAL + 2 BÔNUS</span>','<span>BLACK FRIDAY + 2 BÔNUS</span>',2);
+all('<span>OFERTA ESPECIAL + 2 BÔNUS</span>','<span>BLACK ANTECIPADA + 2 BÔNUS</span>',2);
 once('<span class="sm-mh-title-line sm-mh-title-line-accent">Domine Língua Portuguesa</span>','<span class="sm-mh-title-line sm-mh-title-line-accent"><span class="sm-black47-title-line">Domine Língua</span><span class="sm-black47-title-line">Portuguesa</span></span>','mobile headline composition');
-once('<span class="sm-offer-value-eyebrow">O QUE VOCÊ RECEBE</span>','<span class="sm-offer-value-eyebrow">BLACK FRIDAY • O QUE VOCÊ RECEBE</span>','offer eyebrow');
-once('<span class="sm-offer-clear-label">OFERTA VÁLIDA NOS DIAS</span>','<span class="sm-offer-clear-label">BLACK FRIDAY • OFERTA ESPECIAL</span>','clock label');
+once('<span class="sm-offer-value-eyebrow">O QUE VOCÊ RECEBE</span>','<span class="sm-offer-value-eyebrow">BLACK ANTECIPADA • O QUE VOCÊ RECEBE</span>','offer eyebrow');
+once('<span class="sm-offer-clear-label">OFERTA VÁLIDA NOS DIAS</span>','<span class="sm-offer-clear-label">BLACK ANTECIPADA • OFERTA ESPECIAL</span>','clock label');
 // Preserve original user-facing 'TERMINA HOJE'; countdown behavior is unchanged.
 // Preserve original dock label 'TERMINA HOJE'.
 // Preserve original countdown accessibility label.
@@ -153,6 +153,13 @@ const css=[
 '.sm-offer-price-today strong{box-shadow:0 7px 18px rgba(243,106,45,.24)!important;text-shadow:none!important}',
 '.sm-sales-dock .sm-dock-checkout{background:#FF914D!important;border-color:#FF914D!important;color:#24172F!important;-webkit-text-fill-color:#24172F!important;box-shadow:0 4px 14px rgba(243,106,45,.25)!important}',
 '.sm-sales-dock .sm-dock-checkout span,.sm-sales-dock .sm-dock-checkout b{color:#24172F!important;-webkit-text-fill-color:#24172F!important;text-align:center!important}',
+'/* Black Antecipada: optically centered vector star, no baseline offset. */',
+'.sm-black47-star{display:grid!important;place-items:center!important;flex:0 0 22px!important;width:22px!important;height:22px!important;line-height:0!important;padding:0!important;vertical-align:middle!important}',
+'.sm-black47-star svg{display:block!important;flex:none!important;width:13px!important;height:13px!important;overflow:visible!important;color:#FFB58A!important;fill:#FFB58A!important;transform:none!important}',
+'.sm-black47-star svg path{fill:currentColor!important}',
+'.sm-black47-strip strong{letter-spacing:.055em!important}',
+'@media(max-width:640px){.sm-black47-star{flex-basis:18px!important;width:18px!important;height:18px!important}.sm-black47-star svg{width:11px!important;height:11px!important}.sm-black47-strip strong{font-size:10px!important;letter-spacing:.015em!important}}',
+'@media(max-width:360px){.sm-black47-star{display:grid!important;flex:0 0 16px!important;width:16px!important;height:16px!important}.sm-black47-tagline{display:none!important}.sm-black47-strip strong{font-size:10px!important;letter-spacing:.01em!important}}',
 '@media(max-width:360px){.sm-black47-strip{gap:6px!important}.sm-black47-star{display:none!important}.sm-black47-strip strong{font-size:10px!important}.sm-black47-flash{font-size:9px!important}.sm-black47-tagline{font-size:8px!important}}',
 '</style>'
 ].join('\n');
