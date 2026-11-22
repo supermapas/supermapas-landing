@@ -24,6 +24,7 @@ const strip='<div class="sm-black47-strip" role="note" aria-label="Black Friday 
 once(desktop,desktop+strip,'desktop hero');
 once(mobile,mobile+strip,'mobile hero');
 all('<span>OFERTA ESPECIAL + 2 BÔNUS</span>','<span>BLACK FRIDAY + 2 BÔNUS</span>',2);
+once('<span class="sm-mh-title-line sm-mh-title-line-accent">Domine Língua Portuguesa</span>','<span class="sm-mh-title-line sm-mh-title-line-accent"><span class="sm-black47-title-line">Domine Língua</span><span class="sm-black47-title-line">Portuguesa</span></span>','mobile headline composition');
 once('<span class="sm-offer-value-eyebrow">O QUE VOCÊ RECEBE</span>','<span class="sm-offer-value-eyebrow">BLACK FRIDAY • O QUE VOCÊ RECEBE</span>','offer eyebrow');
 once('<span class="sm-offer-clear-label">OFERTA VÁLIDA NOS DIAS</span>','<span class="sm-offer-clear-label">BLACK FRIDAY • CICLO ATUAL</span>','clock label');
 once('<span class="sm-offer-clear-today">TERMINA HOJE</span>','<span class="sm-offer-clear-today">RENOVA À MEIA-NOITE</span>','clock pill');
@@ -54,6 +55,7 @@ const css=[
 '.sm-hero-offer-badge-v3{box-sizing:border-box!important;max-width:100%!important;background:#231a2f!important;border-color:#4b3b5a!important;box-shadow:0 8px 22px #251b3024!important}',
 '.sm-hero-offer-badge-v3 strong{display:flex!important;align-items:center!important;justify-content:center!important;background:#ffb46d!important;color:#231a2f!important;-webkit-text-fill-color:#231a2f!important;text-align:center!important;line-height:1.1!important}',
 '.sm-hero-offer-badge-v3 span{display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;color:#fff!important;-webkit-text-fill-color:#fff!important;text-align:center!important;line-height:1.1!important}',
+'.sm-mh-title-line-accent{white-space:normal!important;max-width:100%!important;width:100%!important;overflow:visible!important;text-align:center!important}.sm-mh-title-line-accent .sm-black47-title-line{display:block!important;white-space:nowrap!important;width:100%!important;max-width:100%!important;text-align:center!important;line-height:1.03!important}',
 '/* CTA color contract: purple = white label + purple arrow; apricot = dark label + dark arrow. */',
 '.sm-desktop-hero .sm-dh-header .sm-dh-header-cta{background:linear-gradient(130deg,#ffb46d,#ffd19d)!important;border-color:#ffb46d!important;color:#231a2f!important;-webkit-text-fill-color:#231a2f!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;line-height:1.15!important}',
 '.sm-dh-primary,.sm-mh-cta{background:linear-gradient(125deg,#7359df,#5f43c8)!important;color:#fff!important;-webkit-text-fill-color:#fff!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:12px!important;text-align:center!important}',
