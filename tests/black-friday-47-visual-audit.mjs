@@ -49,6 +49,10 @@ for (const width of widths) {
   if(themeCheck.hasWarmPalette||!themeCheck.hasLavender)failures.push(width+': campaign palette regression '+JSON.stringify(themeCheck));
   const orangeCheck=await page.evaluate(()=>{const css=document.getElementById('sm-black47-art-direction')?.textContent||'';return {orange:css.includes('#F36A2D'),oldPink:/#ce206d|#dc287b|#b81868|#ec64a3/i.test(css)}});
   if(!orangeCheck.orange||orangeCheck.oldPink)failures.push(width+': orange campaign regression '+JSON.stringify(orangeCheck));
+  if(width<=430){
+    await page.evaluate(()=>{const scroller=document.querySelector('.sm-sales-scroll'),hero=document.getElementById('inicio-mobile');if(scroller&&hero)scroller.scrollTop=hero.scrollHeight+260;});
+    await page.waitForTimeout(500);
+  }
   const dockAndToday=await page.evaluate(()=>{
     const today=document.querySelector('.sm-offer-price-today strong');
     const dock=document.querySelector('.sm-sales-dock .sm-dock-checkout');
@@ -64,6 +68,7 @@ for (const width of widths) {
     if(!bg||!fg||contrast(bg,fg)<4.5)failures.push(width+': fixed dock text contrast too low');
   }
 
+  if(width<=430){await page.evaluate(()=>{const scroller=document.querySelector('.sm-sales-scroll');if(scroller)scroller.scrollTop=0;});await page.waitForTimeout(250);}
   if(width<=430){const firstLineAudit=await page.evaluate(()=>{const e=document.querySelector('.sm-mobile-hero .sm-mh-first-line');if(!e)return {missing:true};const r=e.getBoundingClientRect(),parent=e.closest('.sm-mh-title').getBoundingClientRect();return {x:r.x,right:r.right,parentX:parent.x,parentRight:parent.right,scrollWidth:e.scrollWidth,clientWidth:e.clientWidth}});console.log('MOBILE_FIRST_LINE_AUDIT '+JSON.stringify({width,firstLineAudit}));if(firstLineAudit.missing||firstLineAudit.x< -1||firstLineAudit.right>width+1||firstLineAudit.scrollWidth>firstLineAudit.clientWidth+2)failures.push(width+': first hero line clipped '+JSON.stringify(firstLineAudit));}
   if(width<=430){const titleAudit=await page.evaluate(()=>{const e=document.querySelector('.sm-mobile-hero .sm-mh-title-line-accent');if(!e)return {missing:true};return {clientWidth:e.clientWidth,scrollWidth:e.scrollWidth,text:e.textContent}});console.log('MOBILE_TITLE_AUDIT '+JSON.stringify({width,titleAudit}));if(titleAudit.missing||titleAudit.scrollWidth>titleAudit.clientWidth+2)failures.push(width+': mobile title text clipped '+JSON.stringify(titleAudit));}
   if(width<=430){const badgeAudit=await page.evaluate(()=>{const e=document.querySelector('.sm-mobile-hero .sm-hero-offer-badge-v3');if(!e)return {missing:true};const r=e.getBoundingClientRect(),parent=e.parentElement.getBoundingClientRect(),cs=getComputedStyle(e);return {x:r.x,right:r.right,parentX:parent.x,parentRight:parent.right,radius:cs.borderTopRightRadius,scrollWidth:e.scrollWidth,clientWidth:e.clientWidth}});console.log('MOBILE_BADGE_AUDIT '+JSON.stringify({width,badgeAudit}));if(badgeAudit.missing||badgeAudit.x< -1||badgeAudit.right>width+1||badgeAudit.right>badgeAudit.parentRight+2||badgeAudit.scrollWidth>badgeAudit.clientWidth+3)failures.push(width+': clipped mobile campaign badge '+JSON.stringify(badgeAudit));}
