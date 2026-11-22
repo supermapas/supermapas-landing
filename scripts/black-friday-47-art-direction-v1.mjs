@@ -169,12 +169,33 @@ let css=[
 css=css.replace(/([^{}]+)\{([^{}]*)\}/g,(rule,selector)=>
  /\.sm-dh-header-cta|\.sm-dh-primary|\.sm-mh-cta|\.sm-offer-value-cta|\.sm-dock-checkout/.test(selector)?'':rule);
 css=css.replace('</style>',`
-.sm-sales-dock .sm-dock-checkout{background:#FF914D!important;border-color:#FF914D!important;color:#24172F!important;-webkit-text-fill-color:#24172F!important;box-shadow:0 4px 14px rgba(243,106,45,.25)!important}
-.sm-sales-dock .sm-dock-checkout span,.sm-sales-dock .sm-dock-checkout b{color:#24172F!important;-webkit-text-fill-color:#24172F!important}
+.sm-sales-dock .sm-dock-checkout{background:linear-gradient(135deg,#f36a2d 0%,#ff7a2f 100%)!important;border-color:#f36a2d!important;color:#fff!important;-webkit-text-fill-color:#fff!important;box-shadow:0 4px 14px rgba(243,106,45,.25)!important}
+.sm-sales-dock .sm-dock-checkout span,.sm-sales-dock .sm-dock-checkout b{color:#fff!important;-webkit-text-fill-color:#fff!important}
+/* One orange surface across the campaign, matching the purchase CTA. */
+.sm-black47-flash,.sm-hero-offer-badge-v3 strong,.sm-offer-clear-today,.sm-offer-price-today strong,.sm-sales-dock .sm-dock-discount strong{background:linear-gradient(135deg,#f36a2d 0%,#ff7a2f 100%)!important}
+.sm-black47-star,.sm-black47-star svg,.sm-offer-clear-label,.sm-sales-dock .sm-dock-discount,.sm-offer-value-item--bonus .sm-offer-value-type{color:#f36a2d!important;-webkit-text-fill-color:#f36a2d!important}
+.sm-black47-star svg{fill:#f36a2d!important}
+/* Make the campaign recognizable immediately, then repeat at purchase points. */
+.sm-black47-strip{min-height:66px!important;padding:12px 18px!important;gap:16px!important;border-bottom:3px solid #f36a2d!important}
+.sm-black47-strip strong{font-size:clamp(19px,2vw,26px)!important;letter-spacing:.065em!important;line-height:1.15!important}
+.sm-black47-flash{font-size:15px!important;padding:7px 12px!important}
+.sm-hero-offer-badge-v3 span{font-size:15px!important;font-weight:950!important;letter-spacing:.025em!important}
+.sm-offer-value-eyebrow{font-size:13px!important;letter-spacing:.07em!important;padding:13px 20px!important}
+.sm-offer-clear-label{font-size:13px!important;letter-spacing:.055em!important;line-height:1.35!important}
+.sm-dock-inventory{display:flex!important;flex-direction:column!important;gap:3px!important}
+.sm-dock-inventory strong{color:#fff!important;font-size:13px!important;letter-spacing:.045em!important}
+.sm-dock-inventory span{font-size:10px!important;opacity:.85}
+@media(max-width:820px){.sm-dock-inventory{display:none!important}.sm-dock-urgency>span{font-size:8px!important;letter-spacing:0!important;white-space:nowrap!important}}
+@media(max-width:640px){.sm-black47-strip{min-height:76px!important;display:grid!important;grid-template-columns:auto auto!important;gap:6px 10px!important;padding:11px 12px!important}.sm-black47-strip strong{grid-column:1/-1!important;font-size:19px!important;letter-spacing:.045em!important}.sm-black47-star{display:none!important}.sm-black47-flash{font-size:11px!important;min-height:24px!important;padding:4px 9px!important}.sm-black47-tagline{display:block!important;font-size:10px!important}.sm-hero-offer-badge-v3 span{font-size:11px!important;letter-spacing:0!important}.sm-offer-value-eyebrow{font-size:11px!important;padding:11px 14px!important}}
+@media(max-width:360px){.sm-black47-strip strong{font-size:17px!important}.sm-mobile-hero .sm-hero-offer-badge-v3 span{font-size:9.2px!important;letter-spacing:-.035em!important}}
 </style>`);
 html=html.replaceAll('GARANTIR MEU ACESSO','APROVEITAR A OFERTA')
  .replaceAll('QUERO DOMINAR PORTUGUÊS','APROVEITAR A OFERTA')
  .replaceAll('<span>EU QUERO</span>','<span>QUERO AGORA</span>');
+once('<div class="sm-dock-inventory">98 Supermapas + 50 Super-Resumos + 190 Supercards</div>',
+ '<div class="sm-dock-inventory"><strong>BLACK ANTECIPADA</strong><span>98 Supermapas + 50 Super-Resumos + 190 Supercards</span></div>','campaign dock name');
+html=html.replaceAll('aria-label="Oferta termina hoje"><span>TERMINA HOJE</span>',
+ 'aria-label="Black Antecipada termina hoje"><span>BLACK ANTECIPADA</span>');
 html=html.replace('<head>','<head><meta name="robots" content="noindex,nofollow">');
 html=html.replace('</head>',css+'\n</head>');
 fs.writeFileSync(target,html);
