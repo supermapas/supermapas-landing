@@ -34,7 +34,7 @@ for (const width of widths) {
     for (const sel of selectors) for(const el of document.querySelectorAll(sel)){
       if(!visible(el))continue;
       const s=getComputedStyle(el),r=rect(el);
-      const descendants=[...el.querySelectorAll('span,b,svg')].filter(visible).map(x=>({tag:x.tagName,text:(x.textContent||'').trim().slice(0,45),color:getComputedStyle(x).color,fill:getComputedStyle(x).fill,rect:rect(x),scrollWidth:x.scrollWidth,clientWidth:x.clientWidth}));
+      const descendants=[...el.querySelectorAll('span,b,svg')].filter(visible).map(x=>({tag:x.tagName,text:(x.textContent||'').trim().slice(0,45),color:getComputedStyle(x).color,bg:getComputedStyle(x).backgroundColor,fill:getComputedStyle(x).fill,rect:rect(x),scrollWidth:x.scrollWidth,clientWidth:x.clientWidth}));
       data.push({sel,text:(el.textContent||'').trim().slice(0,65),color:s.color,bg:s.backgroundColor,gradient:s.backgroundImage,rect:r,scrollWidth:el.scrollWidth,clientWidth:el.clientWidth,descendants});
     }
     const dock=document.querySelector('.sm-sales-dock');
@@ -105,7 +105,9 @@ for (const width of widths) {
       if(item.sel==='.sm-offer-value-cta'){
         const arrow=item.descendants.find(d=>d.tag==='B');
         const arrowColor=rgb(arrow?.color||'');
-        for(const stop of stops)if(arrowColor && contrast(arrowColor,stop)<4.5)failures.push(width+': CTA arrow contrast '+item.sel);
+        const arrowBg=rgb(arrow?.bg||'');
+        if(arrowColor&&arrowBg&&contrast(arrowColor,arrowBg)<4.5)failures.push(width+': CTA arrow-on-circle contrast '+item.sel);
+        for(const stop of stops)if(arrowBg&&contrast(arrowBg,stop)<3)failures.push(width+': CTA arrow-circle contrast '+item.sel);
       }
     }
   }
