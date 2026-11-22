@@ -196,6 +196,8 @@ css=css.replace('</style>',`
 .sm-black47-strip>strong,.sm-black47-strip>.sm-black47-tagline:last-child{font-size:var(--black47-masthead-size)!important;font-weight:950!important;letter-spacing:var(--black47-masthead-tracking)!important;line-height:1.15!important;align-self:center!important;white-space:nowrap!important}
 @media(max-width:640px){.sm-black47-strip{--black47-masthead-size:clamp(10px,2.8vw,14px);--black47-masthead-tracking:.025em}}
 @media(max-width:360px){.sm-black47-strip{--black47-masthead-size:10px;--black47-masthead-tracking:.01em}}
+/* The full campaign label wraps inside the Production dock's narrow clock column. */
+@media(max-width:820px){.sm-sales-dock .sm-dock-urgency>span{display:block!important;box-sizing:border-box!important;width:100%!important;max-width:100%!important;white-space:normal!important;overflow-wrap:normal!important;word-break:normal!important;font-size:8px!important;line-height:1.1!important;letter-spacing:0!important;text-align:center!important}.sm-sales-dock .sm-dock-urgency{gap:3px!important}}
 </style>`);
 html=html.replaceAll('GARANTIR MEU ACESSO','APROVEITAR A OFERTA')
  .replaceAll('QUERO DOMINAR PORTUGUÊS','APROVEITAR A OFERTA')
