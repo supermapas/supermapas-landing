@@ -12,7 +12,7 @@ all('70% de desconto','80% de desconto',1);
 all('Setenta por cento de desconto','Oitenta por cento de desconto',1);
 all('R$ 223,33','R$ 235,00',2);
 all('R$ 307,33','R$ 319,00',3);
-all('223,33 + R$ 37,00 + R$ 47,00','235,00 + R$ 37,00 + R$ 47,00',1);
+// The arithmetic line is updated by the R$ 223,33 replacement above.
 all('12x de R$ 6,93','12x de R$ 4,86',1);
 once('<div class="sm-offer-value-final"><sup>R$</sup><strong>67</strong><span>,00</span></div>','<div class="sm-offer-value-final"><sup>R$</sup><strong>47</strong><span>,00</span></div>','price');
 all('R$ 67 à vista','R$ 47 à vista',1);
