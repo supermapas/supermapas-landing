@@ -33,7 +33,7 @@ once('<span class="sm-offer-clear-label">OFERTA VÁLIDA NOS DIAS</span>','<span 
 // Preserve original date-range accessibility label.
 all('<span>QUERO DOMINAR PORTUGUÊS</span>','<span>GARANTIR MEU ACESSO</span>',3);
 all('>QUERO DOMINAR PORTUGUÊS</a>','>GARANTIR MEU ACESSO</a>',1);
-all('<span>QUERO AGORA</span>','<span>GARANTIR</span>',1);
+all('<span>QUERO AGORA</span>','<span>EU QUERO</span>',1);
 
 // Pricing and countdown stay client-side, no checkout change.
 for(const required of ['data-sm-countdown-hours','data-sm-countdown-minutes','data-sm-countdown-seconds','data-sm-dock-countdown','data-sm-date-range','America/Fortaleza','https://pay.hotmart.com/A92093667Q?off=ia91gsts&checkoutMode=10']){
@@ -149,6 +149,10 @@ const css=[
 '.sm-black47-strip{border-bottom-color:#F36A2D!important}',
 '.sm-offer-value-checkout{border-top-color:#F36A2D!important}',
 '.sm-offer-value-total--simple .sm-offer-value-total-price s{text-decoration-color:#F36A2D!important}',
+'/* Black Friday v4: remove inherited green shadow from HOJE and brighten only fixed dock CTA. */',
+'.sm-offer-price-today strong{box-shadow:0 7px 18px rgba(243,106,45,.24)!important;text-shadow:none!important}',
+'.sm-sales-dock .sm-dock-checkout{background:#FF914D!important;border-color:#FF914D!important;color:#24172F!important;-webkit-text-fill-color:#24172F!important;box-shadow:0 4px 14px rgba(243,106,45,.25)!important}',
+'.sm-sales-dock .sm-dock-checkout span,.sm-sales-dock .sm-dock-checkout b{color:#24172F!important;-webkit-text-fill-color:#24172F!important;text-align:center!important}',
 '@media(max-width:360px){.sm-black47-strip{gap:6px!important}.sm-black47-star{display:none!important}.sm-black47-strip strong{font-size:10px!important}.sm-black47-flash{font-size:9px!important}.sm-black47-tagline{font-size:8px!important}}',
 '</style>'
 ].join('\n');
