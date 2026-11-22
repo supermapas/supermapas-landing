@@ -2,6 +2,8 @@ name: Black Friday R$47 visual audit
 on:
   push:
     branches: [preview/black-friday-47-art-direction-v1]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
