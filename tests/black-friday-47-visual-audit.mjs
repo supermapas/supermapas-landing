@@ -9,7 +9,7 @@ fs.mkdirSync('visual-artifacts', {recursive:true});
 const browser = await chromium.launch({channel:'chrome', headless:true, args:['--no-sandbox']});
 const failures = [], results = [];
 const widths = [320, 360, 390, 430, 768, 1024, 1440];
-const selectors = ['.sm-dh-header-cta','.sm-dh-primary','.sm-mh-cta','.sm-offer-value-cta','.sm-dock-checkout','.sm-dock-whatsapp','.sm-hero-offer-badge-v3 strong','.sm-hero-offer-badge-v3 span','.sm-black47-strip>strong','.sm-black47-strip>span:last-child'];
+const selectors = ['.sm-dh-header-cta','.sm-dh-primary','.sm-mh-cta','.sm-offer-value-cta','.sm-dock-checkout','.sm-dock-whatsapp','.sm-hero-offer-badge-v3 strong','.sm-hero-offer-badge-v3 span','.sm-black47-strip>strong','.sm-black47-strip>span:last-child','.sm-black47-flash','.sm-offer-clear-today','.sm-offer-price-today strong','.sm-sales-dock .sm-dock-discount strong'];
 
 function rgb(s) {
   const m=String(s).match(/rgba?\((\d+)[,\s]+(\d+)[,\s]+(\d+)/);
@@ -47,6 +47,8 @@ for (const width of widths) {
   if(!campaignCopy.includes('TERMINA HOJE'))failures.push(width+': missing original urgency label '+campaignCopy);
   const themeCheck=await page.evaluate(()=>{const css=document.getElementById('sm-black47-art-direction')?.textContent||'';return {hasWarmPalette:/ffb46d|ffd19d|ffd09b|ffcf9d|ffceaa/i.test(css),hasLavender:css.includes('#c9b6ff')}});
   if(themeCheck.hasWarmPalette||!themeCheck.hasLavender)failures.push(width+': campaign palette regression '+JSON.stringify(themeCheck));
+  const orangeCheck=await page.evaluate(()=>{const css=document.getElementById('sm-black47-art-direction')?.textContent||'';return {orange:css.includes('#F36A2D'),oldPink:/#ce206d|#dc287b|#b81868|#ec64a3/i.test(css)}});
+  if(!orangeCheck.orange||orangeCheck.oldPink)failures.push(width+': orange campaign regression '+JSON.stringify(orangeCheck));
   if(width<=430){const firstLineAudit=await page.evaluate(()=>{const e=document.querySelector('.sm-mobile-hero .sm-mh-first-line');if(!e)return {missing:true};const r=e.getBoundingClientRect(),parent=e.closest('.sm-mh-title').getBoundingClientRect();return {x:r.x,right:r.right,parentX:parent.x,parentRight:parent.right,scrollWidth:e.scrollWidth,clientWidth:e.clientWidth}});console.log('MOBILE_FIRST_LINE_AUDIT '+JSON.stringify({width,firstLineAudit}));if(firstLineAudit.missing||firstLineAudit.x< -1||firstLineAudit.right>width+1||firstLineAudit.scrollWidth>firstLineAudit.clientWidth+2)failures.push(width+': first hero line clipped '+JSON.stringify(firstLineAudit));}
   if(width<=430){const titleAudit=await page.evaluate(()=>{const e=document.querySelector('.sm-mobile-hero .sm-mh-title-line-accent');if(!e)return {missing:true};return {clientWidth:e.clientWidth,scrollWidth:e.scrollWidth,text:e.textContent}});console.log('MOBILE_TITLE_AUDIT '+JSON.stringify({width,titleAudit}));if(titleAudit.missing||titleAudit.scrollWidth>titleAudit.clientWidth+2)failures.push(width+': mobile title text clipped '+JSON.stringify(titleAudit));}
   if(width<=430){const badgeAudit=await page.evaluate(()=>{const e=document.querySelector('.sm-mobile-hero .sm-hero-offer-badge-v3');if(!e)return {missing:true};const r=e.getBoundingClientRect(),parent=e.parentElement.getBoundingClientRect(),cs=getComputedStyle(e);return {x:r.x,right:r.right,parentX:parent.x,parentRight:parent.right,radius:cs.borderTopRightRadius,scrollWidth:e.scrollWidth,clientWidth:e.clientWidth}});console.log('MOBILE_BADGE_AUDIT '+JSON.stringify({width,badgeAudit}));if(badgeAudit.missing||badgeAudit.x< -1||badgeAudit.right>width+1||badgeAudit.right>badgeAudit.parentRight+2||badgeAudit.scrollWidth>badgeAudit.clientWidth+3)failures.push(width+': clipped mobile campaign badge '+JSON.stringify(badgeAudit));}
@@ -97,6 +99,7 @@ for (const width of widths) {
     const fg=rgb(item.color),bg=rgb(item.bg);
     if(fg && bg && item.gradient==='none' && contrast(fg,bg)<3.0 && (sel.includes('bf-campaign')||sel.includes('badge'))) failures.push(width+': contrast low '+sel+' '+contrast(fg,bg).toFixed(2));
     if(item.sel==='.sm-hero-offer-badge-v3 strong' && fg && bg && contrast(fg,bg)<4.5) failures.push(width+': campaign discount contrast low');
+    if(['.sm-black47-flash','.sm-offer-clear-today','.sm-offer-price-today strong','.sm-sales-dock .sm-dock-discount strong','.sm-dock-checkout'].includes(item.sel) && fg && bg && contrast(fg,bg)<4.5)failures.push(width+': orange label contrast low '+item.sel+' '+contrast(fg,bg).toFixed(2));
     if(['.sm-dh-header-cta','.sm-dh-primary','.sm-mh-cta','.sm-offer-value-cta'].includes(item.sel)){
       const label=item.descendants.find(d=>d.tag==='SPAN');
       const labelColor=rgb(label?.color||item.color);
