@@ -72,7 +72,7 @@ const css=[
 '.sm-offer-clear-today{background:#ffb46d!important;color:#231a2f!important;-webkit-text-fill-color:#231a2f!important;text-align:center!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 7px 17px #120d1a2b!important;letter-spacing:.045em!important}',
 '.sm-offer-value-was--total span{color:#f0e7fa!important;-webkit-text-fill-color:#f0e7fa!important}',
 '.sm-offer-value-was--total s{color:#ffceaa!important;-webkit-text-fill-color:#ffceaa!important}',
-'.sm-offer-price-today strong{color:#ffb46d!important;-webkit-text-fill-color:#ffb46d!important}',
+'.sm-offer-price-today strong{display:inline-flex!important;align-items:center!important;justify-content:center!important;background:#ffb46d!important;color:#231a2f!important;-webkit-text-fill-color:#231a2f!important;text-align:center!important}',
 '.sm-offer-price-today em{color:#fff!important;-webkit-text-fill-color:#fff!important}',
 '.sm-offer-value-final,.sm-offer-value-final sup,.sm-offer-value-final strong,.sm-offer-value-final>span{color:#fff!important;-webkit-text-fill-color:#fff!important}',
 '.sm-offer-value-installments,.sm-offer-value-installments strong{color:#f5ebff!important;-webkit-text-fill-color:#f5ebff!important}',
@@ -87,6 +87,7 @@ const css=[
 '/* Mobile dock: same Production dimensions and two-button arrangement. Contrast is explicit for every nested element. */',
 '.sm-sales-dock{background:#241b30!important;border:1px solid #574368!important;box-shadow:0 10px 28px #17102245!important}',
 '.sm-sales-dock .sm-dock-discount{color:#ffb46d!important;-webkit-text-fill-color:#ffb46d!important}',
+'@media(min-width:821px){.sm-sales-dock .sm-dock-discount{color:#231a2f!important;-webkit-text-fill-color:#231a2f!important}.sm-sales-dock .sm-dock-inventory{color:#f0e9f7!important;-webkit-text-fill-color:#f0e9f7!important}}',
 '.sm-sales-dock .sm-dock-urgency span{color:#f1e6f8!important;-webkit-text-fill-color:#f1e6f8!important}',
 '.sm-sales-dock .sm-dock-urgency strong{color:#fff!important;-webkit-text-fill-color:#fff!important;font-variant-numeric:tabular-nums!important}',
 '.sm-sales-dock .sm-dock-checkout{background:#ffb46d!important;border-color:#ffb46d!important;color:#231a2f!important;-webkit-text-fill-color:#231a2f!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important}',
@@ -95,7 +96,9 @@ const css=[
 '.sm-sales-dock .sm-dock-whatsapp span{color:#fff!important;-webkit-text-fill-color:#fff!important;text-align:center!important;line-height:1.1!important}',
 '.sm-sales-dock .sm-dock-whatsapp svg,.sm-sales-dock .sm-dock-whatsapp svg path{fill:#fff!important;color:#fff!important}',
 '@media(max-width:640px){.sm-black47-strip{min-height:39px;padding:7px 9px;gap:8px}.sm-black47-strip strong{font-size:10px;letter-spacing:.085em}.sm-black47-strip>span:last-child{font-size:9px;letter-spacing:.045em}.sm-black47-star{flex-basis:18px;width:18px;height:18px;font-size:11px}.sm-hero-offer-badge-v3 span{font-size:12px!important}.sm-offer-value-eyebrow{letter-spacing:.045em!important;font-size:9px!important}.sm-offer-value-cta span{font-size:13.5px!important}}',
-'@media(max-width:360px){.sm-black47-strip{gap:6px;padding-left:6px;padding-right:6px}.sm-black47-strip>span:last-child{font-size:8px}.sm-black47-star{display:none}.sm-hero-offer-badge-v3 strong,.sm-hero-offer-badge-v3 span{font-size:11px!important;letter-spacing:0!important}.sm-offer-value-cta span{font-size:12.5px!important}}',
+'@media(min-width:821px) and (max-width:1150px){.sm-dh-header{grid-template-columns:160px minmax(0,1fr) 170px!important;gap:10px!important}.sm-dh-brand{width:160px!important}.sm-dh-header nav{gap:8px!important;min-width:0!important}.sm-dh-header nav a{font-size:10px!important;white-space:nowrap!important}.sm-desktop-hero .sm-dh-header .sm-dh-header-cta{min-width:165px!important;max-width:170px!important;padding:0 8px!important;font-size:10px!important}}',
+'@media(max-width:640px){.sm-mh-title-line-accent{font-size:clamp(30px,9.3vw,38px)!important}}',
+'@media(max-width:360px){.sm-black47-strip{gap:6px;padding-left:6px;padding-right:6px}.sm-black47-strip>span:last-child{font-size:8px}.sm-black47-star{display:none}.sm-hero-offer-badge-v3 strong,.sm-hero-offer-badge-v3 span{font-size:10px!important;letter-spacing:-.02em!important}.sm-offer-value-cta span{font-size:12.5px!important}}',
 '</style>'
 ].join('\n');
 html=html.replace('<head>','<head><meta name="robots" content="noindex,nofollow">');
