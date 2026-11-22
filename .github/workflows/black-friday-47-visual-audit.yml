@@ -1,0 +1,32 @@
+name: Black Friday R$47 visual audit
+on:
+  push:
+    branches: [preview/black-friday-47-art-direction-v1]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  visual:
+    name: Chrome responsive, contrast and midnight audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser automation
+        run: |
+          npm install --prefix tests/.playwright-ci --no-save playwright-core@1.58.2
+          command -v google-chrome
+      - name: Inspect Black Friday R$47 Preview in Chrome
+        env:
+          PREVIEW_URL: https://supermapas-landing-39vomvi8j-supermapas.vercel.app/
+        run: node tests/black-friday-47-visual-audit.mjs
+      - name: Save mobile and desktop screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: black-friday-47-visual-audit
+          path: visual-artifacts/
+          retention-days: 7
