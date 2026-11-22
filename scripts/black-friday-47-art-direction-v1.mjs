@@ -191,6 +191,11 @@ css=css.replace('</style>',`
 @media(max-width:820px){.sm-sales-dock .sm-dock-inventory{display:none!important}.sm-dock-urgency>span{font-size:8px!important;letter-spacing:0!important;white-space:nowrap!important}}
 @media(max-width:640px){.sm-black47-strip{min-height:44px!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:center!important;gap:8px!important;padding:8px 10px!important}.sm-black47-strip strong{font-size:clamp(10px,3vw,14px)!important;letter-spacing:.025em!important;white-space:nowrap!important;flex:0 0 auto!important}.sm-black47-star{display:none!important}.sm-black47-flash{font-size:10px!important;min-height:24px!important;padding:4px 7px!important;flex:0 0 auto!important}.sm-black47-tagline{display:block!important;font-size:9px!important;letter-spacing:.025em!important;white-space:nowrap!important;flex:0 0 auto!important}.sm-hero-offer-badge-v3 span{font-size:11px!important;letter-spacing:0!important}.sm-offer-value-eyebrow{font-size:11px!important;padding:11px 14px!important}}
 @media(max-width:360px){.sm-black47-strip{gap:6px!important;padding-left:6px!important;padding-right:6px!important}.sm-black47-strip strong{font-size:10px!important}.sm-black47-flash{font-size:9px!important;padding-left:6px!important;padding-right:6px!important}.sm-black47-tagline{font-size:8px!important}.sm-mobile-hero .sm-hero-offer-badge-v3 span{font-size:9.2px!important;letter-spacing:-.035em!important}}
+/* Campaign name and brand share typography and vertical alignment at every width. */
+.sm-black47-strip{--black47-masthead-size:clamp(19px,2vw,26px);--black47-masthead-tracking:.065em;align-items:center!important}
+.sm-black47-strip>strong,.sm-black47-strip>.sm-black47-tagline:last-child{font-size:var(--black47-masthead-size)!important;font-weight:950!important;letter-spacing:var(--black47-masthead-tracking)!important;line-height:1.15!important;align-self:center!important;white-space:nowrap!important}
+@media(max-width:640px){.sm-black47-strip{--black47-masthead-size:clamp(10px,2.8vw,14px);--black47-masthead-tracking:.025em}}
+@media(max-width:360px){.sm-black47-strip{--black47-masthead-size:10px;--black47-masthead-tracking:.01em}}
 </style>`);
 html=html.replaceAll('GARANTIR MEU ACESSO','APROVEITAR A OFERTA')
  .replaceAll('QUERO DOMINAR PORTUGUÊS','APROVEITAR A OFERTA')
