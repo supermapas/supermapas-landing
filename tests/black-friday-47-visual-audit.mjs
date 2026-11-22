@@ -9,7 +9,7 @@ fs.mkdirSync('visual-artifacts', {recursive:true});
 const browser = await chromium.launch({channel:'chrome', headless:true, args:['--no-sandbox']});
 const failures = [], results = [];
 const widths = [320, 360, 390, 430, 768, 1024, 1440];
-const selectors = ['.sm-dh-header-cta','.sm-dh-primary','.sm-mh-cta','.sm-offer-value-cta','.sm-dock-checkout','.sm-dock-whatsapp','.sm-hero-offer-badge-v3 strong','.sm-hero-offer-badge-v3 span','.sm-black47-strip>strong','.sm-hero-offer-badge-v3 strong'];
+const selectors = ['.sm-dh-header-cta','.sm-dh-primary','.sm-mh-cta','.sm-offer-value-cta','.sm-dock-checkout','.sm-dock-whatsapp','.sm-hero-offer-badge-v3 strong','.sm-hero-offer-badge-v3 span','.sm-black47-strip>strong','.sm-black47-strip>span:last-child'];
 
 function rgb(s) {
   const m=String(s).match(/rgba?\((\d+)[,\s]+(\d+)[,\s]+(\d+)/);
@@ -42,7 +42,8 @@ for (const width of widths) {
     const dockClock=document.querySelector('[data-sm-dock-countdown]');
     return {innerWidth,scrollWidth:document.documentElement.scrollWidth,items:data,dock: dock?{visible:visible(dock),rect:rect(dock)}:null,mainClock:mainClock?.textContent,dockClock:dockClock?.textContent,checkout:document.querySelector('.sm-offer-value-cta')?.getAttribute('href'),price:document.querySelector('.sm-offer-value-final strong')?.textContent,installments:document.querySelector('.sm-offer-value-installments')?.textContent,discount:document.querySelector('.sm-hero-offer-badge-v3 strong')?.textContent};
   },selectors);
-  if(width===390){const heroGeometry=await page.evaluate(()=>{const sels=['.sm-mh-title','.sm-mh-title-line-accent','.sm-mh-subtitle','.sm-mh-cta','.sm-hero-offer-badge-v3','.sm-bf-campaign','.sm-sales-dock'];return sels.map(sel=>{const e=document.querySelector(sel);if(!e)return {sel,missing:true};const r=e.getBoundingClientRect(),cs=getComputedStyle(e);return {sel,x:Math.round(r.x),right:Math.round(r.right),width:Math.round(r.width),display:cs.display,visibility:cs.visibility}})});console.log('PREVIEW_HERO_GEOMETRY '+JSON.stringify(heroGeometry));}
+  if(width<=430){const badgeAudit=await page.evaluate(()=>{const e=document.querySelector('.sm-mobile-hero .sm-hero-offer-badge-v3');if(!e)return {missing:true};const r=e.getBoundingClientRect(),parent=e.parentElement.getBoundingClientRect(),cs=getComputedStyle(e);return {x:r.x,right:r.right,parentX:parent.x,parentRight:parent.right,radius:cs.borderTopRightRadius,scrollWidth:e.scrollWidth,clientWidth:e.clientWidth}});console.log('MOBILE_BADGE_AUDIT '+JSON.stringify({width,badgeAudit}));if(badgeAudit.missing||badgeAudit.x< -1||badgeAudit.right>width+1||badgeAudit.right>badgeAudit.parentRight+2||badgeAudit.scrollWidth>badgeAudit.clientWidth+3)failures.push(width+': clipped mobile campaign badge '+JSON.stringify(badgeAudit));}
+  if(width===390){const heroGeometry=await page.evaluate(()=>{const sels=['.sm-mh-title','.sm-mh-title-line-accent','.sm-mh-subtitle','.sm-mh-cta','.sm-hero-offer-badge-v3','.sm-black47-strip','.sm-sales-dock'];return sels.map(sel=>{const e=document.querySelector(sel);if(!e)return {sel,missing:true};const r=e.getBoundingClientRect(),cs=getComputedStyle(e);return {sel,x:Math.round(r.x),right:Math.round(r.right),width:Math.round(r.width),display:cs.display,visibility:cs.visibility}})});console.log('PREVIEW_HERO_GEOMETRY '+JSON.stringify(heroGeometry));}
   if(width===390){const geom=await page.evaluate(()=>{const sels=['.sm-offer-value-list--unified','.sm-offer-value-item','.sm-offer-value-price','.sm-offer-value-total--simple','.sm-offer-value-bridge','.sm-offer-value-checkout','.sm-offer-value-was--total','.sm-offer-clear-label','.sm-offer-value-final','.sm-offer-value-cta','.sm-side-rail','.sm-mobile-side-rail'];return sels.map(sel=>{const e=document.querySelector(sel);if(!e)return {sel,missing:true};const r=e.getBoundingClientRect(),cs=getComputedStyle(e);return {sel,x:Math.round(r.x),right:Math.round(r.right),width:Math.round(r.width),clientWidth:e.clientWidth,scrollWidth:e.scrollWidth,overflow:cs.overflow,display:cs.display}})});console.log('PREVIEW_OFFER_GEOMETRY '+JSON.stringify(geom));}
   const summary={width,scrollWidth:report.scrollWidth,overflow:report.scrollWidth-width,mainClock:report.mainClock,dockClock:report.dockClock,price:report.price,installments:report.installments,discount:report.discount,components:report.items.length};
   results.push(summary);
@@ -74,7 +75,7 @@ for (const width of widths) {
   }
   
   if(width<=820){const geometry=await page.evaluate(()=>{const sels=['.sm-offer-value-list--unified','.sm-offer-value-bridge','.sm-offer-value-checkout','.sm-offer-value-cta','.sm-offer-value-bridge p'];return sels.map(sel=>{const e=document.querySelector(sel);if(!e)return {sel,missing:true};const r=e.getBoundingClientRect();return {sel,x:r.x,right:r.right,w:r.width}})});for(const g of geometry){if(g.missing||g.x< -2||g.right>width+2)failures.push(width+': clipped offer region '+JSON.stringify(g));}}
-  if(report.price!=='47') failures.push(width+': price not R$57');
+  if(report.price!=='47') failures.push(width+': price not R$47');
   if(!report.installments?.includes('12x de R$ 4,86')) failures.push(width+': installment mismatch');
   if(report.discount!=='80% OFF') failures.push(width+': discount mismatch');
   if(report.mainClock==='--') failures.push(width+': main countdown did not initialize');
