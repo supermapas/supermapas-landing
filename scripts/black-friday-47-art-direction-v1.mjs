@@ -16,13 +16,13 @@ for(const required of ['70% OFF','R$ 223,33','R$ 307,33','12x de R$ 6,93','<stro
 // Creative direction: original composition, clear hero, dark campaign accent and carefully scoped CTA styling.
 const desktop='<section class="sm-desktop-hero" id="inicio-desktop" aria-label="Supermapas de Língua Portuguesa">';
 const mobile='<section class="sm-mobile-hero" id="inicio-mobile" aria-label="Supermapas de Língua Portuguesa">';
-const strip='<div class="sm-black47-strip" role="note" aria-label="Black Antecipada Supermapas, 70% de desconto"><span class="sm-black47-star" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" focusable="false" aria-hidden="true"><path d="M12 2.5 14.9 8.9 22 9.7 16.7 14.5 18.2 21.5 12 17.9 5.8 21.5 7.3 14.5 2 9.7 9.1 8.9Z" fill="currentColor"/></svg></span><strong>BLACK ANTECIPADA</strong><span class="sm-black47-flash">70% OFF</span><span class="sm-black47-tagline">SUPERMAPAS</span></div>';
+const strip='<div class="sm-black47-strip" role="note" aria-label="Black November Supermapas, 70% de desconto"><span class="sm-black47-star" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" focusable="false" aria-hidden="true"><path d="M12 2.5 14.9 8.9 22 9.7 16.7 14.5 18.2 21.5 12 17.9 5.8 21.5 7.3 14.5 2 9.7 9.1 8.9Z" fill="currentColor"/></svg></span><strong>BLACK NOVEMBER</strong><span class="sm-black47-flash">70% OFF</span><span class="sm-black47-tagline">SUPERMAPAS</span></div>';
 once(desktop,desktop+strip,'desktop hero');
 once(mobile,mobile+strip,'mobile hero');
-all('<span>OFERTA ESPECIAL + 2 BÔNUS</span>','<span>BLACK ANTECIPADA + 2 BÔNUS</span>',2);
+all('<span>OFERTA ESPECIAL + 2 BÔNUS</span>','<span>BLACK NOVEMBER + 2 BÔNUS</span>',2);
 once('<span class="sm-mh-title-line sm-mh-title-line-accent">Domine Língua Portuguesa</span>','<span class="sm-mh-title-line sm-mh-title-line-accent"><span class="sm-black47-title-line">Domine Língua</span><span class="sm-black47-title-line">Portuguesa</span></span>','mobile headline composition');
-once('<span class="sm-offer-value-eyebrow">O QUE VOCÊ RECEBE</span>','<span class="sm-offer-value-eyebrow">BLACK ANTECIPADA • O QUE VOCÊ RECEBE</span>','offer eyebrow');
-once('<span class="sm-offer-clear-label">OFERTA VÁLIDA NOS DIAS</span>','<span class="sm-offer-clear-label">BLACK ANTECIPADA • OFERTA ESPECIAL</span>','clock label');
+once('<span class="sm-offer-value-eyebrow">O QUE VOCÊ RECEBE</span>','<span class="sm-offer-value-eyebrow">BLACK NOVEMBER • O QUE VOCÊ RECEBE</span>','offer eyebrow');
+once('<span class="sm-offer-clear-label">OFERTA VÁLIDA NOS DIAS</span>','<span class="sm-offer-clear-label">BLACK NOVEMBER • OFERTA ESPECIAL</span>','clock label');
 // Preserve original user-facing 'TERMINA HOJE'; countdown behavior is unchanged.
 // Preserve original dock label 'TERMINA HOJE'.
 // Preserve original countdown accessibility label.
@@ -149,7 +149,7 @@ let css=[
 '.sm-offer-price-today strong{box-shadow:0 7px 18px rgba(243,106,45,.24)!important;text-shadow:none!important}',
 '.sm-sales-dock .sm-dock-checkout{background:#FF914D!important;border-color:#FF914D!important;color:#24172F!important;-webkit-text-fill-color:#24172F!important;box-shadow:0 4px 14px rgba(243,106,45,.25)!important}',
 '.sm-sales-dock .sm-dock-checkout span,.sm-sales-dock .sm-dock-checkout b{color:#24172F!important;-webkit-text-fill-color:#24172F!important;text-align:center!important}',
-'/* Black Antecipada: optically centered vector star, no baseline offset. */',
+'/* Black November: optically centered vector star, no baseline offset. */',
 '.sm-black47-star{display:grid!important;place-items:center!important;flex:0 0 22px!important;width:22px!important;height:22px!important;line-height:0!important;padding:0!important;vertical-align:middle!important}',
 '.sm-black47-star svg{display:block!important;flex:none!important;width:13px!important;height:13px!important;overflow:visible!important;color:#FFB58A!important;fill:#FFB58A!important;transform:none!important}',
 '.sm-black47-star svg path{fill:currentColor!important}',
@@ -198,9 +198,9 @@ html=html.replaceAll('GARANTIR MEU ACESSO','APROVEITAR A OFERTA')
  .replaceAll('QUERO DOMINAR PORTUGUÊS','APROVEITAR A OFERTA')
  .replaceAll('<span>EU QUERO</span>','<span>QUERO AGORA</span>');
 once('<div class="sm-dock-inventory">98 Supermapas + 50 Super-Resumos + 190 Supercards</div>',
- '<div class="sm-dock-inventory"><strong>BLACK ANTECIPADA</strong><span>98 Supermapas + 50 Super-Resumos + 190 Supercards</span></div>','campaign dock name');
+ '<div class="sm-dock-inventory"><strong>BLACK NOVEMBER</strong><span>98 Supermapas + 50 Super-Resumos + 190 Supercards</span></div>','campaign dock name');
 html=html.replaceAll('aria-label="Oferta termina hoje"><span>TERMINA HOJE</span>',
- 'aria-label="Black Antecipada termina hoje"><span>BLACK ANTECIPADA</span>');
+ 'aria-label="Black November termina hoje"><span>BLACK NOVEMBER</span>');
 html=html.replace('<head>','<head><meta name="robots" content="noindex,nofollow">');
 html=html.replace('</head>',css+'\n</head>');
 // Normalize existing orange accents in generated CSS, including content sections.
@@ -219,4 +219,4 @@ const normalizeCssFiles=dir=>{for(const entry of fs.readdirSync(dir,{withFileTyp
 }};
 normalizeCssFiles(path.dirname(target));
 fs.writeFileSync(target,html);
-console.log('Black Antecipada preview: 70% OFF, R$67, 12x R$6,93, reference R$223,33, total R$307,33; branding, countdown and checkout preserved.');
+console.log('Black November preview: 70% OFF, R$67, 12x R$6,93, reference R$223,33, total R$307,33; branding, countdown and checkout preserved.');

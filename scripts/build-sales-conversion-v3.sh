@@ -48,4 +48,4 @@ node scripts/preview-offer-value-math-correction-v1.mjs dist/index.html
 node scripts/preview-offer-calendar-clock-v1.mjs dist/index.html
 node scripts/black-friday-47-art-direction-v1.mjs dist/index.html
 
-echo 'Black Antecipada R$67 preview: 70% OFF, 12x R$6,93, reference R$223,33 and total R$307,33.'
+echo 'Black November R$67 preview: 70% OFF, 12x R$6,93, reference R$223,33 and total R$307,33.'
