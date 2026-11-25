@@ -7,21 +7,16 @@ let html=fs.readFileSync(target,'utf8');
 const once=(a,b,label)=>{if(html.split(a).length!==2)throw new Error('Expected one '+label);html=html.replace(a,b);};
 const all=(a,b,min=1)=>{const n=html.split(a).length-1;if(n<min)throw new Error('Expected '+min+' occurrences: '+a);html=html.split(a).join(b);return n;};
 
-// Offer mathematics: R$47 / 0.20 = R$235; R$235 + R$37 + R$47 = R$319.
-all('70% OFF','80% OFF',3);
-all('70% de desconto','80% de desconto',1);
-all('Setenta por cento de desconto','Oitenta por cento de desconto',1);
-all('R$ 223,33','R$ 235,00',2);
-all('R$ 307,33','R$ 319,00',3);
-// The arithmetic line is updated by the R$ 223,33 replacement above.
-all('12x de R$ 6,93','12x de R$ 4,86',1);
-once('<div class="sm-offer-value-final"><sup>R$</sup><strong>67</strong><span>,00</span></div>','<div class="sm-offer-value-final"><sup>R$</sup><strong>47</strong><span>,00</span></div>','price');
-// No price claim outside the main checkout price markup.
+// Retain the pre-campaign R$67 / 70% offer while keeping Black campaign branding.
+// R$67 / 0.30 = R$223.33 reference; plus R$37 and R$47 bonuses = R$307.33.
+for(const required of ['70% OFF','R$ 223,33','R$ 307,33','12x de R$ 6,93','<strong>67</strong>']){
+ if(!html.includes(required))throw new Error('Expected restored offer: '+required);
+}
 
 // Creative direction: original composition, clear hero, dark campaign accent and carefully scoped CTA styling.
 const desktop='<section class="sm-desktop-hero" id="inicio-desktop" aria-label="Supermapas de Língua Portuguesa">';
 const mobile='<section class="sm-mobile-hero" id="inicio-mobile" aria-label="Supermapas de Língua Portuguesa">';
-const strip='<div class="sm-black47-strip" role="note" aria-label="Black Antecipada Supermapas, 80% de desconto"><span class="sm-black47-star" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" focusable="false" aria-hidden="true"><path d="M12 2.5 14.9 8.9 22 9.7 16.7 14.5 18.2 21.5 12 17.9 5.8 21.5 7.3 14.5 2 9.7 9.1 8.9Z" fill="currentColor"/></svg></span><strong>BLACK ANTECIPADA</strong><span class="sm-black47-flash">80% OFF</span><span class="sm-black47-tagline">SUPERMAPAS</span></div>';
+const strip='<div class="sm-black47-strip" role="note" aria-label="Black Antecipada Supermapas, 70% de desconto"><span class="sm-black47-star" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" focusable="false" aria-hidden="true"><path d="M12 2.5 14.9 8.9 22 9.7 16.7 14.5 18.2 21.5 12 17.9 5.8 21.5 7.3 14.5 2 9.7 9.1 8.9Z" fill="currentColor"/></svg></span><strong>BLACK ANTECIPADA</strong><span class="sm-black47-flash">70% OFF</span><span class="sm-black47-tagline">SUPERMAPAS</span></div>';
 once(desktop,desktop+strip,'desktop hero');
 once(mobile,mobile+strip,'mobile hero');
 all('<span>OFERTA ESPECIAL + 2 BÔNUS</span>','<span>BLACK ANTECIPADA + 2 BÔNUS</span>',2);
@@ -63,7 +58,7 @@ let css=[
 '.sm-dh-primary,.sm-mh-cta{background:linear-gradient(125deg,#7359df,#5f43c8)!important;color:#fff!important;-webkit-text-fill-color:#fff!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:12px!important;text-align:center!important}',
 '.sm-dh-primary span,.sm-mh-cta span{color:#fff!important;-webkit-text-fill-color:#fff!important;text-align:center!important;line-height:1.15!important;min-width:0!important}',
 '.sm-dh-primary b,.sm-mh-cta b{display:grid!important;place-items:center!important;background:#fff!important;color:#5f43c8!important;-webkit-text-fill-color:#5f43c8!important;line-height:1!important;flex-shrink:0!important}',
-'/* Valuation: no clipped grid on narrow phones; reference and sum follow exact 80% mathematics. */',
+'/* Valuation: no clipped grid on narrow phones; reference and sum follow exact 70% mathematics. */',
 '.sm-offer-value{background:linear-gradient(180deg,#faf7ff 0%,#fff 100%)!important}',
 '.sm-offer-value-eyebrow{background:#f0eaff!important;color:#5b3fbf!important;-webkit-text-fill-color:#5b3fbf!important;border-color:#e2d8ff!important}',
 '.sm-offer-value-list--unified{align-self:start!important}',
@@ -224,4 +219,4 @@ const normalizeCssFiles=dir=>{for(const entry of fs.readdirSync(dir,{withFileTyp
 }};
 normalizeCssFiles(path.dirname(target));
 fs.writeFileSync(target,html);
-console.log('Black Friday 47 preview from Production: 80%, R$47, 12x R$4,86, reference R$235, total R$319; original midnight reset and checkout preserved.');
+console.log('Black Antecipada preview: 70% OFF, R$67, 12x R$6,93, reference R$223,33, total R$307,33; branding, countdown and checkout preserved.');
